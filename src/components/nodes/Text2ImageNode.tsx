@@ -36,13 +36,13 @@ function Text2ImageNode({ id, data }: NodeProps) {
   };
 
   return (
-    <div className="node-card w-[280px] rounded-xl border-2 overflow-hidden
+    <div className="node-card w-70 rounded-xl border-2 overflow-hidden
       bg-node-bg dark:bg-node-bg-dark
       border-node-border dark:border-node-border-dark
       shadow-lg">
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2
-        bg-gradient-to-r from-indigo-500/10 to-purple-500/10
+        bg-linear-to-r from-indigo-500/10 to-purple-500/10
         dark:from-indigo-500/20 dark:to-purple-500/20
         border-b border-border dark:border-border-dark">
         <Type size={14} className="text-accent" />
@@ -68,7 +68,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
             border border-border dark:border-border-dark
             focus:outline-none focus:border-accent
             placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark
-            min-h-[60px] max-h-[200px] overflow-y-auto custom-scrollbar"
+            min-h-15 max-h-50 overflow-y-auto custom-scrollbar"
         />
 
         {/* Grid size selector */}
@@ -122,12 +122,12 @@ function Text2ImageNode({ id, data }: NodeProps) {
       <Handle
         type="target"
         position={Position.Left}
-        className="!w-2.5 !h-2.5"
+        className="w-2.5! h-2.5!"
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="!w-2.5 !h-2.5"
+        className="w-2.5! h-2.5!"
       />
     </div>
   );
