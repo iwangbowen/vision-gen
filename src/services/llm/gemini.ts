@@ -3,21 +3,18 @@ import { LLMServiceError } from './index';
 
 // Gemini image generation models
 export const GEMINI_IMAGE_MODELS = [
+  { label: 'Gemini 3 Pro (Image Preview)', value: 'gemini-3-pro-image-preview' },
   { label: 'Gemini 2.0 Flash (Image Preview)', value: 'gemini-2.0-flash-preview-image-generation' },
   { label: 'Imagen 3.0', value: 'imagen-3.0-generate-001' },
 ] as const;
 
-// Map aspect ratio string to Gemini API format
-function mapAspectRatio(ratio: string | undefined): string {
-  switch (ratio) {
-    case '1:1': return '1:1';
-    case '16:9': return '16:9';
-    case '9:16': return '9:16';
-    case '4:3': return '4:3';
-    case '3:4': return '3:4';
-    case '3:2': return '3:2';
-    case '2:3': return '2:3';
-    default: return '1:1';
+// Map image size from our format to API format
+function mapImageSize(size: string | undefined): string {
+  switch (size) {
+    case '1k': return '1K';
+    case '2k': return '2K';
+    case '4k': return '4K';
+    default: return '1K';
   }
 }
 
@@ -48,7 +45,8 @@ export class GeminiImageService implements LLMService {
       imageCount = size * size;
     }
 
-    const aspectRatio = mapAspectRatio(options.aspectRatio);
+    const aspectRatio = options.aspectRatio || '1:1';
+    const imageSize = mapImageSize(options.size);
 
     // Build prompt with grid context if applicable
     let prompt = options.prompt;
@@ -57,9 +55,9 @@ export class GeminiImageService implements LLMService {
     }
 
     try {
-      // Use Gemini generateContent API (for gemini-2.0-flash-preview-image-generation)
+      // Use Gemini generateContent API
       if (this.model.startsWith('gemini-')) {
-        return await this.generateWithGeminiAPI(prompt, aspectRatio, imageCount);
+        return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, imageCount);
       }
       // Use Imagen API (for imagen-3.0-generate-001)
       return await this.generateWithImagenAPI(prompt, aspectRatio, imageCount);
@@ -74,7 +72,7 @@ export class GeminiImageService implements LLMService {
     }
   }
 
-  private async generateWithGeminiAPI(prompt: string, _aspectRatio: string, imageCount: number): Promise<string | string[]> {
+  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, imageCount: number): Promise<string | string[]> {
     const url = `${this.baseUrl.replace(/\/$/, '')}/models/${this.model}:generateContent?key=${this.apiKey}`;
 
     const allImages: string[] = [];
@@ -93,7 +91,10 @@ export class GeminiImageService implements LLMService {
           }
         ],
         generationConfig: {
-          responseModalities: ['TEXT', 'IMAGE'],
+          imageConfig: {
+            aspectRatio,
+            imageSize,
+          },
         },
       };
 
