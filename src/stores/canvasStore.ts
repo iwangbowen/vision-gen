@@ -200,6 +200,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         aspectRatio,
         size: imageSize,
         gridSize,
+        sourceImage: (data as Image2ImageData).sourceImage,
       });
 
       clearInterval(progressInterval);

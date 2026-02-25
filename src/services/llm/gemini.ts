@@ -54,7 +54,7 @@ export class GeminiImageService implements LLMService {
     }
 
     try {
-      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, imageCount);
+      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, imageCount, options.sourceImage);
     } catch (error) {
       if (error instanceof LLMServiceError) {
         throw error;
@@ -66,7 +66,7 @@ export class GeminiImageService implements LLMService {
     }
   }
 
-  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, imageCount: number): Promise<string | string[]> {
+  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, imageCount: number, sourceImage?: string): Promise<string | string[]> {
     const url = `${this.baseUrl}/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
     const allImages: string[] = [];
@@ -76,12 +76,26 @@ export class GeminiImageService implements LLMService {
         ? `${prompt}\n\nThis is image ${i + 1} of ${imageCount} in the storyboard grid.`
         : prompt;
 
+      const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [{ text: currentPrompt }];
+
+      if (sourceImage) {
+        // Extract base64 data and mime type
+        const regex = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/;
+        const match = regex.exec(sourceImage);
+        if (match) {
+          parts.push({
+            inlineData: {
+              mimeType: match[1],
+              data: match[2]
+            }
+          });
+        }
+      }
+
       const payload = {
         contents: [
           {
-            parts: [
-              { text: currentPrompt }
-            ]
+            parts
           }
         ],
         generationConfig: {
