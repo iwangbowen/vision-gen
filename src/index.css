@@ -55,6 +55,10 @@
   --color-handle: #e8e8e8;
 }
 
+button {
+  cursor: pointer;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
