@@ -1,15 +1,14 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { ImageIcon, Sparkles, Loader2, Settings2, Scissors, Upload, Library, ArrowDownToLine } from 'lucide-react';
+import { ImageIcon, Sparkles, Loader2, Settings2, Scissors, Upload, Library } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
-import { useTimelineStore } from '../../stores/timelineStore';
 import AssetPickerDialog from '../ui/AssetPickerDialog';
+import ImageContextMenu from '../ui/ImageContextMenu';
 import type { Image2ImageData } from '../../types';
 
 function Image2ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as Image2ImageData;
   const { updateNodeData, simulateGenerate, splitGeneratedImage, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
-  const addToTimeline = useTimelineStore((s) => s.addItem);
 
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const [showAssetPicker, setShowAssetPicker] = useState(false);
@@ -71,7 +70,12 @@ function Image2ImageNode({ id, data }: NodeProps) {
       <div className="p-2 space-y-2">
         {/* Source image */}
         {nodeData.sourceImage ? (
-          <div className="w-full rounded-lg overflow-hidden border border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group">
+          <ImageContextMenu
+            image={nodeData.sourceImage}
+            sourceNodeId={id}
+            label={nodeData.label || '参考图'}
+            className="w-full rounded-lg overflow-hidden border border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group"
+          >
             <img src={nodeData.sourceImage} alt="source" className="w-full aspect-video object-cover" />
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
               <button
@@ -91,14 +95,7 @@ function Image2ImageNode({ id, data }: NodeProps) {
                 <Library size={10} />
               </button>
             </div>
-            <button
-              onClick={() => addToTimeline({ id: `timeline_${id}_src_${Date.now()}`, image: nodeData.sourceImage!, sourceNodeId: id, label: nodeData.label || '参考图' })}
-              className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
-              title="添加到轨道"
-            >
-              <ArrowDownToLine size={10} />
-            </button>
-          </div>
+          </ImageContextMenu>
         ) : (
           <div className="w-full rounded-lg border border-dashed border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark">
             <div className="w-full aspect-video flex items-center justify-center gap-2 p-2">
@@ -167,16 +164,14 @@ function Image2ImageNode({ id, data }: NodeProps) {
 
         {nodeData.generatedImage && (
           <div className="space-y-1">
-            <div className="relative group/gen rounded-lg overflow-hidden border border-border dark:border-border-dark">
+            <ImageContextMenu
+              image={nodeData.generatedImage}
+              sourceNodeId={id}
+              label={nodeData.prompt || '生成图片'}
+              className="rounded-lg overflow-hidden border border-border dark:border-border-dark"
+            >
               <img src={nodeData.generatedImage} alt="generated" className="w-full aspect-square object-cover" />
-              <button
-                onClick={() => addToTimeline({ id: `timeline_${id}_gen_${Date.now()}`, image: nodeData.generatedImage!, sourceNodeId: id, label: nodeData.prompt || '生成图片' })}
-                className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white opacity-0 group-hover/gen:opacity-100 transition-opacity hover:bg-black/80"
-                title="添加到轨道"
-              >
-                <ArrowDownToLine size={10} />
-              </button>
-            </div>
+            </ImageContextMenu>
             {nodeData.gridSize && nodeData.gridSize !== '1x1' && (
               <button
                 onClick={() => splitGeneratedImage(id)}
