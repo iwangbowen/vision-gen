@@ -34,7 +34,7 @@ interface CanvasState {
 
   // Add nodes
   addText2ImageNode: (position: { x: number; y: number }) => void;
-  addImage2ImageNode: (position: { x: number; y: number }) => void;
+  addImage2ImageNode: (position: { x: number; y: number }, image?: string, label?: string) => void;
   addImageNode: (position: { x: number; y: number }, image: string, label?: string) => void;
   addGridNode: (position: { x: number; y: number }, gridSize: GridSize, generatedImages?: string[]) => void;
 
@@ -97,19 +97,20 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     set((state) => ({ nodes: [...state.nodes, newNode] }));
   },
 
-  addImage2ImageNode: (position) => {
+  addImage2ImageNode: (position, image, label) => {
     const id = getNodeId();
     const newNode: AppNode = {
       id,
       type: 'image2image',
       position,
       data: {
-        label: '图生图',
+        label: label || '图生图',
         prompt: '',
         status: 'idle',
         gridSize: '1x1',
         aspectRatio: '16:9',
         imageSize: '1k',
+        sourceImage: image,
       },
     };
     set((state) => ({ nodes: [...state.nodes, newNode] }));

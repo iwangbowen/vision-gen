@@ -35,7 +35,6 @@ export default function InfiniteCanvas() {
     onEdgesChange,
     onConnect,
     setSelectedNodeId,
-    addImageNode,
   } = useCanvasStore();
 
   const { theme } = useThemeStore();
@@ -127,9 +126,10 @@ export default function InfiniteCanvas() {
       position.x -= 100;
       position.y -= 112;
 
-      addImageNode(position, image, name);
+      const { addImage2ImageNode } = useCanvasStore.getState();
+      addImage2ImageNode(position, image, name);
     },
-    [addImageNode, screenToFlowPosition],
+    [screenToFlowPosition],
   );
 
   const defaultEdgeOptions = useMemo(
