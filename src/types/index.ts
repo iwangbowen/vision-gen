@@ -12,12 +12,17 @@ export interface Asset {
 }
 
 // ===== Node Data Types =====
+export type AspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:4' | '3:2' | '2:3';
+export type ImageSize = '1k' | '2k' | '4k';
+
 export interface Text2ImageData {
   [key: string]: unknown;
   label: string;
   prompt: string;
   generatedImage?: string;
   gridSize?: GridSize;
+  aspectRatio?: AspectRatio;
+  imageSize?: ImageSize;
   status: 'idle' | 'generating' | 'done';
 }
 
@@ -28,6 +33,8 @@ export interface Image2ImageData {
   sourceImage?: string;
   generatedImage?: string;
   gridSize?: GridSize;
+  aspectRatio?: AspectRatio;
+  imageSize?: ImageSize;
   status: 'idle' | 'generating' | 'done';
 }
 

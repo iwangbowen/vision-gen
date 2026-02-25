@@ -80,6 +80,8 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         label: '文生图',
         prompt: '',
         status: 'idle',
+        aspectRatio: '16:9',
+        imageSize: '1k',
       },
     };
     set((state) => ({ nodes: [...state.nodes, newNode] }));
@@ -95,6 +97,8 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         label: '图生图',
         prompt: '',
         status: 'idle',
+        aspectRatio: '16:9',
+        imageSize: '1k',
       },
     };
     set((state) => ({ nodes: [...state.nodes, newNode] }));
@@ -116,7 +120,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
   addGridNode: (position, gridSize) => {
     const id = getNodeId();
-    const size = parseInt(gridSize[0]);
+    const size = Number.parseInt(gridSize[0]);
     const totalCells = size * size;
     const images = getGridSampleImages(totalCells);
     const cells: GridCell[] = images.map((img, idx) => ({
@@ -156,7 +160,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       if (!node) return;
 
       if (node.type === 'text2image' || node.type === 'image2image') {
-        const data = node.data as Text2ImageData | Image2ImageData;
+        const data = node.data;
         const gridSize = data.gridSize;
 
         if (gridSize && gridSize !== '1x1') {
@@ -179,7 +183,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     if (!node || node.type !== 'grid') return;
 
     const gridData = node.data as unknown as { cells: GridCell[]; gridSize: GridSize };
-    const size = parseInt(gridData.gridSize[0]);
+    const size = Number.parseInt(gridData.gridSize[0]);
     const spacing = 220;
     const startX = node.position.x;
     const startY = node.position.y + 300;
