@@ -1,0 +1,101 @@
+@import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-canvas-bg: #f8f9fa;
+  --color-canvas-bg-dark: #1a1a2e;
+  --color-surface: #ffffff;
+  --color-surface-dark: #16213e;
+  --color-surface-hover: #f0f0f0;
+  --color-surface-hover-dark: #1e2d4a;
+  --color-border: #e2e8f0;
+  --color-border-dark: #2a3a5c;
+  --color-text-primary: #1a1a2e;
+  --color-text-primary-dark: #e8e8e8;
+  --color-text-secondary: #64748b;
+  --color-text-secondary-dark: #94a3b8;
+  --color-accent: #6366f1;
+  --color-accent-hover: #5558e6;
+  --color-node-bg: #ffffff;
+  --color-node-bg-dark: #1e2d4a;
+  --color-node-border: #d1d5db;
+  --color-node-border-dark: #334466;
+  --color-node-selected: #6366f1;
+  --color-handle: #6366f1;
+  --color-toolbar-bg: #ffffff;
+  --color-toolbar-bg-dark: #0f1629;
+  --color-panel-bg: #ffffff;
+  --color-panel-bg-dark: #111827;
+  --color-timeline-bg: #f1f5f9;
+  --color-timeline-bg-dark: #0f172a;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+}
+
+:root {
+  --xy-background-color: var(--color-canvas-bg);
+  --xy-node-background-color: var(--color-node-bg);
+  --xy-node-border-color: var(--color-node-border);
+  --xy-edge-stroke: var(--color-border);
+  --xy-minimap-background-color: var(--color-surface);
+}
+
+.dark {
+  --xy-background-color: var(--color-canvas-bg-dark);
+  --xy-node-background-color: var(--color-node-bg-dark);
+  --xy-node-border-color: var(--color-node-border-dark);
+  --xy-edge-stroke: var(--color-border-dark);
+  --xy-minimap-background-color: var(--color-surface-dark);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #64748b40;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b80;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.react-flow__node.selected .node-card {
+  border-color: var(--color-node-selected) !important;
+  box-shadow: 0 0 0 2px var(--color-node-selected);
+}
+
+.react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+  border: 2px solid var(--color-handle) !important;
+  background: white !important;
+}
+
+.dark .react-flow__handle {
+  background: var(--color-node-bg-dark) !important;
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__background {
+  opacity: 0.5;
+}
