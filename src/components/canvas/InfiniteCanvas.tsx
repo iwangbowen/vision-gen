@@ -16,6 +16,7 @@ import Image2ImageNode from '../nodes/Image2ImageNode';
 import ImageNode from '../nodes/ImageNode';
 import GridNode from '../nodes/GridNode';
 import NodeContextMenu from '../ui/NodeContextMenu';
+import CanvasContextMenu from '../ui/CanvasContextMenu';
 
 const nodeTypes = {
   text2image: Text2ImageNode,
@@ -47,20 +48,34 @@ export default function InfiniteCanvas() {
     y: number;
   } | null>(null);
 
+  const [canvasContextMenu, setCanvasContextMenu] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
   const onNodeContextMenu: NodeMouseHandler = useCallback(
     (event, node) => {
       event.preventDefault();
+      setCanvasContextMenu(null);
       setContextMenu({ nodeId: node.id, x: event.clientX, y: event.clientY });
     },
     [],
   );
 
+  const onPaneContextMenu = useCallback((event: React.MouseEvent | MouseEvent) => {
+    event.preventDefault();
+    setContextMenu(null);
+    setCanvasContextMenu({ x: event.clientX, y: event.clientY });
+  }, []);
+
   const onNodeDragStart = useCallback(() => {
     setContextMenu(null);
+    setCanvasContextMenu(null);
   }, []);
 
   const onPaneClick = useCallback(() => {
     setContextMenu(null);
+    setCanvasContextMenu(null);
   }, []);
 
   const onSelectionChange: OnSelectionChangeFunc = useCallback(
@@ -123,6 +138,7 @@ export default function InfiniteCanvas() {
         onConnect={onConnect}
         onSelectionChange={onSelectionChange}
         onNodeContextMenu={onNodeContextMenu}
+        onPaneContextMenu={onPaneContextMenu}
         onNodeDragStart={onNodeDragStart}
         onPaneClick={onPaneClick}
         onDragOver={onDragOver}
@@ -142,13 +158,13 @@ export default function InfiniteCanvas() {
           variant={BackgroundVariant.Dots}
           gap={20}
           size={1}
-          className="!bg-canvas-bg dark:!bg-canvas-bg-dark"
+          className="bg-canvas-bg! dark:bg-canvas-bg-dark!"
         />
         <Controls
-          className="!bg-surface dark:!bg-surface-dark !border-border dark:!border-border-dark !rounded-lg !shadow-lg [&>button]:!bg-surface [&>button]:dark:!bg-surface-dark [&>button]:!border-border [&>button]:dark:!border-border-dark [&>button]:!text-text-primary [&>button]:dark:!text-text-primary-dark"
+          className="bg-surface! dark:bg-surface-dark! border-border! dark:border-border-dark! rounded-lg! shadow-lg! [&>button]:bg-surface! [&>button]:dark:bg-surface-dark! [&>button]:border-border! [&>button]:dark:border-border-dark! [&>button]:text-text-primary! [&>button]:dark:text-text-primary-dark!"
         />
         <MiniMap
-          className="!bg-surface dark:!bg-surface-dark !border-border dark:!border-border-dark !rounded-lg"
+          className="bg-surface! dark:bg-surface-dark! border-border! dark:border-border-dark! rounded-lg!"
           nodeColor={theme === 'dark' ? '#333333' : '#e8e8e8'}
           maskColor={theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
         />
@@ -159,6 +175,13 @@ export default function InfiniteCanvas() {
           x={contextMenu.x}
           y={contextMenu.y}
           onClose={() => setContextMenu(null)}
+        />
+      )}
+      {canvasContextMenu && (
+        <CanvasContextMenu
+          x={canvasContextMenu.x}
+          y={canvasContextMenu.y}
+          onClose={() => setCanvasContextMenu(null)}
         />
       )}
     </div>
