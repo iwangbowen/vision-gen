@@ -62,7 +62,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   onConnect: (connection) =>
     set((state) => ({
       edges: addEdge(
-        { ...connection, animated: true, style: { stroke: '#6366f1', strokeWidth: 2 } },
+        { ...connection, animated: true, style: { stroke: '#8b5cf6', strokeWidth: 2 } },
         state.edges
       ),
     })),

@@ -71,7 +71,7 @@ export default function InfiniteCanvas() {
   const defaultEdgeOptions = useMemo(
     () => ({
       animated: true,
-      style: { stroke: '#6366f1', strokeWidth: 2 },
+      style: { stroke: '#8b5cf6', strokeWidth: 2 },
     }),
     [],
   );
@@ -90,6 +90,10 @@ export default function InfiniteCanvas() {
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
+        fitViewOptions={{ maxZoom: 0.6, padding: 0.3 }}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
+        minZoom={0.1}
+        maxZoom={2}
         snapToGrid
         snapGrid={[16, 16]}
         deleteKeyCode={['Backspace', 'Delete']}
@@ -107,7 +111,7 @@ export default function InfiniteCanvas() {
         />
         <MiniMap
           className="!bg-surface dark:!bg-surface-dark !border-border dark:!border-border-dark !rounded-lg"
-          nodeColor="#6366f1"
+          nodeColor="#8b5cf6"
           maskColor="rgba(0,0,0,0.1)"
         />
       </ReactFlow>
