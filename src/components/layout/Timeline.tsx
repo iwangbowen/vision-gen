@@ -189,9 +189,9 @@ export default function Timeline() {
             {Array.from({ length: Math.max(20, Math.max(...items.map(i => i.position ?? 0)) + 5) }).map((_, i) => (
               <div
                 key={`empty-slot-${i}`}
-                className="w-16 h-16 rounded-lg border-2 border-dashed border-border/50 dark:border-border-dark/50 flex items-center justify-center shrink-0"
+                className="w-16 h-16 rounded-lg border-2 border-dashed border-border/80 dark:border-border-dark/50 bg-surface/50 dark:bg-transparent flex items-center justify-center shrink-0"
               >
-                <span className="text-[8px] text-text-secondary/30 dark:text-text-secondary-dark/30">#{i + 1}</span>
+                <span className="text-[8px] text-text-secondary/50 dark:text-text-secondary-dark/30">#{i + 1}</span>
               </div>
             ))}
 
