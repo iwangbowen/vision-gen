@@ -86,7 +86,7 @@ body {
 
 .react-flow__node.selected .node-card {
   border-color: var(--color-node-selected) !important;
-  box-shadow: 0 0 0 2px var(--color-node-selected);
+  box-shadow: 0 0 0 1px var(--color-node-selected);
 }
 
 .react-flow__handle {
