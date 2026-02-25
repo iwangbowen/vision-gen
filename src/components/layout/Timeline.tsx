@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   X,
   Download,
@@ -11,8 +11,33 @@ import {
 import { useTimelineStore } from '../../stores/timelineStore';
 
 export default function Timeline() {
-  const { items, removeItem, clearTimeline } = useTimelineStore();
+  const { items, removeItem, reorderItems, clearTimeline } = useTimelineStore();
   const [collapsed, setCollapsed] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
+
+  const handleDragStart = useCallback((e: React.DragEvent, idx: number) => {
+    setDragIndex(idx);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(idx));
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDropIndex(idx);
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    if (dragIndex !== null && dropIndex !== null && dragIndex !== dropIndex) {
+      const newItems = [...items];
+      const [dragged] = newItems.splice(dragIndex, 1);
+      newItems.splice(dropIndex, 0, dragged);
+      reorderItems(newItems.map((item, idx) => ({ ...item, order: idx })));
+    }
+    setDragIndex(null);
+    setDropIndex(null);
+  }, [dragIndex, dropIndex, items, reorderItems]);
 
   return (
     <div
@@ -74,7 +99,13 @@ export default function Timeline() {
             items.map((item, idx) => (
               <div
                 key={item.id}
-                className="flex-shrink-0 group relative"
+                draggable
+                onDragStart={(e) => handleDragStart(e, idx)}
+                onDragOver={(e) => handleDragOver(e, idx)}
+                onDragEnd={handleDragEnd}
+                className={`shrink-0 group relative transition-transform ${
+                  dragIndex === idx ? 'opacity-50' : ''
+                } ${dropIndex === idx && dragIndex !== idx ? 'scale-110' : ''}`}
               >
                 {/* Frame number */}
                 <div className="absolute -top-0.5 left-1 text-[8px] font-bold text-text-secondary dark:text-text-secondary-dark z-10">
