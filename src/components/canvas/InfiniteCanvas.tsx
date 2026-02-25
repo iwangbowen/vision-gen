@@ -55,6 +55,10 @@ export default function InfiniteCanvas() {
     [],
   );
 
+  const onNodeDragStart = useCallback(() => {
+    setContextMenu(null);
+  }, []);
+
   const onPaneClick = useCallback(() => {
     setContextMenu(null);
   }, []);
@@ -116,6 +120,7 @@ export default function InfiniteCanvas() {
         onConnect={onConnect}
         onSelectionChange={onSelectionChange}
         onNodeContextMenu={onNodeContextMenu}
+        onNodeDragStart={onNodeDragStart}
         onPaneClick={onPaneClick}
         onDragOver={onDragOver}
         onDrop={onDrop}
