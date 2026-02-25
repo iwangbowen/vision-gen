@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import ThemeToggle from '../ui/ThemeToggle';
 import SettingsDialog from '../ui/SettingsDialog';
+import NotificationCenter from '../ui/NotificationCenter';
 import { useCanvasStore } from '../../stores/canvasStore';
 import type { GridSize } from '../../types';
 
@@ -136,6 +137,7 @@ export default function Toolbar({
 
       {/* Right section */}
       <div className="flex items-center gap-2">
+        <NotificationCenter />
         <button
           onClick={() => setSettingsOpen(true)}
           className="p-2 rounded-lg transition-colors

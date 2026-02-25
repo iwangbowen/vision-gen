@@ -17,6 +17,8 @@ import type {
 } from '../types';
 import { getRandomSampleImage, getGridSampleImages } from '../utils/sampleData';
 
+import { useTaskStore } from './taskStore';
+
 interface CanvasState {
   nodes: AppNode[];
   edges: AppEdge[];
@@ -163,14 +165,31 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const node = get().nodes.find((n) => n.id === nodeId);
     if (!node) return;
 
+    const data = node.data as Text2ImageData | Image2ImageData;
+    const prompt = data.prompt || '';
+    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+
+    useTaskStore.getState().addTask({
+      id: taskId,
+      nodeId,
+      type: node.type as 'text2image' | 'image2image',
+      prompt,
+    });
+
     updateNodeData(nodeId, { status: 'generating' } as Partial<Text2ImageData>);
+
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
+      if (task?.status === 'generating' && task.progress < 90) {
+        useTaskStore.getState().updateTask(taskId, { progress: task.progress + Math.floor(Math.random() * 10) + 5 });
+      }
+    }, 500);
 
     try {
       const { getLLMService } = await import('../services/llm/factory');
       const llmService = getLLMService();
 
-      const data = node.data as Text2ImageData | Image2ImageData;
-      const prompt = data.prompt || '';
       const aspectRatio = data.aspectRatio || '1:1';
       const imageSize = data.imageSize || '1k';
       const gridSize = data.gridSize || '1x1';
@@ -182,6 +201,9 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         size: imageSize,
         gridSize,
       });
+
+      clearInterval(progressInterval);
+      useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
 
       if (gridSize && gridSize !== '1x1') {
         // Generate grid node with real images
@@ -203,6 +225,9 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       // If API key is not configured, fallback to simulation for demo purposes
       if (errorMessage.includes('not configured')) {
         setTimeout(() => {
+          clearInterval(progressInterval);
+          useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+
           const node = get().nodes.find((n) => n.id === nodeId);
           if (!node) return;
 
@@ -222,6 +247,8 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
           }
         }, 1500);
       } else {
+        clearInterval(progressInterval);
+        useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
         alert(`生成图片失败: ${errorMessage}`);
         updateNodeData(nodeId, { status: 'idle' } as Partial<Text2ImageData>);
       }
