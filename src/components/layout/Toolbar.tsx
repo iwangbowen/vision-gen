@@ -69,9 +69,12 @@ export default function Toolbar({
 
         <div className="w-px h-6 bg-border dark:bg-border-dark mx-1" />
 
-        <span className="text-sm font-semibold text-text-primary dark:text-text-primary-dark tracking-wide">
-          InstaVideo
-        </span>
+        <div className="flex items-center gap-1.5">
+          <img src="/favicon.svg" alt="InstaVideo Logo" className="w-5 h-5" />
+          <span className="text-sm font-semibold text-text-primary dark:text-text-primary-dark tracking-wide">
+            InstaVideo
+          </span>
+        </div>
       </div>
 
       {/* Center section - tools */}
