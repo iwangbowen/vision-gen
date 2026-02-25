@@ -8,8 +8,10 @@ import {
   PanelRightOpen,
   PanelRightClose,
   ChevronDown,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 import ThemeToggle from '../ui/ThemeToggle';
+import SettingsDialog from '../ui/SettingsDialog';
 import { useCanvasStore } from '../../stores/canvasStore';
 import type { GridSize } from '../../types';
 
@@ -36,6 +38,7 @@ export default function Toolbar({
 }: ToolbarProps) {
   const { addText2ImageNode, addImage2ImageNode, addGridNode } = useCanvasStore();
   const [gridMenuOpen, setGridMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleAddText2Image = useCallback(() => {
     addText2ImageNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 });
@@ -133,6 +136,15 @@ export default function Toolbar({
 
       {/* Right section */}
       <div className="flex items-center gap-2">
+        <button
+          onClick={() => setSettingsOpen(true)}
+          className="p-2 rounded-lg transition-colors
+            hover:bg-surface-hover dark:hover:bg-surface-hover-dark
+            text-text-secondary dark:text-text-secondary-dark"
+          title="设置"
+        >
+          <SettingsIcon size={18} />
+        </button>
         <ThemeToggle />
         <div className="w-px h-6 bg-border dark:bg-border-dark mx-1" />
         <button
@@ -145,6 +157,8 @@ export default function Toolbar({
           {rightPanelOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
         </button>
       </div>
+
+      <SettingsDialog isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 }

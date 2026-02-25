@@ -34,7 +34,7 @@ interface CanvasState {
   addText2ImageNode: (position: { x: number; y: number }) => void;
   addImage2ImageNode: (position: { x: number; y: number }) => void;
   addImageNode: (position: { x: number; y: number }, image: string, label?: string) => void;
-  addGridNode: (position: { x: number; y: number }, gridSize: GridSize) => void;
+  addGridNode: (position: { x: number; y: number }, gridSize: GridSize, generatedImages?: string[]) => void;
 
   // Node actions
   updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData>) => void;
@@ -124,11 +124,13 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     set((state) => ({ nodes: [...state.nodes, newNode] }));
   },
 
-  addGridNode: (position, gridSize) => {
+  addGridNode: (position, gridSize, generatedImages) => {
     const id = getNodeId();
     const size = Number.parseInt(gridSize[0]);
     const totalCells = size * size;
-    const images = getGridSampleImages(totalCells);
+    const images = generatedImages && generatedImages.length === totalCells
+      ? generatedImages
+      : getGridSampleImages(totalCells);
     const cells: GridCell[] = images.map((img, idx) => ({
       id: `${id}_cell_${idx}`,
       image: img,
@@ -156,31 +158,73 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       ) as AppNode[],
     })),
 
-  simulateGenerate: (nodeId) => {
+  simulateGenerate: async (nodeId) => {
     const { updateNodeData } = get();
+    const node = get().nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+
     updateNodeData(nodeId, { status: 'generating' } as Partial<Text2ImageData>);
 
-    // Simulate generation delay
-    setTimeout(() => {
-      const node = get().nodes.find((n) => n.id === nodeId);
-      if (!node) return;
+    try {
+      const { getLLMService } = await import('../services/llm/factory');
+      const llmService = getLLMService();
 
-      if (node.type === 'text2image' || node.type === 'image2image') {
-        const data = node.data;
-        const gridSize = data.gridSize;
+      const data = node.data as Text2ImageData | Image2ImageData;
+      const prompt = data.prompt || '';
+      const aspectRatio = data.aspectRatio || '1:1';
+      const imageSize = data.imageSize || '1k';
 
-        if (gridSize && gridSize !== '1x1') {
-          // Generate grid node instead
-          const { addGridNode } = get();
-          const pos = { x: node.position.x + 350, y: node.position.y };
-          addGridNode(pos, gridSize);
-          updateNodeData(nodeId, { status: 'done', generatedImage: getRandomSampleImage() } as Partial<Text2ImageData>);
-        } else {
-          const image = getRandomSampleImage();
-          updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
-        }
+      // Call the actual LLM service
+      const generatedImage = await llmService.generateImage({
+        prompt,
+        aspectRatio,
+        size: imageSize,
+      });
+
+      const gridSize = data.gridSize;
+
+      if (gridSize && gridSize !== '1x1') {
+        // Generate grid node instead
+        const { addGridNode } = get();
+        const pos = { x: node.position.x + 350, y: node.position.y };
+        addGridNode(pos, gridSize);
+        updateNodeData(nodeId, { status: 'done', generatedImage } as Partial<Text2ImageData>);
+      } else {
+        updateNodeData(nodeId, { status: 'done', generatedImage } as Partial<Text2ImageData>);
       }
-    }, 1500);
+    } catch (error) {
+      console.error('Failed to generate image:', error);
+
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      // If API key is not configured, fallback to simulation for demo purposes
+      if (errorMessage.includes('not configured')) {
+        setTimeout(() => {
+          const node = get().nodes.find((n) => n.id === nodeId);
+          if (!node) return;
+
+          if (node.type === 'text2image' || node.type === 'image2image') {
+            const data = node.data;
+            const gridSize = data.gridSize;
+
+            if (gridSize && gridSize !== '1x1') {
+              // Generate grid node instead
+              const { addGridNode } = get();
+              const pos = { x: node.position.x + 350, y: node.position.y };
+              addGridNode(pos, gridSize);
+              updateNodeData(nodeId, { status: 'done', generatedImage: getRandomSampleImage() } as Partial<Text2ImageData>);
+            } else {
+              const image = getRandomSampleImage();
+              updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
+            }
+          }
+        }, 1500);
+      } else {
+        // Show error to user and reset status
+        alert(`生成图片失败: ${errorMessage}`);
+        updateNodeData(nodeId, { status: 'idle' } as Partial<Text2ImageData>);
+      }
+    }
   },
 
   splitGridNode: (nodeId) => {
