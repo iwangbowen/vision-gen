@@ -18,26 +18,26 @@ function ImageNode({ id, data }: NodeProps) {
   };
 
   return (
-    <div className="node-card w-[200px] rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
-        <div className="flex items-center gap-1.5">
-          <ImageIcon size={12} className="text-amber-500" />
-          <span className="text-[11px] font-semibold text-text-primary dark:text-text-primary-dark truncate max-w-[120px]">
+    <div className="node-card w-44 rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
+      {/* Header - compact */}
+      <div className="flex items-center justify-between px-2 py-1 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
+        <div className="flex items-center gap-1">
+          <ImageIcon size={10} className="text-amber-500" />
+          <span className="text-[10px] font-medium text-text-primary dark:text-text-primary-dark truncate max-w-25">
             {nodeData.label}
           </span>
         </div>
         <button
           onClick={handleAddToTimeline}
-          className="p-1 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark hover:text-accent transition-colors"
+          className="p-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark hover:text-accent transition-colors"
           title="添加到轨道"
         >
-          <ArrowDownToLine size={12} />
+          <ArrowDownToLine size={10} />
         </button>
       </div>
 
       {/* Image */}
-      <div className="p-2">
+      <div className="p-1.5">
         <div className="rounded-lg overflow-hidden">
           <img
             src={nodeData.image}
