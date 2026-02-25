@@ -68,20 +68,20 @@ export default function Toolbar({
       <div className="flex items-center gap-1">
         <button
           onClick={handleAddText2Image}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
+          className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors
             bg-accent/10 text-accent hover:bg-accent/20"
         >
           <Type size={16} />
-          文生图
+          <span className="hidden sm:inline">文生图</span>
         </button>
 
         <button
           onClick={handleAddImage2Image}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
+          className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors
             bg-accent/10 text-accent hover:bg-accent/20"
         >
           <ImageIcon size={16} />
-          图生图
+          <span className="hidden sm:inline">图生图</span>
         </button>
       </div>
 
