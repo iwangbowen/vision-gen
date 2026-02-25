@@ -5,18 +5,18 @@ import { useTimelineStore } from '../../stores/timelineStore';
 import type { ImageData, GridData, GridCell } from '../../types';
 
 interface ContextMenuProps {
-  readonly nodeId: string;
+  readonly nodeIds: string[];
   readonly x: number;
   readonly y: number;
   readonly onClose: () => void;
 }
 
-export default function NodeContextMenu({ nodeId, x, y, onClose }: ContextMenuProps) {
+export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { nodes, removeNode, duplicateNode, splitGridNode } = useCanvasStore();
+  const { nodes, removeNodes, duplicateNodes, splitGridNode } = useCanvasStore();
   const { addItem } = useTimelineStore();
 
-  const node = nodes.find((n) => n.id === nodeId);
+  const targetNodes = nodes.filter((n) => nodeIds.includes(n.id));
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -35,50 +35,59 @@ export default function NodeContextMenu({ nodeId, x, y, onClose }: ContextMenuPr
     };
   }, [onClose]);
 
-  if (!node) return null;
+  if (targetNodes.length === 0) return null;
+
+  const isSingleNode = targetNodes.length === 1;
+  const node = isSingleNode ? targetNodes[0] : null;
 
   const handleDuplicate = () => {
-    duplicateNode(nodeId);
+    duplicateNodes(nodeIds);
     onClose();
   };
 
   const handleDelete = () => {
-    removeNode(nodeId);
+    removeNodes(nodeIds);
     onClose();
   };
 
   const handleAddToTimeline = () => {
-    if (node.type === 'image') {
-      const data = node.data as unknown as ImageData;
-      addItem({
-        id: `timeline_${nodeId}_${Date.now()}`,
-        image: data.image,
-        sourceNodeId: nodeId,
-        label: data.label,
-      });
-    }
+    targetNodes.forEach(n => {
+      if (n.type === 'image') {
+        const data = n.data as unknown as ImageData;
+        addItem({
+          id: `timeline_${n.id}_${Date.now()}`,
+          image: data.image,
+          sourceNodeId: n.id,
+          label: data.label,
+        });
+      }
+    });
     onClose();
   };
 
   const handleSplitGrid = () => {
-    splitGridNode(nodeId);
+    if (isSingleNode && node?.type === 'grid') {
+      splitGridNode(node.id);
+    }
     onClose();
   };
 
   const handleAddGridCellsToTimeline = () => {
-    if (node.type === 'grid') {
+    if (isSingleNode && node?.type === 'grid') {
       const data = node.data as unknown as GridData;
       data.cells.forEach((cell: GridCell) => {
         addItem({
-          id: `timeline_${nodeId}_cell_${cell.id}_${Date.now()}`,
+          id: `timeline_${node.id}_cell_${cell.id}_${Date.now()}`,
           image: cell.image,
-          sourceNodeId: nodeId,
+          sourceNodeId: node.id,
           label: `分镜 ${cell.row + 1}-${cell.col + 1}`,
         });
       });
     }
     onClose();
   };
+
+  const hasImageNodes = targetNodes.some(n => n.type === 'image');
 
   return (
     <div
@@ -96,11 +105,11 @@ export default function NodeContextMenu({ nodeId, x, y, onClose }: ContextMenuPr
           hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
       >
         <Copy size={14} />
-        复制节点
+        {isSingleNode ? '复制节点' : `复制 ${targetNodes.length} 个节点`}
       </button>
 
       {/* Add to timeline - image node */}
-      {node.type === 'image' && (
+      {hasImageNodes && (
         <button
           onClick={handleAddToTimeline}
           className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors
@@ -108,12 +117,12 @@ export default function NodeContextMenu({ nodeId, x, y, onClose }: ContextMenuPr
             hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
         >
           <ArrowDownToLine size={14} />
-          添加到轨道
+          {isSingleNode ? '添加到轨道' : '将图片节点添加到轨道'}
         </button>
       )}
 
       {/* Grid-specific actions */}
-      {node.type === 'grid' && (
+      {isSingleNode && node?.type === 'grid' && (
         <>
           <button
             onClick={handleSplitGrid}
@@ -146,7 +155,7 @@ export default function NodeContextMenu({ nodeId, x, y, onClose }: ContextMenuPr
           text-red-500 hover:bg-red-500/10"
       >
         <Trash2 size={14} />
-        删除节点
+        {isSingleNode ? '删除节点' : `删除 ${targetNodes.length} 个节点`}
       </button>
     </div>
   );

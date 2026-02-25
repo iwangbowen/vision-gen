@@ -44,7 +44,9 @@ interface CanvasState {
   splitGridNode: (nodeId: string) => void;
   splitGeneratedImage: (nodeId: string) => Promise<void>;
   duplicateNode: (nodeId: string) => void;
+  duplicateNodes: (nodeIds: string[]) => void;
   removeNode: (nodeId: string) => void;
+  removeNodes: (nodeIds: string[]) => void;
 }
 
 let nodeIdCounter = 0;
@@ -366,9 +368,31 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     set((s) => ({ nodes: [...s.nodes, newNode] }));
   },
 
+  duplicateNodes: (nodeIds) => {
+    const state = get();
+    const nodesToDuplicate = state.nodes.filter((n) => nodeIds.includes(n.id));
+    if (nodesToDuplicate.length === 0) return;
+
+    const newNodes: AppNode[] = nodesToDuplicate.map((node) => ({
+      ...node,
+      id: getNodeId(),
+      position: { x: node.position.x + 50, y: node.position.y + 50 },
+      data: { ...node.data },
+      selected: false,
+    } as AppNode));
+
+    set((s) => ({ nodes: [...s.nodes, ...newNodes] }));
+  },
+
   removeNode: (nodeId) =>
     set((state) => ({
       nodes: state.nodes.filter((n) => n.id !== nodeId),
       edges: state.edges.filter((e) => e.source !== nodeId && e.target !== nodeId),
+    })),
+
+  removeNodes: (nodeIds) =>
+    set((state) => ({
+      nodes: state.nodes.filter((n) => !nodeIds.includes(n.id)),
+      edges: state.edges.filter((e) => !nodeIds.includes(e.source) && !nodeIds.includes(e.target)),
     })),
 }));

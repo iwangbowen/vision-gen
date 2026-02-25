@@ -45,7 +45,7 @@ export default function InfiniteCanvas() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   const [contextMenu, setContextMenu] = useState<{
-    nodeId: string;
+    nodeIds: string[];
     x: number;
     y: number;
   } | null>(null);
@@ -59,7 +59,17 @@ export default function InfiniteCanvas() {
     (event, node) => {
       event.preventDefault();
       setCanvasContextMenu(null);
-      setContextMenu({ nodeId: node.id, x: event.clientX, y: event.clientY });
+
+      const { nodes } = useCanvasStore.getState();
+      const selectedNodes = nodes.filter(n => n.selected);
+      const isSelected = selectedNodes.some(n => n.id === node.id);
+
+      let targetNodeIds = [node.id];
+      if (isSelected && selectedNodes.length > 1) {
+        targetNodeIds = selectedNodes.map(n => n.id);
+      }
+
+      setContextMenu({ nodeIds: targetNodeIds, x: event.clientX, y: event.clientY });
     },
     [],
   );
@@ -153,7 +163,7 @@ export default function InfiniteCanvas() {
         snapToGrid
         snapGrid={[16, 16]}
         deleteKeyCode={['Backspace', 'Delete']}
-        multiSelectionKeyCode="Shift"
+        multiSelectionKeyCode={['Shift', 'Control', 'Meta']}
         className="bg-canvas-bg dark:bg-canvas-bg-dark"
       >
         <Background
@@ -173,7 +183,7 @@ export default function InfiniteCanvas() {
       </ReactFlow>
       {contextMenu && (
         <NodeContextMenu
-          nodeId={contextMenu.nodeId}
+          nodeIds={contextMenu.nodeIds}
           x={contextMenu.x}
           y={contextMenu.y}
           onClose={() => setContextMenu(null)}
