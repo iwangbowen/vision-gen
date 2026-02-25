@@ -14,10 +14,10 @@ import NotificationCenter from '../ui/NotificationCenter';
 import { useCanvasStore } from '../../stores/canvasStore';
 
 interface ToolbarProps {
-  leftPanelOpen: boolean;
-  rightPanelOpen: boolean;
-  onToggleLeftPanel: () => void;
-  onToggleRightPanel: () => void;
+  readonly leftPanelOpen: boolean;
+  readonly rightPanelOpen: boolean;
+  readonly onToggleLeftPanel: () => void;
+  readonly onToggleRightPanel: () => void;
 }
 
 export default function Toolbar({

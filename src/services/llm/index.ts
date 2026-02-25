@@ -8,7 +8,7 @@ export interface GenerateImageOptions {
 }
 
 export interface LLMService {
-  generateImage(options: GenerateImageOptions): Promise<string | string[]>;
+  generateImage(options: GenerateImageOptions): Promise<string>;
 }
 
 export class LLMServiceError extends Error {

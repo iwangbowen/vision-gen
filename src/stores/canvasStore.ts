@@ -40,8 +40,9 @@ interface CanvasState {
 
   // Node actions
   updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData>) => void;
-  simulateGenerate: (nodeId: string) => void;
+  simulateGenerate: (nodeId: string) => Promise<void>;
   splitGridNode: (nodeId: string) => void;
+  splitGeneratedImage: (nodeId: string) => Promise<void>;
   duplicateNode: (nodeId: string) => void;
   removeNode: (nodeId: string) => void;
 }
@@ -130,7 +131,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const id = getNodeId();
     const size = Number.parseInt(gridSize[0]);
     const totalCells = size * size;
-    const images = generatedImages && generatedImages.length === totalCells
+    const images = generatedImages?.length === totalCells
       ? generatedImages
       : getGridSampleImages(totalCells);
     const cells: GridCell[] = images.map((img, idx) => ({
@@ -206,18 +207,16 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       clearInterval(progressInterval);
       useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
 
-      if (gridSize && gridSize !== '1x1') {
-        // Generate grid node with real images
-        const { addGridNode } = get();
-        const pos = { x: node.position.x + 350, y: node.position.y };
-        const images = Array.isArray(result) ? result : [result];
-        addGridNode(pos, gridSize, images);
-        const firstImage = Array.isArray(result) ? result[0] : result;
-        updateNodeData(nodeId, { status: 'done', generatedImage: firstImage } as Partial<Text2ImageData>);
+      // Always store as single generatedImage on the node (even for grid sizes)
+      let image: string;
+      if (typeof result === 'string') {
+        image = result;
+      } else if (Array.isArray(result)) {
+        image = result[0];
       } else {
-        const image = Array.isArray(result) ? result[0] : result;
-        updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
+        image = String(result);
       }
+      updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
     } catch (error) {
       console.error('Failed to generate image:', error);
 
@@ -233,18 +232,8 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
           if (!node) return;
 
           if (node.type === 'text2image' || node.type === 'image2image') {
-            const data = node.data;
-            const gridSize = data.gridSize;
-
-            if (gridSize && gridSize !== '1x1') {
-              const { addGridNode } = get();
-              const pos = { x: node.position.x + 350, y: node.position.y };
-              addGridNode(pos, gridSize);
-              updateNodeData(nodeId, { status: 'done', generatedImage: getRandomSampleImage() } as Partial<Text2ImageData>);
-            } else {
-              const image = getRandomSampleImage();
-              updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
-            }
+            const image = getRandomSampleImage();
+            updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
           }
         }, 1500);
       } else {
@@ -281,6 +270,69 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     }));
 
     set((state) => ({ nodes: [...state.nodes, ...newNodes] }));
+  },
+
+  splitGeneratedImage: async (nodeId) => {
+    const state = get();
+    const node = state.nodes.find((n) => n.id === nodeId);
+    if (!node || (node.type !== 'text2image' && node.type !== 'image2image')) return;
+
+    const data = node.data;
+    const generatedImage = (data as Text2ImageData).generatedImage;
+    const gridSize = (data as Text2ImageData).gridSize;
+    if (!generatedImage || !gridSize || gridSize === '1x1') return;
+
+    const size = Number.parseInt(gridSize[0]);
+
+    // Load image and split using Canvas API
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    const splitImages = await new Promise<string[]>((resolve, reject) => {
+      img.onload = () => {
+        const cellWidth = Math.floor(img.width / size);
+        const cellHeight = Math.floor(img.height / size);
+        const results: string[] = [];
+
+        for (let row = 0; row < size; row++) {
+          for (let col = 0; col < size; col++) {
+            const canvas = document.createElement('canvas');
+            canvas.width = cellWidth;
+            canvas.height = cellHeight;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) continue;
+            ctx.drawImage(
+              img,
+              col * cellWidth, row * cellHeight, cellWidth, cellHeight,
+              0, 0, cellWidth, cellHeight
+            );
+            results.push(canvas.toDataURL('image/png'));
+          }
+        }
+        resolve(results);
+      };
+      img.onerror = () => reject(new Error('Failed to load image for splitting'));
+      img.src = generatedImage;
+    });
+
+    const spacing = 220;
+    const startX = node.position.x;
+    const startY = node.position.y + 500;
+
+    const newNodes: AppNode[] = splitImages.map((imgSrc, idx) => ({
+      id: getNodeId(),
+      type: 'image' as const,
+      position: {
+        x: startX + (idx % size) * spacing,
+        y: startY + Math.floor(idx / size) * spacing,
+      },
+      data: {
+        label: `分镜 ${Math.floor(idx / size) + 1}-${(idx % size) + 1}`,
+        image: imgSrc,
+      },
+    }));
+
+    set((s) => ({ nodes: [...s.nodes, ...newNodes] }));
   },
 
   duplicateNode: (nodeId) => {

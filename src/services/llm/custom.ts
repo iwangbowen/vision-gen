@@ -12,7 +12,7 @@ export class CustomImageService implements LLMService {
     this.model = model;
   }
 
-  async generateImage(options: GenerateImageOptions): Promise<string | string[]> {
+  async generateImage(options: GenerateImageOptions): Promise<string> {
     if (!this.apiKey || !this.baseUrl) {
       throw new LLMServiceError('Custom API Key or Base URL is not configured');
     }

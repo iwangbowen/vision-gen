@@ -32,29 +32,23 @@ export class GeminiImageService implements LLMService {
     this.model = model;
   }
 
-  async generateImage(options: GenerateImageOptions): Promise<string | string[]> {
+  async generateImage(options: GenerateImageOptions): Promise<string> {
     if (!this.apiKey) {
       throw new LLMServiceError('Gemini API Key is not configured');
-    }
-
-    // Determine how many images to generate
-    let imageCount = 1;
-    if (options.gridSize && options.gridSize !== '1x1') {
-      const size = parseInt(options.gridSize[0], 10);
-      imageCount = size * size;
     }
 
     const aspectRatio = options.aspectRatio || '1:1';
     const imageSize = mapImageSize(options.size);
 
-    // Build prompt with grid context if applicable
+    // Build prompt — include grid context so the LLM returns a single composite grid image
     let prompt = options.prompt;
-    if (imageCount > 1) {
-      prompt = `Generate a set of ${imageCount} distinct images for a storyboard grid. Each image should be a variation of the following scene but with slightly different compositions or angles. Scene description: ${options.prompt}`;
+    if (options.gridSize && options.gridSize !== '1x1') {
+      const size = Number.parseInt(options.gridSize[0], 10);
+      prompt = `Generate a single image that is a ${options.gridSize} grid layout (${size} rows × ${size} columns) of distinct scenes. Each cell should show a different variation of the following description with different compositions or angles. Description: ${options.prompt}`;
     }
 
     try {
-      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, imageCount, options.sourceImage);
+      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, options.sourceImage);
     } catch (error) {
       if (error instanceof LLMServiceError) {
         throw error;
@@ -66,69 +60,55 @@ export class GeminiImageService implements LLMService {
     }
   }
 
-  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, imageCount: number, sourceImage?: string): Promise<string | string[]> {
+  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, sourceImage?: string): Promise<string> {
     const url = `${this.baseUrl}/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
-    const allImages: string[] = [];
+    const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [{ text: prompt }];
 
-    for (let i = 0; i < imageCount; i++) {
-      const currentPrompt = imageCount > 1
-        ? `${prompt}\n\nThis is image ${i + 1} of ${imageCount} in the storyboard grid.`
-        : prompt;
-
-      const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [{ text: currentPrompt }];
-
-      if (sourceImage) {
-        // Extract base64 data and mime type
-        const regex = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/;
-        const match = regex.exec(sourceImage);
-        if (match) {
-          parts.push({
-            inlineData: {
-              mimeType: match[1],
-              data: match[2]
-            }
-          });
-        }
-      }
-
-      const payload = {
-        contents: [
-          {
-            parts
+    if (sourceImage) {
+      const regex = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/;
+      const match = regex.exec(sourceImage);
+      if (match) {
+        parts.push({
+          inlineData: {
+            mimeType: match[1],
+            data: match[2]
           }
-        ],
-        generationConfig: {
-          imageConfig: {
-            aspectRatio,
-            imageSize,
-          },
+        });
+      }
+    }
+
+    const payload = {
+      contents: [
+        {
+          parts
+        }
+      ],
+      generationConfig: {
+        imageConfig: {
+          aspectRatio,
+          imageSize,
         },
-      };
+      },
+    };
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error?.message || `HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      const image = this.extractImageFromGeminiResponse(data);
-      if (image) {
-        allImages.push(image);
-      }
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.error?.message || `HTTP ${response.status}`);
     }
 
-    if (allImages.length === 0) {
-      throw new Error('No images generated from Gemini API');
+    const data = await response.json();
+    const image = this.extractImageFromGeminiResponse(data);
+    if (!image) {
+      throw new Error('No image generated from Gemini API');
     }
-
-    return imageCount === 1 ? allImages[0] : allImages;
+    return image;
   }
 
   private extractImageFromGeminiResponse(data: Record<string, unknown>): string | null {

@@ -1,12 +1,12 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { Type, Sparkles, Loader2, Settings2 } from 'lucide-react';
+import { Type, Sparkles, Loader2, Settings2, Scissors } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import type { Text2ImageData } from '../../types';
 
 function Text2ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as Text2ImageData;
-  const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
+  const { updateNodeData, simulateGenerate, splitGeneratedImage, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -95,12 +95,23 @@ function Text2ImageNode({ id, data }: NodeProps) {
 
         {/* Generated image preview */}
         {nodeData.generatedImage && (
-          <div className="rounded-lg overflow-hidden border border-border dark:border-border-dark">
-            <img
-              src={nodeData.generatedImage}
-              alt="generated"
-              className="w-full aspect-square object-cover"
-            />
+          <div className="space-y-1.5">
+            <div className="rounded-lg overflow-hidden border border-border dark:border-border-dark">
+              <img
+                src={nodeData.generatedImage}
+                alt="generated"
+                className="w-full aspect-square object-cover"
+              />
+            </div>
+            {nodeData.gridSize && nodeData.gridSize !== '1x1' && (
+              <button
+                onClick={() => splitGeneratedImage(id)}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-pink-500/10 text-pink-500 hover:bg-pink-500/20"
+              >
+                <Scissors size={12} />
+                切分为独立图片
+              </button>
+            )}
           </div>
         )}
       </div>
