@@ -2,6 +2,10 @@
 
 InstaVideo 是一个基于 React 和 TypeScript 构建的节点式无限画布应用程序。它提供了一个强大的可视化界面，用于生成和管理视频/图像资产，集成了大语言模型（如 Gemini）以支持“文生图”和“图生图”工作流，并配备了时间轴和资产管理系统。
 
+## 参考资源
+
+- [momoLab画布功能，让你丝滑创作～](https://www.bilibili.com/video/BV1CdZUBHEwk/?buvid=XYD4D53D84262135A4832878215D444F68CC2&from_spmid=main.space-contribution.0.0&is_story_h5=false&mid=96xKhD1suI8WjI3s18775A%3D%3D&plat_id=116&share_from=ugc&share_medium=android&share_plat=android&share_session_id=787508f1-0e15-4b5c-8974-25b9c27ecdca&share_source=WEIXIN&share_tag=s_i&spmid=united.player-video-detail.0.0&timestamp=1771571515&unique_k=T6W99Sa&up_id=3461577015561160&vd_source=4455aacef5bcb5d446f39ae821eaf26b)
+
 ## 功能特性
 
 - **无限画布编辑器**：基于 React Flow 构建，允许用户可视化地连接和管理生成节点。
