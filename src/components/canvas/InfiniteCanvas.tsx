@@ -9,6 +9,7 @@ import {
   type OnSelectionChangeFunc,
   type NodeMouseHandler,
 } from '@xyflow/react';
+import { Map } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useThemeStore } from '../../stores/themeStore';
 import Text2ImageNode from '../nodes/Text2ImageNode';
@@ -38,6 +39,7 @@ export default function InfiniteCanvas() {
   } = useCanvasStore();
 
   const { theme } = useThemeStore();
+  const [minimapOpen, setMinimapOpen] = useState(false);
 
   const { screenToFlowPosition } = useReactFlow();
 
@@ -177,10 +179,24 @@ export default function InfiniteCanvas() {
           className="bg-surface! dark:bg-surface-dark! border-border! dark:border-border-dark! rounded-lg! shadow-lg! [&>button]:bg-surface! [&>button]:dark:bg-surface-dark! [&>button]:border-border! [&>button]:dark:border-border-dark! [&>button]:text-text-primary! [&>button]:dark:text-text-primary-dark!"
         />
         <MiniMap
-          className="bg-surface! dark:bg-surface-dark! border-border! dark:border-border-dark! rounded-lg!"
+          className={`bg-surface! dark:bg-surface-dark! border-border! dark:border-border-dark! rounded-lg! transition-all duration-200 ${minimapOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none w-0! h-0!'}`}
           nodeColor={theme === 'dark' ? '#333333' : '#e8e8e8'}
           maskColor={theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
         />
+        {/* Minimap toggle */}
+        <div className="absolute bottom-2 right-2 z-10">
+          <button
+            onClick={() => setMinimapOpen(!minimapOpen)}
+            className={`p-1.5 rounded-lg shadow-md border transition-colors ${
+              minimapOpen
+                ? 'bg-accent/10 dark:bg-accent/20 border-accent/30 text-accent'
+                : 'bg-surface dark:bg-surface-dark border-border dark:border-border-dark text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
+            }`}
+            title={minimapOpen ? '隐藏小地图' : '显示小地图'}
+          >
+            <Map size={14} />
+          </button>
+        </div>
       </ReactFlow>
       {contextMenu && (
         <NodeContextMenu
