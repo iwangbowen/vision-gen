@@ -4,8 +4,7 @@ import { LLMServiceError } from './index';
 // Gemini image generation models
 export const GEMINI_IMAGE_MODELS = [
   { label: 'Gemini 3 Pro (Image Preview)', value: 'gemini-3-pro-image-preview' },
-  { label: 'Gemini 2.0 Flash (Image Preview)', value: 'gemini-2.0-flash-preview-image-generation' },
-  { label: 'Imagen 3.0', value: 'imagen-3.0-generate-001' },
+  { label: 'Gemini 2.5 Flash (Image)', value: 'gemini-2.5-flash-image' },
 ] as const;
 
 // Map image size from our format to API format
@@ -26,7 +25,7 @@ export class GeminiImageService implements LLMService {
   constructor(
     apiKey: string,
     baseUrl: string = 'https://generativelanguage.googleapis.com',
-    model: string = 'gemini-2.0-flash-preview-image-generation'
+    model: string = 'gemini-3-pro-image-preview'
   ) {
     this.apiKey = apiKey;
     this.baseUrl = baseUrl.replace(/\/+$/, '');
