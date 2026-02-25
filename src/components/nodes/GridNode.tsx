@@ -30,7 +30,7 @@ function GridNode({ id, data }: NodeProps) {
   return (
     <div className="node-card rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-pink-500/10 to-rose-500/10 dark:from-pink-500/20 dark:to-rose-500/20 border-b border-border dark:border-border-dark">
+      <div className="flex items-center justify-between px-3 py-2 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
         <div className="flex items-center gap-1.5">
           <Grid3X3 size={14} className="text-pink-500" />
           <span className="text-xs font-semibold text-text-primary dark:text-text-primary-dark">
