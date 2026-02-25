@@ -142,7 +142,7 @@ export default function PropertyPanel() {
                     key={opt.value}
                     onClick={() => updateNodeData(selectedNode.id, { gridSize: opt.value })}
                     className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                      ${generativeData.gridSize === opt.value
+                      ${(generativeData.gridSize || '1x1') === opt.value
                         ? 'bg-accent text-white dark:text-black'
                         : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
                       }`}
@@ -164,7 +164,7 @@ export default function PropertyPanel() {
                     key={opt.value}
                     onClick={() => updateNodeData(selectedNode.id, { aspectRatio: opt.value })}
                     className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                      ${generativeData.aspectRatio === opt.value
+                      ${(generativeData.aspectRatio || '16:9') === opt.value
                         ? 'bg-accent text-white dark:text-black'
                         : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
                       }`}
@@ -186,7 +186,7 @@ export default function PropertyPanel() {
                     key={opt.value}
                     onClick={() => updateNodeData(selectedNode.id, { imageSize: opt.value })}
                     className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                      ${generativeData.imageSize === opt.value
+                      ${(generativeData.imageSize || '1k') === opt.value
                         ? 'bg-accent text-white dark:text-black'
                         : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
                       }`}
