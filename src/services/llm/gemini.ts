@@ -54,12 +54,7 @@ export class GeminiImageService implements LLMService {
     }
 
     try {
-      // Use Gemini generateContent API
-      if (this.model.startsWith('gemini-')) {
-        return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, imageCount);
-      }
-      // Use Imagen API (for imagen-3.0-generate-001)
-      return await this.generateWithImagenAPI(prompt, aspectRatio, imageCount);
+      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, imageCount);
     } catch (error) {
       if (error instanceof LLMServiceError) {
         throw error;
@@ -140,53 +135,5 @@ export class GeminiImageService implements LLMService {
     }
 
     return null;
-  }
-
-  private async generateWithImagenAPI(prompt: string, aspectRatio: string, imageCount: number): Promise<string | string[]> {
-    const url = `${this.baseUrl}/v1beta/models/${this.model}:predict?key=${this.apiKey}`;
-    const allImages: string[] = [];
-    let remaining = imageCount;
-
-    while (remaining > 0) {
-      const batchSize = Math.min(remaining, 4);
-
-      const payload = {
-        instances: [{ prompt }],
-        parameters: {
-          sampleCount: batchSize,
-          aspectRatio,
-        },
-      };
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error?.message || `HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      const predictions = data.predictions as Array<Record<string, string>> | undefined;
-
-      if (predictions) {
-        for (const p of predictions) {
-          if (p.bytesBase64Encoded) {
-            allImages.push(`data:image/jpeg;base64,${p.bytesBase64Encoded}`);
-          }
-        }
-      }
-
-      remaining -= batchSize;
-    }
-
-    if (allImages.length === 0) {
-      throw new Error('No images generated from Imagen API');
-    }
-
-    return imageCount === 1 ? allImages[0] : allImages;
   }
 }

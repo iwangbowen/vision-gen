@@ -132,16 +132,6 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                       </option>
                     ))}
                   </select>
-                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    也可以直接输入其他模型名称
-                  </p>
-                  <input
-                    type="text"
-                    value={gemini.model}
-                    onChange={(e) => updateGeminiSettings({ model: e.target.value })}
-                    placeholder="自定义模型名称"
-                    className={`${inputClass} mt-2`}
-                  />
                 </div>
               </>
             )}
