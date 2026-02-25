@@ -9,6 +9,7 @@ function Image2ImageNode({ id, data }: NodeProps) {
   const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const adjustHeight = () => {
     if (textareaRef.current) {
@@ -24,6 +25,18 @@ function Image2ImageNode({ id, data }: NodeProps) {
   const handleGenerate = () => {
     updateNodeData(id, { prompt: localPrompt });
     simulateGenerate(id);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        updateNodeData(id, { sourceImage: result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -42,23 +55,39 @@ function Image2ImageNode({ id, data }: NodeProps) {
       {/* Body */}
       <div className="p-3 space-y-2.5">
         {/* Source image preview */}
-        <div className="rounded-lg overflow-hidden border border-dashed border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark">
+        <button
+          type="button"
+          className="w-full rounded-lg overflow-hidden border border-dashed border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark cursor-pointer hover:border-emerald-500/50 transition-colors relative group"
+          onClick={() => fileInputRef.current?.click()}
+        >
           {nodeData.sourceImage ? (
-            <img src={nodeData.sourceImage} alt="source" className="w-full aspect-video object-cover" />
+            <>
+              <img src={nodeData.sourceImage} alt="source" className="w-full aspect-video object-cover" />
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="text-white text-xs">点击更换图片</span>
+              </div>
+            </>
           ) : (
             <div className="w-full aspect-video flex items-center justify-center">
               <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark">
-                连接图片输入或拖入图片
+                点击上传或连接图片输入
               </p>
             </div>
           )}
-        </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept="image/*"
+            onChange={handleImageUpload}
+          />
+        </button>
 
         <textarea
           ref={textareaRef}
           value={localPrompt}
           onChange={(e) => setLocalPrompt(e.target.value)}
-          placeholder="输入提示词描述变化方向..."
+          placeholder="输入提示词..."
           rows={2}
           className="w-full px-2.5 py-2 rounded-lg text-xs resize-none bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark focus:outline-none focus:border-accent placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark min-h-10 max-h-50 overflow-y-auto custom-scrollbar"
         />
