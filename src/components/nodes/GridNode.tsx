@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { Grid3X3, Scissors, ArrowDownToLine } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
@@ -18,14 +18,14 @@ function GridNode({ id, data }: NodeProps) {
     splitGridNode(id);
   };
 
-  const handleCellAddToTimeline = (cell: GridCell) => {
+  const handleCellAddToTimeline = useCallback((cell: GridCell) => {
     addItem({
       id: `timeline_${id}_cell_${cell.id}_${Date.now()}`,
       image: cell.image,
       sourceNodeId: id,
       label: `分镜 ${cell.row + 1}-${cell.col + 1}`,
     });
-  };
+  }, [addItem, id]);
 
   return (
     <div className="node-card rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">

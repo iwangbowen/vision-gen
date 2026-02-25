@@ -15,7 +15,7 @@ function App() {
   // Initialize dark class on mount
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, []);
+  }, [theme]);
 
   return (
     <ReactFlowProvider>

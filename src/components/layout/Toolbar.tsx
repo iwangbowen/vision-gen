@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Type,
   ImageIcon,
@@ -37,18 +37,18 @@ export default function Toolbar({
   const { addText2ImageNode, addImage2ImageNode, addGridNode } = useCanvasStore();
   const [gridMenuOpen, setGridMenuOpen] = useState(false);
 
-  const handleAddText2Image = () => {
+  const handleAddText2Image = useCallback(() => {
     addText2ImageNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 });
-  };
+  }, [addText2ImageNode]);
 
-  const handleAddImage2Image = () => {
+  const handleAddImage2Image = useCallback(() => {
     addImage2ImageNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 });
-  };
+  }, [addImage2ImageNode]);
 
-  const handleAddGrid = (size: GridSize) => {
+  const handleAddGrid = useCallback((size: GridSize) => {
     addGridNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 }, size);
     setGridMenuOpen(false);
-  };
+  }, [addGridNode]);
 
   return (
     <div className="h-12 flex items-center justify-between px-4

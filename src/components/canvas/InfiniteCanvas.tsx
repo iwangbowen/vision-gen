@@ -94,6 +94,9 @@ export default function InfiniteCanvas() {
 
       // Offset by half the node size to center it on the cursor
       // ImageNode is 200px wide and roughly 225px high
+      // We don't need to manually offset here because screenToFlowPosition already handles the zoom level
+      // and we want the top-left corner of the node to be at the cursor position, or we can offset by a fixed amount
+      // in flow coordinates (which are already scaled)
       position.x -= 100;
       position.y -= 112;
 
@@ -126,7 +129,6 @@ export default function InfiniteCanvas() {
         onDrop={onDrop}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
-
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         minZoom={0.1}
         maxZoom={2}

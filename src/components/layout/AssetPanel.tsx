@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   User,
   Sword,
@@ -35,13 +35,13 @@ export default function AssetPanel() {
     e.dataTransfer.effectAllowed = 'copy';
   };
 
-  const handleDoubleClick = (image: string, name: string) => {
+  const handleDoubleClick = useCallback((image: string, name: string) => {
     addImageNode(
       { x: 300 + Math.random() * 300, y: 200 + Math.random() * 300 },
       image,
       name,
     );
-  };
+  }, [addImageNode]);
 
   return (
     <div className="w-64 h-full flex flex-col
