@@ -1,12 +1,14 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { Type, Sparkles, Loader2, Settings2, Scissors } from 'lucide-react';
+import { Type, Sparkles, Loader2, Settings2, Scissors, ArrowDownToLine } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
+import { useTimelineStore } from '../../stores/timelineStore';
 import type { Text2ImageData } from '../../types';
 
 function Text2ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as Text2ImageData;
   const { updateNodeData, simulateGenerate, splitGeneratedImage, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
+  const addToTimeline = useTimelineStore((s) => s.addItem);
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -96,12 +98,19 @@ function Text2ImageNode({ id, data }: NodeProps) {
         {/* Generated image preview */}
         {nodeData.generatedImage && (
           <div className="space-y-1">
-            <div className="rounded-lg overflow-hidden border border-border dark:border-border-dark">
+            <div className="relative group rounded-lg overflow-hidden border border-border dark:border-border-dark">
               <img
                 src={nodeData.generatedImage}
                 alt="generated"
                 className="w-full aspect-square object-cover"
               />
+              <button
+                onClick={() => addToTimeline({ id: `timeline_${id}_${Date.now()}`, image: nodeData.generatedImage!, sourceNodeId: id, label: nodeData.prompt || '生成图片' })}
+                className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
+                title="添加到轨道"
+              >
+                <ArrowDownToLine size={10} />
+              </button>
             </div>
             {nodeData.gridSize && nodeData.gridSize !== '1x1' && (
               <button
