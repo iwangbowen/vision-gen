@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { Type, Sparkles, Loader2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
@@ -17,6 +17,18 @@ function Text2ImageNode({ id, data }: NodeProps) {
   const { updateNodeData, simulateGenerate } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const [selectedGrid, setSelectedGrid] = useState<GridSize>(nodeData.gridSize || '1x1');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight();
+  }, [localPrompt]);
 
   const handleGenerate = () => {
     updateNodeData(id, { prompt: localPrompt, gridSize: selectedGrid });
@@ -45,6 +57,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
       {/* Body */}
       <div className="p-3 space-y-2.5">
         <textarea
+          ref={textareaRef}
           value={localPrompt}
           onChange={(e) => setLocalPrompt(e.target.value)}
           placeholder="输入提示词描述想要生成的画面..."
@@ -54,7 +67,8 @@ function Text2ImageNode({ id, data }: NodeProps) {
             text-text-primary dark:text-text-primary-dark
             border border-border dark:border-border-dark
             focus:outline-none focus:border-accent
-            placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
+            placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark
+            min-h-[60px] max-h-[200px] overflow-y-auto custom-scrollbar"
         />
 
         {/* Grid size selector */}

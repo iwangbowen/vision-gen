@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { ImageIcon, Sparkles, Loader2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
@@ -17,6 +17,18 @@ function Image2ImageNode({ id, data }: NodeProps) {
   const { updateNodeData, simulateGenerate } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const [selectedGrid, setSelectedGrid] = useState<GridSize>(nodeData.gridSize || '1x1');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight();
+  }, [localPrompt]);
 
   const handleGenerate = () => {
     updateNodeData(id, { prompt: localPrompt, gridSize: selectedGrid });
@@ -52,11 +64,12 @@ function Image2ImageNode({ id, data }: NodeProps) {
         </div>
 
         <textarea
+          ref={textareaRef}
           value={localPrompt}
           onChange={(e) => setLocalPrompt(e.target.value)}
           placeholder="输入提示词描述变化方向..."
           rows={2}
-          className="w-full px-2.5 py-2 rounded-lg text-xs resize-none bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark focus:outline-none focus:border-accent placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
+          className="w-full px-2.5 py-2 rounded-lg text-xs resize-none bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark focus:outline-none focus:border-accent placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark min-h-[40px] max-h-[200px] overflow-y-auto custom-scrollbar"
         />
 
         {/* Grid size selector */}
