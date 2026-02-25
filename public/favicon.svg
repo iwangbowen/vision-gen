@@ -11,12 +11,12 @@
 
   <rect width="120" height="120" rx="28" fill="url(#bg)" />
 
-  <g filter="url(#shadow)" transform="translate(60, 60) scale(1.2) translate(-60, -60)">
+  <g filter="url(#shadow)" transform="translate(60, 62) scale(1.2) translate(-60, -60)">
     <!-- Play Icon -->
     <path d="M48 38 L84 60 L48 82 Z" fill="#ffffff" />
 
     <!-- Sparkles -->
     <path d="M85 20 Q88 32 100 35 Q88 38 85 50 Q82 38 70 35 Q82 32 85 20 Z" fill="#fef08a" />
-    <path d="M30 25 Q32 33 40 35 Q32 37 30 45 Q28 37 20 35 Q28 33 30 25 Z" fill="#fef08a" />
+    <path d="M30 75 Q32 83 40 85 Q32 87 30 95 Q28 87 20 85 Q28 83 30 75 Z" fill="#fef08a" />
   </g>
 </svg>
