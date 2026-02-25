@@ -21,12 +21,14 @@ interface CanvasState {
   nodes: AppNode[];
   edges: AppEdge[];
   selectedNodeId: string | null;
+  rightPanelOpen: boolean;
 
   // Node operations
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   onConnect: (connection: Connection) => void;
   setSelectedNodeId: (id: string | null) => void;
+  setRightPanelOpen: (open: boolean) => void;
 
   // Add nodes
   addText2ImageNode: (position: { x: number; y: number }) => void;
@@ -49,6 +51,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   nodes: [],
   edges: [],
   selectedNodeId: null,
+  rightPanelOpen: true,
 
   onNodesChange: (changes) =>
     set((state) => ({
@@ -69,6 +72,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     })),
 
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
+  setRightPanelOpen: (open) => set({ rightPanelOpen: open }),
 
   addText2ImageNode: (position) => {
     const id = getNodeId();

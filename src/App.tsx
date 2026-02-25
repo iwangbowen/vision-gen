@@ -6,10 +6,11 @@ import PropertyPanel from './components/layout/PropertyPanel';
 import Timeline from './components/layout/Timeline';
 import InfiniteCanvas from './components/canvas/InfiniteCanvas';
 import { useThemeStore } from './stores/themeStore';
+import { useCanvasStore } from './stores/canvasStore';
 
 function App() {
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
-  const [rightPanelOpen, setRightPanelOpen] = useState(true);
+  const { rightPanelOpen, setRightPanelOpen } = useCanvasStore();
   const { theme } = useThemeStore();
 
   // Initialize dark class on mount

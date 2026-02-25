@@ -6,7 +6,7 @@ import type { Text2ImageData } from '../../types';
 
 function Text2ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as Text2ImageData;
-  const { updateNodeData, simulateGenerate, setSelectedNodeId } = useCanvasStore();
+  const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -66,7 +66,10 @@ function Text2ImageNode({ id, data }: NodeProps) {
         <button
           type="button"
           className="w-full flex items-center justify-between px-2 py-1.5 rounded-md bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark cursor-pointer hover:border-accent/50 transition-colors"
-          onClick={() => setSelectedNodeId(id)}
+          onClick={() => {
+            setSelectedNodeId(id);
+            setRightPanelOpen(true);
+          }}
           title="点击在右侧面板修改设置"
         >
           <div className="flex items-center gap-2 text-[10px] text-text-secondary dark:text-text-secondary-dark font-medium">
