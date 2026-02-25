@@ -5,6 +5,7 @@ import {
   Controls,
   MiniMap,
   BackgroundVariant,
+  useReactFlow,
   type OnSelectionChangeFunc,
 } from '@xyflow/react';
 import { useCanvasStore } from '../../stores/canvasStore';
@@ -31,6 +32,8 @@ export default function InfiniteCanvas() {
     addImageNode,
   } = useCanvasStore();
 
+  const { screenToFlowPosition } = useReactFlow();
+
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   const onSelectionChange: OnSelectionChangeFunc = useCallback(
@@ -56,16 +59,20 @@ export default function InfiniteCanvas() {
       if (!data) return;
 
       const { image, name } = JSON.parse(data);
-      const bounds = reactFlowWrapper.current?.getBoundingClientRect();
-      if (!bounds) return;
 
-      const position = {
-        x: event.clientX - bounds.left,
-        y: event.clientY - bounds.top,
-      };
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      // Offset by half the node size to center it on the cursor
+      // ImageNode is 200px wide and roughly 225px high
+      position.x -= 100;
+      position.y -= 112;
+
       addImageNode(position, image, name);
     },
-    [addImageNode],
+    [addImageNode, screenToFlowPosition],
   );
 
   const defaultEdgeOptions = useMemo(
