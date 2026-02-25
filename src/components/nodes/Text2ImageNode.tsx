@@ -1,40 +1,13 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { Type, Sparkles, Loader2 } from 'lucide-react';
+import { Type, Sparkles, Loader2, Settings2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
-import type { Text2ImageData, GridSize, AspectRatio, ImageSize } from '../../types';
-
-const GRID_OPTIONS: { label: string; value: GridSize }[] = [
-  { label: '1×1', value: '1x1' },
-  { label: '2×2', value: '2x2' },
-  { label: '3×3', value: '3x3' },
-  { label: '4×4', value: '4x4' },
-  { label: '5×5', value: '5x5' },
-];
-
-const ASPECT_RATIO_OPTIONS: { label: string; value: AspectRatio }[] = [
-  { label: '1:1', value: '1:1' },
-  { label: '16:9', value: '16:9' },
-  { label: '9:16', value: '9:16' },
-  { label: '4:3', value: '4:3' },
-  { label: '3:4', value: '3:4' },
-  { label: '3:2', value: '3:2' },
-  { label: '2:3', value: '2:3' },
-];
-
-const IMAGE_SIZE_OPTIONS: { label: string; value: ImageSize }[] = [
-  { label: '1K', value: '1k' },
-  { label: '2K', value: '2k' },
-  { label: '4K', value: '4k' },
-];
+import type { Text2ImageData } from '../../types';
 
 function Text2ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as Text2ImageData;
-  const { updateNodeData, simulateGenerate } = useCanvasStore();
+  const { updateNodeData, simulateGenerate, setSelectedNodeId } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
-  const [selectedGrid, setSelectedGrid] = useState<GridSize>(nodeData.gridSize || '1x1');
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(nodeData.aspectRatio || '16:9');
-  const [selectedImageSize, setSelectedImageSize] = useState<ImageSize>(nodeData.imageSize || '1k');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const adjustHeight = () => {
@@ -49,12 +22,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
   }, [localPrompt]);
 
   const handleGenerate = () => {
-    updateNodeData(id, {
-      prompt: localPrompt,
-      gridSize: selectedGrid,
-      aspectRatio: selectedAspectRatio,
-      imageSize: selectedImageSize
-    });
+    updateNodeData(id, { prompt: localPrompt });
     simulateGenerate(id);
   };
 
@@ -94,72 +62,22 @@ function Text2ImageNode({ id, data }: NodeProps) {
             min-h-15 max-h-50 overflow-y-auto custom-scrollbar"
         />
 
-        {/* Grid size selector */}
-        <div>
-          <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1">
-            生成规格
-          </p>
-          <div className="flex gap-1 flex-wrap">
-            {GRID_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setSelectedGrid(opt.value)}
-                className={`px-2 py-1 rounded text-[10px] font-medium transition-colors
-                  ${selectedGrid === opt.value
-                    ? 'bg-accent text-white dark:text-black'
-                    : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark'
-                  }`}
-              >
-                {opt.label}
-              </button>
-            ))}
+        {/* Settings Summary */}
+        <button
+          type="button"
+          className="w-full flex items-center justify-between px-2 py-1.5 rounded-md bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark cursor-pointer hover:border-accent/50 transition-colors"
+          onClick={() => setSelectedNodeId(id)}
+          title="点击在右侧面板修改设置"
+        >
+          <div className="flex items-center gap-2 text-[10px] text-text-secondary dark:text-text-secondary-dark font-medium">
+            <span>{nodeData.gridSize || '1x1'}</span>
+            <span className="w-1 h-1 rounded-full bg-border dark:bg-border-dark"></span>
+            <span>{nodeData.aspectRatio || '16:9'}</span>
+            <span className="w-1 h-1 rounded-full bg-border dark:bg-border-dark"></span>
+            <span className="uppercase">{nodeData.imageSize || '1k'}</span>
           </div>
-        </div>
-
-        {/* Aspect Ratio selector */}
-        <div>
-          <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1">
-            画面比例
-          </p>
-          <div className="flex gap-1 flex-wrap">
-            {ASPECT_RATIO_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setSelectedAspectRatio(opt.value)}
-                className={`px-2 py-1 rounded text-[10px] font-medium transition-colors
-                  ${selectedAspectRatio === opt.value
-                    ? 'bg-accent text-white dark:text-black'
-                    : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark'
-                  }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Image Size selector */}
-        <div>
-          <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1">
-            图片尺寸
-          </p>
-          <div className="flex gap-1 flex-wrap">
-            {IMAGE_SIZE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setSelectedImageSize(opt.value)}
-                className={`px-2 py-1 rounded text-[10px] font-medium transition-colors
-                  ${selectedImageSize === opt.value
-                    ? 'bg-accent text-white dark:text-black'
-                    : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark'
-                  }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
+          <Settings2 size={12} className="text-text-secondary dark:text-text-secondary-dark" />
+        </button>
         {/* Generate button */}
         <button
           onClick={handleGenerate}

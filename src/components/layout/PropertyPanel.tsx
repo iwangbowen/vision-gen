@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useAssetStore } from '../../stores/assetStore';
-import type { AssetCategory } from '../../types';
+import type { AssetCategory, GridSize, AspectRatio, ImageSize, Text2ImageData, Image2ImageData } from '../../types';
 import { useState } from 'react';
 
 const ASSET_CATEGORIES: { label: string; value: AssetCategory }[] = [
@@ -21,8 +21,32 @@ const ASSET_CATEGORIES: { label: string; value: AssetCategory }[] = [
   { label: '分镜', value: 'storyboard' },
 ];
 
+const GRID_OPTIONS: { label: string; value: GridSize }[] = [
+  { label: '1×1', value: '1x1' },
+  { label: '2×2', value: '2x2' },
+  { label: '3×3', value: '3x3' },
+  { label: '4×4', value: '4x4' },
+  { label: '5×5', value: '5x5' },
+];
+
+const ASPECT_RATIO_OPTIONS: { label: string; value: AspectRatio }[] = [
+  { label: '1:1', value: '1:1' },
+  { label: '16:9', value: '16:9' },
+  { label: '9:16', value: '9:16' },
+  { label: '4:3', value: '4:3' },
+  { label: '3:4', value: '3:4' },
+  { label: '3:2', value: '3:2' },
+  { label: '2:3', value: '2:3' },
+];
+
+const IMAGE_SIZE_OPTIONS: { label: string; value: ImageSize }[] = [
+  { label: '1K', value: '1k' },
+  { label: '2K', value: '2k' },
+  { label: '4K', value: '4k' },
+];
+
 export default function PropertyPanel() {
-  const { nodes, selectedNodeId, removeNode, setSelectedNodeId } = useCanvasStore();
+  const { nodes, selectedNodeId, removeNode, setSelectedNodeId, updateNodeData } = useCanvasStore();
   const { addAsset } = useAssetStore();
   const [saveCategory, setSaveCategory] = useState<AssetCategory>('scene');
   const [saveName, setSaveName] = useState('');
@@ -61,6 +85,9 @@ export default function PropertyPanel() {
     setSaveName('');
   };
 
+  const isGenerativeNode = selectedNode.type === 'text2image' || selectedNode.type === 'image2image';
+  const generativeData = isGenerativeNode ? (selectedNode.data as unknown as Text2ImageData | Image2ImageData) : null;
+
   return (
     <div className="w-72 h-full flex flex-col
       bg-panel-bg dark:bg-panel-bg-dark
@@ -96,6 +123,81 @@ export default function PropertyPanel() {
             {(selectedNode.data as { label: string }).label}
           </p>
         </div>
+
+        {/* Generative Settings */}
+        {isGenerativeNode && generativeData && (
+          <div className="px-4 py-3 border-b border-border dark:border-border-dark space-y-4">
+            <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
+              生成设置
+            </p>
+
+            {/* Grid size selector */}
+            <div>
+              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                生成规格
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {GRID_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateNodeData(selectedNode.id, { gridSize: opt.value })}
+                    className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
+                      ${generativeData.gridSize === opt.value
+                        ? 'bg-accent text-white dark:text-black'
+                        : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                      }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Aspect Ratio selector */}
+            <div>
+              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                画面比例
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {ASPECT_RATIO_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateNodeData(selectedNode.id, { aspectRatio: opt.value })}
+                    className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
+                      ${generativeData.aspectRatio === opt.value
+                        ? 'bg-accent text-white dark:text-black'
+                        : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                      }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Image Size selector */}
+            <div>
+              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                图片尺寸
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {IMAGE_SIZE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateNodeData(selectedNode.id, { imageSize: opt.value })}
+                    className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
+                      ${generativeData.imageSize === opt.value
+                        ? 'bg-accent text-white dark:text-black'
+                        : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                      }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Image preview */}
         {nodeImage && (
