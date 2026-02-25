@@ -9,6 +9,7 @@ import {
   type OnSelectionChangeFunc,
 } from '@xyflow/react';
 import { useCanvasStore } from '../../stores/canvasStore';
+import { useThemeStore } from '../../stores/themeStore';
 import Text2ImageNode from '../nodes/Text2ImageNode';
 import Image2ImageNode from '../nodes/Image2ImageNode';
 import ImageNode from '../nodes/ImageNode';
@@ -31,6 +32,8 @@ export default function InfiniteCanvas() {
     setSelectedNodeId,
     addImageNode,
   } = useCanvasStore();
+
+  const { theme } = useThemeStore();
 
   const { screenToFlowPosition } = useReactFlow();
 
@@ -118,8 +121,8 @@ export default function InfiniteCanvas() {
         />
         <MiniMap
           className="!bg-surface dark:!bg-surface-dark !border-border dark:!border-border-dark !rounded-lg"
-          nodeColor="#e8e8e8"
-          maskColor="rgba(0,0,0,0.1)"
+          nodeColor={theme === 'dark' ? '#333333' : '#e8e8e8'}
+          maskColor={theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
         />
       </ReactFlow>
     </div>
