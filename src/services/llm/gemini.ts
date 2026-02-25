@@ -25,11 +25,11 @@ export class GeminiImageService implements LLMService {
 
   constructor(
     apiKey: string,
-    baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta',
+    baseUrl: string = 'https://generativelanguage.googleapis.com',
     model: string = 'gemini-2.0-flash-preview-image-generation'
   ) {
     this.apiKey = apiKey;
-    this.baseUrl = baseUrl;
+    this.baseUrl = baseUrl.replace(/\/+$/, '');
     this.model = model;
   }
 
@@ -73,7 +73,7 @@ export class GeminiImageService implements LLMService {
   }
 
   private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, imageCount: number): Promise<string | string[]> {
-    const url = `${this.baseUrl.replace(/\/$/, '')}/models/${this.model}:generateContent?key=${this.apiKey}`;
+    const url = `${this.baseUrl}/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
     const allImages: string[] = [];
 
@@ -144,7 +144,7 @@ export class GeminiImageService implements LLMService {
   }
 
   private async generateWithImagenAPI(prompt: string, aspectRatio: string, imageCount: number): Promise<string | string[]> {
-    const url = `${this.baseUrl.replace(/\/$/, '')}/models/${this.model}:predict?key=${this.apiKey}`;
+    const url = `${this.baseUrl}/v1beta/models/${this.model}:predict?key=${this.apiKey}`;
     const allImages: string[] = [];
     let remaining = imageCount;
 

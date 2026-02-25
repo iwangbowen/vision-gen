@@ -115,7 +115,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                     type="text"
                     value={gemini.baseUrl}
                     onChange={(e) => updateGeminiSettings({ baseUrl: e.target.value })}
-                    placeholder="https://generativelanguage.googleapis.com/v1beta"
+                    placeholder="https://generativelanguage.googleapis.com"
                     className={inputClass}
                   />
                 </div>
