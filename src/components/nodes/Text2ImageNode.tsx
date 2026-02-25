@@ -33,8 +33,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
       shadow-lg">
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2
-        bg-linear-to-r from-indigo-500/10 to-purple-500/10
-        dark:from-indigo-500/20 dark:to-purple-500/20
+        bg-surface dark:bg-surface-dark
         border-b border-border dark:border-border-dark">
         <Type size={14} className="text-accent" />
         <span className="text-xs font-semibold text-text-primary dark:text-text-primary-dark">
