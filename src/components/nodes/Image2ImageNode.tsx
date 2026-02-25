@@ -29,7 +29,7 @@ function Image2ImageNode({ id, data }: NodeProps) {
   return (
     <div className="node-card w-70 rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
       {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-linear-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 border-b border-border dark:border-border-dark">
+      <div className="flex items-center gap-2 px-3 py-2 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
         <ImageIcon size={14} className="text-emerald-500" />
         <span className="text-xs font-semibold text-text-primary dark:text-text-primary-dark">
           图生图
