@@ -71,7 +71,7 @@ export default function InfiniteCanvas() {
   const defaultEdgeOptions = useMemo(
     () => ({
       animated: true,
-      style: { stroke: '#8b5cf6', strokeWidth: 2 },
+      style: { strokeWidth: 2 },
     }),
     [],
   );
@@ -111,7 +111,7 @@ export default function InfiniteCanvas() {
         />
         <MiniMap
           className="!bg-surface dark:!bg-surface-dark !border-border dark:!border-border-dark !rounded-lg"
-          nodeColor="#8b5cf6"
+          nodeColor="#e8e8e8"
           maskColor="rgba(0,0,0,0.1)"
         />
       </ReactFlow>

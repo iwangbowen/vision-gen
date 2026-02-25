@@ -69,7 +69,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
                 onClick={() => setSelectedGrid(opt.value)}
                 className={`px-2 py-1 rounded text-[10px] font-medium transition-colors
                   ${selectedGrid === opt.value
-                    ? 'bg-accent text-white'
+                    ? 'bg-accent text-white dark:text-black'
                     : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark'
                   }`}
               >
@@ -85,7 +85,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
           disabled={nodeData.status === 'generating'}
           className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg
             text-xs font-medium transition-colors
-            bg-accent text-white hover:bg-accent-hover
+            bg-accent text-white dark:text-black hover:bg-accent-hover
             disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Sparkles size={14} />

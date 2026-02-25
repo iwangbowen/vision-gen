@@ -16,14 +16,14 @@
   --color-text-primary-dark: #e8e8e8;
   --color-text-secondary: #64748b;
   --color-text-secondary-dark: #888888;
-  --color-accent: #8b5cf6;
-  --color-accent-hover: #7c3aed;
+  --color-accent: #333333;
+  --color-accent-hover: #111111;
   --color-node-bg: #ffffff;
   --color-node-bg-dark: #181818;
   --color-node-border: #d1d5db;
   --color-node-border-dark: #2a2a2a;
-  --color-node-selected: #8b5cf6;
-  --color-handle: #8b5cf6;
+  --color-node-selected: #333333;
+  --color-handle: #333333;
   --color-toolbar-bg: #ffffff;
   --color-toolbar-bg-dark: #0e0e0e;
   --color-panel-bg: #ffffff;
@@ -49,6 +49,10 @@
   --xy-node-border-color: var(--color-node-border-dark);
   --xy-edge-stroke: var(--color-border-dark);
   --xy-minimap-background-color: var(--color-surface-dark);
+  --color-accent: #e8e8e8;
+  --color-accent-hover: #ffffff;
+  --color-node-selected: #e8e8e8;
+  --color-handle: #e8e8e8;
 }
 
 ::-webkit-scrollbar {
@@ -94,6 +98,7 @@ body {
 
 .react-flow__edge-path {
   stroke-width: 2;
+  stroke: var(--color-accent);
 }
 
 .react-flow__background {

@@ -152,7 +152,7 @@ export default function PropertyPanel() {
               <button
                 onClick={() => setShowSaveForm(true)}
                 className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
-                  bg-accent text-white hover:bg-accent-hover transition-colors"
+                  bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
               >
                 <Save size={14} />
                 保存为资产
@@ -186,7 +186,7 @@ export default function PropertyPanel() {
                   <button
                     onClick={handleSaveAsAsset}
                     className="flex-1 px-3 py-1.5 rounded-md text-xs font-medium
-                      bg-accent text-white hover:bg-accent-hover transition-colors"
+                      bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
                   >
                     保存
                   </button>

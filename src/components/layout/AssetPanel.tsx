@@ -77,7 +77,7 @@ export default function AssetPanel() {
             onClick={() => setSelectedCategory(cat.value)}
             className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
               ${selectedCategory === cat.value
-                ? 'bg-accent text-white'
+                ? 'bg-accent text-white dark:text-black'
                 : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark'
               }`}
           >
