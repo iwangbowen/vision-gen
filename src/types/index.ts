@@ -85,6 +85,7 @@ export interface TimelineItem {
   sourceNodeId: string;
   order: number;
   label?: string;
+  position?: number; // Position in pixels or grid units for snap effect
 }
 
 // ===== Theme =====

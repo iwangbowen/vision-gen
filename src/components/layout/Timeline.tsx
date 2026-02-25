@@ -20,15 +20,20 @@ export default function Timeline() {
     setDragIndex(idx);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', String(idx));
+    // Add a specific type for internal timeline dragging
+    e.dataTransfer.setData('application/instavideo-timeline-item', String(idx));
   }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent track drag over from firing
     e.dataTransfer.dropEffect = 'move';
     setDropIndex(idx);
   }, []);
 
-  const handleDragEnd = useCallback(() => {
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (dragIndex !== null && dropIndex !== null && dragIndex !== dropIndex) {
       const newItems = [...items];
       const [dragged] = newItems.splice(dragIndex, 1);
@@ -38,6 +43,90 @@ export default function Timeline() {
     setDragIndex(null);
     setDropIndex(null);
   }, [dragIndex, dropIndex, items, reorderItems]);
+
+  const handleTrackDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    // Check if it's an internal drag or external asset
+    if (e.dataTransfer.types.includes('application/instavideo-timeline-item')) {
+      e.dataTransfer.dropEffect = 'move';
+    } else {
+      e.dataTransfer.dropEffect = 'copy';
+    }
+  }, []);
+
+  const handleTrackDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+
+    const trackElement = e.currentTarget as HTMLDivElement;
+    const trackRect = trackElement.getBoundingClientRect();
+
+    // Calculate the slot position based on mouse X coordinate
+    // Assuming each slot is roughly 80px wide (w-16 = 64px + gap-2 = 8px + padding)
+    // We'll use a fixed slot width for calculation
+    const SLOT_WIDTH = 72;
+    const scrollLeft = trackElement.scrollLeft;
+    const relativeX = e.clientX - trackRect.left + scrollLeft;
+
+    // Calculate which slot the mouse is over
+    const targetPosition = Math.max(0, Math.floor(relativeX / SLOT_WIDTH));
+
+    // Handle internal reordering
+    const timelineItemData = e.dataTransfer.getData('application/instavideo-timeline-item');
+    if (timelineItemData) {
+      const sourceIdx = Number.parseInt(timelineItemData, 10);
+      if (!Number.isNaN(sourceIdx) && sourceIdx >= 0 && sourceIdx < items.length) {
+        const newItems = [...items];
+
+        // Check if the target position is already occupied
+        const occupiedIndex = newItems.findIndex(item => item.position === targetPosition);
+
+        if (occupiedIndex !== -1 && occupiedIndex !== sourceIdx) {
+          // Swap positions if dropping on an occupied slot
+          const tempPos = newItems[sourceIdx].position;
+          newItems[sourceIdx].position = newItems[occupiedIndex].position;
+          newItems[occupiedIndex].position = tempPos;
+        } else {
+          // Just move to the new position
+          newItems[sourceIdx].position = targetPosition;
+        }
+
+        reorderItems(newItems);
+      }
+      setDragIndex(null);
+      setDropIndex(null);
+      return;
+    }
+
+    // Handle external asset drop
+    const data = e.dataTransfer.getData('application/instavideo-asset');
+    if (!data) return;
+
+    const { image, name } = JSON.parse(data);
+
+    const newItem = {
+      id: `timeline_asset_${Date.now()}`,
+      image,
+      sourceNodeId: `asset_${Date.now()}`,
+      label: name,
+      position: targetPosition,
+    };
+
+    // If dropping on an occupied slot, shift existing items to the right
+    const newItems = [...items];
+    const occupiedIndex = newItems.findIndex(item => item.position === targetPosition);
+
+    if (occupiedIndex !== -1) {
+      // Shift all items from targetPosition onwards to the right
+      newItems.forEach(item => {
+        if (item.position !== undefined && item.position >= targetPosition) {
+          item.position += 1;
+        }
+      });
+    }
+
+    newItems.push({ ...newItem, order: newItems.length });
+    reorderItems(newItems);
+  }, [items, reorderItems]);
 
   return (
     <div
@@ -88,63 +177,74 @@ export default function Timeline() {
 
       {/* Timeline track */}
       {!collapsed && (
-        <div className="h-[calc(100%-32px)] flex items-center px-4 overflow-x-auto gap-2">
-          {items.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-xs text-text-secondary dark:text-text-secondary-dark">
-                从画布拖入图片或点击图片节点上的 ↓ 按钮添加到轨道
-              </p>
-            </div>
-          ) : (
-            items.map((item, idx) => (
+        <section
+          className="h-[calc(100%-32px)] flex items-center px-4 overflow-x-auto relative"
+          onDragOver={handleTrackDragOver}
+          onDrop={handleTrackDrop}
+          aria-label="Timeline Track"
+        >
+          {/* Render a fixed number of slots or dynamically based on max position */}
+          <div className="flex items-center gap-2 min-w-max relative h-full py-2">
+            {/* Background slots for visual guidance */}
+            {Array.from({ length: Math.max(20, Math.max(...items.map(i => i.position ?? 0)) + 5) }).map((_, i) => (
               <div
-                key={item.id}
-                draggable
-                onDragStart={(e) => handleDragStart(e, idx)}
-                onDragOver={(e) => handleDragOver(e, idx)}
-                onDragEnd={handleDragEnd}
-                className={`shrink-0 group relative transition-transform ${
-                  dragIndex === idx ? 'opacity-50' : ''
-                } ${dropIndex === idx && dragIndex !== idx ? 'scale-110' : ''}`}
+                key={`empty-slot-${i}`}
+                className="w-16 h-16 rounded-lg border-2 border-dashed border-border/50 dark:border-border-dark/50 flex items-center justify-center shrink-0"
               >
-                {/* Frame number */}
-                <div className="absolute -top-0.5 left-1 text-[8px] font-bold text-text-secondary dark:text-text-secondary-dark z-10">
-                  #{idx + 1}
-                </div>
-                <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-border dark:border-border-dark hover:border-accent transition-colors cursor-grab active:cursor-grabbing relative">
-                  <img
-                    src={item.image}
-                    alt={item.label || `Frame ${idx + 1}`}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-1">
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white hover:bg-red-500 transition-all"
-                      title="移除"
-                    >
-                      <X size={10} />
-                    </button>
-                    <div className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white cursor-grab">
-                      <GripVertical size={10} />
+                <span className="text-[8px] text-text-secondary/30 dark:text-text-secondary-dark/30">#{i + 1}</span>
+              </div>
+            ))}
+
+            {/* Actual items positioned absolutely over the slots */}
+            {items.map((item, idx) => {
+              const pos = item.position ?? idx;
+              return (
+                <div
+                  key={item.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDragEnd={handleDragEnd}
+                  className={`absolute top-2 shrink-0 group transition-transform ${
+                    dragIndex === idx ? 'opacity-50' : ''
+                  } ${dropIndex === idx && dragIndex !== idx ? 'scale-110' : ''}`}
+                  style={{ left: `${pos * 72}px` }} // 72px = 64px (w-16) + 8px (gap-2)
+                >
+                  {/* Frame number */}
+                  <div className="absolute -top-0.5 left-1 text-[8px] font-bold text-text-secondary dark:text-text-secondary-dark z-10 bg-timeline-bg/80 dark:bg-timeline-bg-dark/80 px-1 rounded">
+                    #{pos + 1}
+                  </div>
+                  <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-border dark:border-border-dark hover:border-accent transition-colors cursor-grab active:cursor-grabbing relative bg-surface dark:bg-surface-dark">
+                    <img
+                      src={item.image}
+                      alt={item.label || `Frame ${pos + 1}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-1">
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white hover:bg-red-500 transition-all"
+                        title="移除"
+                      >
+                        <X size={10} />
+                      </button>
+                      <div className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white cursor-grab">
+                        <GripVertical size={10} />
+                      </div>
                     </div>
                   </div>
+                  {item.label && (
+                    <p className="text-[8px] text-text-secondary dark:text-text-secondary-dark text-center mt-0.5 truncate w-16 bg-timeline-bg/80 dark:bg-timeline-bg-dark/80 rounded">
+                      {item.label}
+                    </p>
+                  )}
                 </div>
-                {item.label && (
-                  <p className="text-[8px] text-text-secondary dark:text-text-secondary-dark text-center mt-0.5 truncate w-16">
-                    {item.label}
-                  </p>
-                )}
-                {/* Connector line between frames */}
-                {idx < items.length - 1 && (
-                  <div className="absolute top-8 -right-2 w-2 h-px bg-border dark:bg-border-dark" />
-                )}
-              </div>
-            ))
-          )}
-        </div>
+              );
+            })}
+          </div>
+        </section>
       )}
     </div>
   );
