@@ -15,6 +15,7 @@ import Text2ImageNode from '../nodes/Text2ImageNode';
 import Image2ImageNode from '../nodes/Image2ImageNode';
 import ImageNode from '../nodes/ImageNode';
 import GridNode from '../nodes/GridNode';
+import SplitGroupNode from '../nodes/SplitGroupNode';
 import NodeContextMenu from '../ui/NodeContextMenu';
 import CanvasContextMenu from '../ui/CanvasContextMenu';
 
@@ -23,6 +24,7 @@ const nodeTypes = {
   image2image: Image2ImageNode,
   image: ImageNode,
   grid: GridNode,
+  splitGroup: SplitGroupNode,
 };
 
 export default function InfiniteCanvas() {

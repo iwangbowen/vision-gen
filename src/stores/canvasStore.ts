@@ -315,24 +315,40 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       img.src = generatedImage;
     });
 
-    const spacing = 220;
-    const startX = node.position.x;
-    const startY = node.position.y + 500;
+    const cellSpacing = 210;
+    const padding = 20;
+    const groupWidth = size * cellSpacing + padding * 2;
+    const groupHeight = size * cellSpacing + padding * 2 + 40; // extra 40 for label
 
-    const newNodes: AppNode[] = splitImages.map((imgSrc, idx) => ({
+    // Create a group node as the parent
+    const groupId = getNodeId();
+    const groupNode: AppNode = {
+      id: groupId,
+      type: 'splitGroup',
+      position: { x: node.position.x, y: node.position.y + 500 },
+      data: {
+        label: `切分组 ${gridSize}`,
+      },
+      style: { width: groupWidth, height: groupHeight },
+    } as AppNode;
+
+    // Create child image nodes with positions relative to the group
+    const childNodes: AppNode[] = splitImages.map((imgSrc, idx) => ({
       id: getNodeId(),
       type: 'image' as const,
       position: {
-        x: startX + (idx % size) * spacing,
-        y: startY + Math.floor(idx / size) * spacing,
+        x: padding + (idx % size) * cellSpacing,
+        y: padding + 40 + Math.floor(idx / size) * cellSpacing,
       },
+      parentId: groupId,
+      extent: 'parent' as const,
       data: {
         label: `分镜 ${Math.floor(idx / size) + 1}-${(idx % size) + 1}`,
         image: imgSrc,
       },
     }));
 
-    set((s) => ({ nodes: [...s.nodes, ...newNodes] }));
+    set((s) => ({ nodes: [...s.nodes, groupNode, ...childNodes] }));
   },
 
   duplicateNode: (nodeId) => {

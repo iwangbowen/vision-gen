@@ -63,13 +63,19 @@ export interface GridData {
   sourcePrompt?: string;
 }
 
+export interface SplitGroupData {
+  [key: string]: unknown;
+  label: string;
+}
+
 // ===== Node Type Aliases =====
 export type Text2ImageNode = Node<Text2ImageData, 'text2image'>;
 export type Image2ImageNode = Node<Image2ImageData, 'image2image'>;
 export type ImageNode = Node<ImageData, 'image'>;
 export type GridNode = Node<GridData, 'grid'>;
+export type SplitGroupNode = Node<SplitGroupData, 'splitGroup'>;
 
-export type AppNode = Text2ImageNode | Image2ImageNode | ImageNode | GridNode;
+export type AppNode = Text2ImageNode | Image2ImageNode | ImageNode | GridNode | SplitGroupNode;
 export type AppEdge = Edge;
 
 // ===== Timeline =====
