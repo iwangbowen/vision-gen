@@ -9,7 +9,7 @@ import { useThemeStore } from './stores/themeStore';
 import { useCanvasStore } from './stores/canvasStore';
 
 function App() {
-  const [leftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [leftPanelOpen, setLeftPanelOpen] = useState(false);
   const { rightPanelOpen, setRightPanelOpen } = useCanvasStore();
   const { theme } = useThemeStore();
 

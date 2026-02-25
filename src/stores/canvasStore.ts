@@ -56,7 +56,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   nodes: [],
   edges: [],
   selectedNodeId: null,
-  rightPanelOpen: true,
+  rightPanelOpen: false,
 
   onNodesChange: (changes) =>
     set((state) => ({

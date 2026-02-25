@@ -9,8 +9,8 @@ interface SettingsDialogProps {
   onClose: () => void;
 }
 
-const inputClass = 'w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500';
-const labelClass = 'block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-1';
+const inputClass = 'w-full px-2.5 py-1.5 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent/50 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500';
+const labelClass = 'block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-0.5';
 
 export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const { provider, gemini, custom, setProvider, updateGeminiSettings, updateCustomSettings } = useSettingsStore();
@@ -20,34 +20,34 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-950 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col">
+      <div className="w-full max-w-sm bg-white dark:bg-zinc-950 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
-          <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold">
-            <SettingsIcon size={20} />
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="flex items-center gap-1.5 text-zinc-900 dark:text-zinc-100 text-sm font-semibold">
+            <SettingsIcon size={14} />
             <h2>设置</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           >
-            <X size={20} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-2">
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="mb-4">
+            <label className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
               默认模型提供商
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <button
                 onClick={() => {
                   setProvider('gemini');
                   setActiveTab('gemini');
                 }}
-                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors border ${
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-colors border ${
                   provider === 'gemini'
                     ? 'bg-accent text-white dark:text-black border-accent'
                     : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'
@@ -60,43 +60,43 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                   setProvider('custom');
                   setActiveTab('custom');
                 }}
-                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors border ${
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-colors border ${
                   provider === 'custom'
                     ? 'bg-accent text-white dark:text-black border-accent'
                     : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'
                 }`}
               >
-                自定义 (兼容 OpenAI)
+                自定义 (OpenAI)
               </button>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-zinc-200 dark:border-zinc-800 mb-4">
+          <div className="flex border-b border-zinc-200 dark:border-zinc-800 mb-3">
             <button
               onClick={() => setActiveTab('gemini')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-3 py-1.5 text-xs font-medium border-b-2 transition-colors ${
                 activeTab === 'gemini'
                   ? 'border-accent text-accent'
                   : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
               }`}
             >
-              Gemini 设置
+              Gemini
             </button>
             <button
               onClick={() => setActiveTab('custom')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-3 py-1.5 text-xs font-medium border-b-2 transition-colors ${
                 activeTab === 'custom'
                   ? 'border-accent text-accent'
                   : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
               }`}
             >
-              自定义设置
+              自定义
             </button>
           </div>
 
           {/* Tab Content */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {activeTab === 'gemini' && (
               <>
                 <div>
@@ -174,10 +174,10 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end">
+        <div className="px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-800 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-accent text-white dark:text-black rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors"
+            className="px-3 py-1.5 bg-accent text-white dark:text-black rounded-lg text-xs font-medium hover:bg-accent/90 transition-colors"
           >
             完成
           </button>
