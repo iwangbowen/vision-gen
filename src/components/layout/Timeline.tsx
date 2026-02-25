@@ -42,11 +42,11 @@ export default function Timeline() {
   return (
     <div
       className={`border-t border-border dark:border-border-dark bg-timeline-bg dark:bg-timeline-bg-dark transition-all ${
-        collapsed ? 'h-10' : 'h-40'
+        collapsed ? 'h-8' : 'h-28'
       }`}
     >
       {/* Header */}
-      <div className="h-10 flex items-center justify-between px-4 border-b border-border dark:border-border-dark">
+      <div className="h-8 flex items-center justify-between px-4 border-b border-border dark:border-border-dark">
         <div className="flex items-center gap-2">
           <Film size={14} className="text-accent" />
           <span className="text-xs font-semibold text-text-primary dark:text-text-primary-dark">
@@ -88,7 +88,7 @@ export default function Timeline() {
 
       {/* Timeline track */}
       {!collapsed && (
-        <div className="h-[calc(100%-40px)] flex items-center px-4 overflow-x-auto gap-3">
+        <div className="h-[calc(100%-32px)] flex items-center px-4 overflow-x-auto gap-2">
           {items.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
               <p className="text-xs text-text-secondary dark:text-text-secondary-dark">
@@ -111,7 +111,7 @@ export default function Timeline() {
                 <div className="absolute -top-0.5 left-1 text-[8px] font-bold text-text-secondary dark:text-text-secondary-dark z-10">
                   #{idx + 1}
                 </div>
-                <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-border dark:border-border-dark hover:border-accent transition-colors cursor-grab active:cursor-grabbing relative">
+                <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-border dark:border-border-dark hover:border-accent transition-colors cursor-grab active:cursor-grabbing relative">
                   <img
                     src={item.image}
                     alt={item.label || `Frame ${idx + 1}`}
@@ -133,13 +133,13 @@ export default function Timeline() {
                   </div>
                 </div>
                 {item.label && (
-                  <p className="text-[8px] text-text-secondary dark:text-text-secondary-dark text-center mt-0.5 truncate w-20">
+                  <p className="text-[8px] text-text-secondary dark:text-text-secondary-dark text-center mt-0.5 truncate w-16">
                     {item.label}
                   </p>
                 )}
                 {/* Connector line between frames */}
                 {idx < items.length - 1 && (
-                  <div className="absolute top-1/2 -right-2.5 w-3 h-px bg-border dark:bg-border-dark" />
+                  <div className="absolute top-8 -right-2 w-2 h-px bg-border dark:bg-border-dark" />
                 )}
               </div>
             ))
