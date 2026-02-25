@@ -169,7 +169,8 @@ export default function InfiniteCanvas() {
         <Background
           variant={BackgroundVariant.Dots}
           gap={20}
-          size={1}
+          size={2}
+          color={theme === 'dark' ? '#444' : '#aaa'}
           className="bg-canvas-bg! dark:bg-canvas-bg-dark!"
         />
         <Controls
