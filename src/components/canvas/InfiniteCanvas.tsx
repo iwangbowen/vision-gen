@@ -127,8 +127,8 @@ export default function InfiniteCanvas() {
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
-        fitViewOptions={{ maxZoom: 0.6, padding: 0.3 }}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
+        fitViewOptions={{ maxZoom: 1, padding: 0.3 }}
+        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         minZoom={0.1}
         maxZoom={2}
         snapToGrid
