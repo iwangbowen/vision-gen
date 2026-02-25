@@ -1,4 +1,4 @@
-import { useCallback, useRef, useMemo } from 'react';
+import { useCallback, useRef, useMemo, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -7,6 +7,7 @@ import {
   BackgroundVariant,
   useReactFlow,
   type OnSelectionChangeFunc,
+  type NodeMouseHandler,
 } from '@xyflow/react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useThemeStore } from '../../stores/themeStore';
@@ -14,6 +15,7 @@ import Text2ImageNode from '../nodes/Text2ImageNode';
 import Image2ImageNode from '../nodes/Image2ImageNode';
 import ImageNode from '../nodes/ImageNode';
 import GridNode from '../nodes/GridNode';
+import NodeContextMenu from '../ui/NodeContextMenu';
 
 const nodeTypes = {
   text2image: Text2ImageNode,
@@ -38,6 +40,24 @@ export default function InfiniteCanvas() {
   const { screenToFlowPosition } = useReactFlow();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
+  const [contextMenu, setContextMenu] = useState<{
+    nodeId: string;
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const onNodeContextMenu: NodeMouseHandler = useCallback(
+    (event, node) => {
+      event.preventDefault();
+      setContextMenu({ nodeId: node.id, x: event.clientX, y: event.clientY });
+    },
+    [],
+  );
+
+  const onPaneClick = useCallback(() => {
+    setContextMenu(null);
+  }, []);
 
   const onSelectionChange: OnSelectionChangeFunc = useCallback(
     ({ nodes: selectedNodes }) => {
@@ -95,6 +115,8 @@ export default function InfiniteCanvas() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onSelectionChange={onSelectionChange}
+        onNodeContextMenu={onNodeContextMenu}
+        onPaneClick={onPaneClick}
         onDragOver={onDragOver}
         onDrop={onDrop}
         nodeTypes={nodeTypes}
@@ -125,6 +147,14 @@ export default function InfiniteCanvas() {
           maskColor={theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
         />
       </ReactFlow>
+      {contextMenu && (
+        <NodeContextMenu
+          nodeId={contextMenu.nodeId}
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
     </div>
   );
 }

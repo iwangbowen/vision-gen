@@ -38,6 +38,7 @@ interface CanvasState {
   updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData>) => void;
   simulateGenerate: (nodeId: string) => void;
   splitGridNode: (nodeId: string) => void;
+  duplicateNode: (nodeId: string) => void;
   removeNode: (nodeId: string) => void;
 }
 
@@ -197,6 +198,21 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     }));
 
     set((state) => ({ nodes: [...state.nodes, ...newNodes] }));
+  },
+
+  duplicateNode: (nodeId) => {
+    const state = get();
+    const node = state.nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+
+    const newNode: AppNode = {
+      ...node,
+      id: getNodeId(),
+      position: { x: node.position.x + 50, y: node.position.y + 50 },
+      data: { ...node.data },
+      selected: false,
+    } as AppNode;
+    set((s) => ({ nodes: [...s.nodes, newNode] }));
   },
 
   removeNode: (nodeId) =>
