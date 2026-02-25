@@ -43,7 +43,7 @@ export default function AssetPickerDialog({ open, onClose, onSelect }: AssetPick
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-4">
-          <AssetBrowser onSelect={handleSelect} columns={4} />
+          <AssetBrowser onSelect={handleSelect} columns={4} localCategory />
         </div>
       </div>
     </div>

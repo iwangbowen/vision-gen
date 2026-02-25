@@ -23,15 +23,23 @@ interface AssetBrowserProps {
   onSelect?: (asset: Asset) => void;
   onDragStart?: (e: React.DragEvent, image: string, name: string) => void;
   columns?: number;
+  /** If true, use local category state instead of the global store */
+  localCategory?: boolean;
 }
 
-export default function AssetBrowser({ onSelect, onDragStart, columns = 3 }: AssetBrowserProps) {
-  const { selectedCategory, setSelectedCategory, getFilteredAssets } = useAssetStore();
+export default function AssetBrowser({ onSelect, onDragStart, columns = 3, localCategory = false }: AssetBrowserProps) {
+  const allAssets = useAssetStore((s) => s.assets);
+  const globalCategory = useAssetStore((s) => s.selectedCategory);
+  const setGlobalCategory = useAssetStore((s) => s.setSelectedCategory);
+  const [localCat, setLocalCat] = useState<AssetCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const assets = getFilteredAssets().filter(
-    (a) => !searchQuery || a.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const selectedCategory = localCategory ? localCat : globalCategory;
+  const setSelectedCategory = localCategory ? setLocalCat : setGlobalCategory;
+
+  const assets = allAssets
+    .filter((a) => selectedCategory === 'all' || a.category === selectedCategory)
+    .filter((a) => !searchQuery || a.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className="flex flex-col gap-3">
