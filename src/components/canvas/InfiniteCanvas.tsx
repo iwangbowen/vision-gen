@@ -126,8 +126,7 @@ export default function InfiniteCanvas() {
         onDrop={onDrop}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
-        fitView
-        fitViewOptions={{ maxZoom: 1, padding: 0.3 }}
+
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         minZoom={0.1}
         maxZoom={2}
