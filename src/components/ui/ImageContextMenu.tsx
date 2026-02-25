@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowDownToLine, Download } from 'lucide-react';
+import { saveAs } from 'file-saver';
 import { useTimelineStore } from '../../stores/timelineStore';
 
 interface ImageContextMenuProps {
@@ -64,11 +65,8 @@ export default function ImageContextMenu({ image, sourceNodeId, label, children,
   };
 
   const handleDownload = () => {
-    const a = document.createElement('a');
-    a.href = image;
-    a.download = `${label || 'image'}.png`;
-    a.click();
     setMenu((m) => ({ ...m, open: false }));
+    saveAs(image, `${label || 'image'}.png`);
   };
 
   return (
