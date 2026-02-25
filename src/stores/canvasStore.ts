@@ -173,24 +173,27 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       const prompt = data.prompt || '';
       const aspectRatio = data.aspectRatio || '1:1';
       const imageSize = data.imageSize || '1k';
+      const gridSize = data.gridSize || '1x1';
 
-      // Call the actual LLM service
-      const generatedImage = await llmService.generateImage({
+      // Call the actual LLM service with all parameters
+      const result = await llmService.generateImage({
         prompt,
         aspectRatio,
         size: imageSize,
+        gridSize,
       });
 
-      const gridSize = data.gridSize;
-
       if (gridSize && gridSize !== '1x1') {
-        // Generate grid node instead
+        // Generate grid node with real images
         const { addGridNode } = get();
         const pos = { x: node.position.x + 350, y: node.position.y };
-        addGridNode(pos, gridSize);
-        updateNodeData(nodeId, { status: 'done', generatedImage } as Partial<Text2ImageData>);
+        const images = Array.isArray(result) ? result : [result];
+        addGridNode(pos, gridSize, images);
+        const firstImage = Array.isArray(result) ? result[0] : result;
+        updateNodeData(nodeId, { status: 'done', generatedImage: firstImage } as Partial<Text2ImageData>);
       } else {
-        updateNodeData(nodeId, { status: 'done', generatedImage } as Partial<Text2ImageData>);
+        const image = Array.isArray(result) ? result[0] : result;
+        updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
       }
     } catch (error) {
       console.error('Failed to generate image:', error);
@@ -208,7 +211,6 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
             const gridSize = data.gridSize;
 
             if (gridSize && gridSize !== '1x1') {
-              // Generate grid node instead
               const { addGridNode } = get();
               const pos = { x: node.position.x + 350, y: node.position.y };
               addGridNode(pos, gridSize);
@@ -220,7 +222,6 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
           }
         }, 1500);
       } else {
-        // Show error to user and reset status
         alert(`生成图片失败: ${errorMessage}`);
         updateNodeData(nodeId, { status: 'idle' } as Partial<Text2ImageData>);
       }

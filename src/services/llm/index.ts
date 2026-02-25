@@ -11,8 +11,10 @@ export interface LLMService {
 }
 
 export class LLMServiceError extends Error {
-  constructor(message: string, public readonly cause?: unknown) {
+  readonly cause?: unknown;
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = 'LLMServiceError';
+    this.cause = cause;
   }
 }

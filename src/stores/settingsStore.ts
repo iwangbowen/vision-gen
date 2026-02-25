@@ -27,7 +27,7 @@ export const useSettingsStore = create<SettingsState>()(
       gemini: {
         apiKey: '',
         baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
-        model: 'gemini-2.5-pro',
+        model: 'gemini-2.0-flash-preview-image-generation',
       },
       custom: {
         apiKey: '',

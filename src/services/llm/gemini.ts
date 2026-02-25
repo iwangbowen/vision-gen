@@ -1,6 +1,26 @@
 import type { LLMService, GenerateImageOptions } from './index';
 import { LLMServiceError } from './index';
 
+// Gemini image generation models
+export const GEMINI_IMAGE_MODELS = [
+  { label: 'Gemini 2.0 Flash (Image Preview)', value: 'gemini-2.0-flash-preview-image-generation' },
+  { label: 'Imagen 3.0', value: 'imagen-3.0-generate-001' },
+] as const;
+
+// Map aspect ratio string to Gemini API format
+function mapAspectRatio(ratio: string | undefined): string {
+  switch (ratio) {
+    case '1:1': return '1:1';
+    case '16:9': return '16:9';
+    case '9:16': return '9:16';
+    case '4:3': return '4:3';
+    case '3:4': return '3:4';
+    case '3:2': return '3:2';
+    case '2:3': return '2:3';
+    default: return '1:1';
+  }
+}
+
 export class GeminiImageService implements LLMService {
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -9,66 +29,164 @@ export class GeminiImageService implements LLMService {
   constructor(
     apiKey: string,
     baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta',
-    model: string = 'imagen-3.0-generate-001'
+    model: string = 'gemini-2.0-flash-preview-image-generation'
   ) {
     this.apiKey = apiKey;
     this.baseUrl = baseUrl;
     this.model = model;
   }
 
-  async generateImage(options: GenerateImageOptions): Promise<string> {
+  async generateImage(options: GenerateImageOptions): Promise<string | string[]> {
     if (!this.apiKey) {
       throw new LLMServiceError('Gemini API Key is not configured');
     }
 
+    // Determine how many images to generate
+    let imageCount = 1;
+    if (options.gridSize && options.gridSize !== '1x1') {
+      const size = parseInt(options.gridSize[0], 10);
+      imageCount = size * size;
+    }
+
+    const aspectRatio = mapAspectRatio(options.aspectRatio);
+
+    // Build prompt with grid context if applicable
+    let prompt = options.prompt;
+    if (imageCount > 1) {
+      prompt = `Generate a set of ${imageCount} distinct images for a storyboard grid. Each image should be a variation of the following scene but with slightly different compositions or angles. Scene description: ${options.prompt}`;
+    }
+
     try {
-      // Note: The exact endpoint and payload might vary based on the specific Gemini/Imagen API version.
-      // This is a standard implementation based on Google AI Studio's Imagen API.
-      const url = `${this.baseUrl.replace(/\/$/, '')}/models/${this.model}:predict?key=${this.apiKey}`;
+      // Use Gemini generateContent API (for gemini-2.0-flash-preview-image-generation)
+      if (this.model.startsWith('gemini-')) {
+        return await this.generateWithGeminiAPI(prompt, aspectRatio, imageCount);
+      }
+      // Use Imagen API (for imagen-3.0-generate-001)
+      return await this.generateWithImagenAPI(prompt, aspectRatio, imageCount);
+    } catch (error) {
+      if (error instanceof LLMServiceError) {
+        throw error;
+      }
+      throw new LLMServiceError(
+        `Failed to generate image with Gemini: ${error instanceof Error ? error.message : String(error)}`,
+        error
+      );
+    }
+  }
+
+  private async generateWithGeminiAPI(prompt: string, _aspectRatio: string, imageCount: number): Promise<string | string[]> {
+    const url = `${this.baseUrl.replace(/\/$/, '')}/models/${this.model}:generateContent?key=${this.apiKey}`;
+
+    const allImages: string[] = [];
+
+    for (let i = 0; i < imageCount; i++) {
+      const currentPrompt = imageCount > 1
+        ? `${prompt}\n\nThis is image ${i + 1} of ${imageCount} in the storyboard grid.`
+        : prompt;
 
       const payload = {
-        instances: [
+        contents: [
           {
-            prompt: options.prompt,
+            parts: [
+              { text: currentPrompt }
+            ]
           }
         ],
-        parameters: {
-          sampleCount: 1,
-          // Map aspect ratio if needed, e.g., "1:1", "16:9"
-          aspectRatio: options.aspectRatio || "1:1",
-        }
+        generationConfig: {
+          responseModalities: ['TEXT', 'IMAGE'],
+        },
       };
 
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error?.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData?.error?.message || `HTTP ${response.status}`);
       }
 
       const data = await response.json();
+      const image = this.extractImageFromGeminiResponse(data);
+      if (image) {
+        allImages.push(image);
+      }
+    }
 
-      // Extract the base64 image from the response
-      // The exact response structure depends on the API version
-      if (data.predictions && data.predictions.length > 0) {
-        const prediction = data.predictions[0];
-        if (prediction.bytesBase64Encoded) {
-          return `data:image/jpeg;base64,${prediction.bytesBase64Encoded}`;
+    if (allImages.length === 0) {
+      throw new Error('No images generated from Gemini API');
+    }
+
+    return imageCount === 1 ? allImages[0] : allImages;
+  }
+
+  private extractImageFromGeminiResponse(data: Record<string, unknown>): string | null {
+    const candidates = data.candidates as Array<Record<string, unknown>> | undefined;
+    if (!candidates || candidates.length === 0) return null;
+
+    const content = candidates[0].content as Record<string, unknown> | undefined;
+    if (!content) return null;
+
+    const parts = content.parts as Array<Record<string, unknown>> | undefined;
+    if (!parts) return null;
+
+    for (const part of parts) {
+      const inlineData = part.inlineData as Record<string, string> | undefined;
+      if (inlineData?.data && inlineData?.mimeType) {
+        return `data:${inlineData.mimeType};base64,${inlineData.data}`;
+      }
+    }
+
+    return null;
+  }
+
+  private async generateWithImagenAPI(prompt: string, aspectRatio: string, imageCount: number): Promise<string | string[]> {
+    const url = `${this.baseUrl.replace(/\/$/, '')}/models/${this.model}:predict?key=${this.apiKey}`;
+    const allImages: string[] = [];
+    let remaining = imageCount;
+
+    while (remaining > 0) {
+      const batchSize = Math.min(remaining, 4);
+
+      const payload = {
+        instances: [{ prompt }],
+        parameters: {
+          sampleCount: batchSize,
+          aspectRatio,
+        },
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error?.message || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      const predictions = data.predictions as Array<Record<string, string>> | undefined;
+
+      if (predictions) {
+        for (const p of predictions) {
+          if (p.bytesBase64Encoded) {
+            allImages.push(`data:image/jpeg;base64,${p.bytesBase64Encoded}`);
+          }
         }
       }
 
-      throw new Error('Invalid response format from Gemini API');
-    } catch (error) {
-      if (error instanceof LLMServiceError) {
-        throw error;
-      }
-      throw new LLMServiceError(`Failed to generate image with Gemini: ${error instanceof Error ? error.message : String(error)}`, error);
+      remaining -= batchSize;
     }
+
+    if (allImages.length === 0) {
+      throw new Error('No images generated from Imagen API');
+    }
+
+    return imageCount === 1 ? allImages[0] : allImages;
   }
 }

@@ -2,11 +2,15 @@ import { useState } from 'react';
 import { X, Settings as SettingsIcon } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
 import type { LLMProvider } from '../../stores/settingsStore';
+import { GEMINI_IMAGE_MODELS } from '../../services/llm/gemini';
 
 interface SettingsDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const inputClass = 'w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500';
+const labelClass = 'block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-1';
 
 export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const { provider, gemini, custom, setProvider, updateGeminiSettings, updateCustomSettings } = useSettingsStore();
@@ -15,17 +19,17 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-surface dark:bg-surface-dark rounded-xl shadow-2xl border border-border dark:border-border-dark overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border dark:border-border-dark">
-          <div className="flex items-center gap-2 text-text-primary dark:text-text-primary-dark font-semibold">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
+          <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold">
             <SettingsIcon size={20} />
             <h2>设置</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-text-secondary dark:text-text-secondary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
+            className="p-1 rounded-md text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           >
             <X size={20} />
           </button>
@@ -34,7 +38,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="mb-6">
-            <label className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2">
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-2">
               默认模型提供商
             </label>
             <div className="flex gap-2">
@@ -45,8 +49,8 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                 }}
                 className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors border ${
                   provider === 'gemini'
-                    ? 'bg-accent text-white border-accent'
-                    : 'bg-surface dark:bg-surface-dark text-text-secondary dark:text-text-secondary-dark border-border dark:border-border-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark'
+                    ? 'bg-accent text-white dark:text-zinc-900 border-accent'
+                    : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700'
                 }`}
               >
                 Gemini
@@ -58,8 +62,8 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                 }}
                 className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors border ${
                   provider === 'custom'
-                    ? 'bg-accent text-white border-accent'
-                    : 'bg-surface dark:bg-surface-dark text-text-secondary dark:text-text-secondary-dark border-border dark:border-border-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark'
+                    ? 'bg-accent text-white dark:text-zinc-900 border-accent'
+                    : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700'
                 }`}
               >
                 自定义 (兼容 OpenAI)
@@ -68,13 +72,13 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-border dark:border-border-dark mb-4">
+          <div className="flex border-b border-zinc-200 dark:border-zinc-700 mb-4">
             <button
               onClick={() => setActiveTab('gemini')}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'gemini'
                   ? 'border-accent text-accent'
-                  : 'border-transparent text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
+                  : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
               }`}
             >
               Gemini 设置
@@ -84,7 +88,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'custom'
                   ? 'border-accent text-accent'
-                  : 'border-transparent text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
+                  : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
               }`}
             >
               自定义设置
@@ -96,39 +100,47 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
             {activeTab === 'gemini' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-1">
-                    API Key
-                  </label>
+                  <label className={labelClass}>API Key</label>
                   <input
                     type="password"
                     value={gemini.apiKey}
                     onChange={(e) => updateGeminiSettings({ apiKey: e.target.value })}
                     placeholder="AIzaSy..."
-                    className="w-full px-3 py-2 bg-surface dark:bg-surface-dark border border-border dark:border-border-dark rounded-lg text-sm text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    className={inputClass}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-1">
-                    Base URL
-                  </label>
+                  <label className={labelClass}>Base URL</label>
                   <input
                     type="text"
                     value={gemini.baseUrl}
                     onChange={(e) => updateGeminiSettings({ baseUrl: e.target.value })}
                     placeholder="https://generativelanguage.googleapis.com/v1beta"
-                    className="w-full px-3 py-2 bg-surface dark:bg-surface-dark border border-border dark:border-border-dark rounded-lg text-sm text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    className={inputClass}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-1">
-                    Model
-                  </label>
+                  <label className={labelClass}>图像模型</label>
+                  <select
+                    value={gemini.model}
+                    onChange={(e) => updateGeminiSettings({ model: e.target.value })}
+                    className={inputClass}
+                  >
+                    {GEMINI_IMAGE_MODELS.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    也可以直接输入其他模型名称
+                  </p>
                   <input
                     type="text"
                     value={gemini.model}
                     onChange={(e) => updateGeminiSettings({ model: e.target.value })}
-                    placeholder="gemini-2.5-pro"
-                    className="w-full px-3 py-2 bg-surface dark:bg-surface-dark border border-border dark:border-border-dark rounded-lg text-sm text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    placeholder="自定义模型名称"
+                    className={`${inputClass} mt-2`}
                   />
                 </div>
               </>
@@ -137,39 +149,33 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
             {activeTab === 'custom' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-1">
-                    API Key
-                  </label>
+                  <label className={labelClass}>API Key</label>
                   <input
                     type="password"
                     value={custom.apiKey}
                     onChange={(e) => updateCustomSettings({ apiKey: e.target.value })}
                     placeholder="sk-..."
-                    className="w-full px-3 py-2 bg-surface dark:bg-surface-dark border border-border dark:border-border-dark rounded-lg text-sm text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    className={inputClass}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-1">
-                    Base URL
-                  </label>
+                  <label className={labelClass}>Base URL</label>
                   <input
                     type="text"
                     value={custom.baseUrl}
                     onChange={(e) => updateCustomSettings({ baseUrl: e.target.value })}
                     placeholder="https://api.openai.com/v1"
-                    className="w-full px-3 py-2 bg-surface dark:bg-surface-dark border border-border dark:border-border-dark rounded-lg text-sm text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    className={inputClass}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-1">
-                    Model
-                  </label>
+                  <label className={labelClass}>Model</label>
                   <input
                     type="text"
                     value={custom.model}
                     onChange={(e) => updateCustomSettings({ model: e.target.value })}
                     placeholder="gpt-4o"
-                    className="w-full px-3 py-2 bg-surface dark:bg-surface-dark border border-border dark:border-border-dark rounded-lg text-sm text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    className={inputClass}
                   />
                 </div>
               </>
@@ -178,10 +184,10 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-border dark:border-border-dark flex justify-end">
+        <div className="px-6 py-4 border-t border-zinc-200 dark:border-zinc-700 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors"
+            className="px-4 py-2 bg-accent text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors"
           >
             完成
           </button>
