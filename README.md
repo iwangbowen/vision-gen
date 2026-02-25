@@ -1,73 +1,75 @@
-# React + TypeScript + Vite
+# InstaVideo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+InstaVideo 是一个基于 React 和 TypeScript 构建的节点式无限画布应用程序。它提供了一个强大的可视化界面，用于生成和管理视频/图像资产，集成了大语言模型（如 Gemini）以支持“文生图”和“图生图”工作流，并配备了时间轴和资产管理系统。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **无限画布编辑器**：基于 React Flow 构建，允许用户可视化地连接和管理生成节点。
+- **AI 生成节点**：支持“文生图”（Text-to-Image）、“图生图”（Image-to-Image）和网格（Grid）节点。
+- **大模型集成**：内置对 Gemini 和自定义 LLM 服务的支持。
+- **时间轴与资产管理**：提供专用面板，用于管理生成的资产和时间轴序列。
+- **现代化 UI**：使用 Tailwind CSS v4 和 Lucide React 图标进行样式设计。
+- **状态管理**：使用 Zustand 进行健壮的全局状态处理。
+- **深色/浅色主题**：内置主题切换支持。
 
-## React Compiler
+## 技术栈
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **前端框架**：[React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **构建工具**：[Vite](https://vitejs.dev/)
+- **画布/节点引擎**：[React Flow (@xyflow/react)](https://reactflow.dev/)
+- **样式**：[Tailwind CSS v4](https://tailwindcss.com/)
+- **状态管理**：[Zustand](https://zustand-demo.pmnd.rs/)
+- **图标库**：[Lucide React](https://lucide.dev/)
 
-## Expanding the ESLint configuration
+## 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 环境要求
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+请确保您的计算机上已安装 [Node.js](https://nodejs.org/)（推荐 v18 或更高版本）。
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 安装步骤
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. 克隆仓库：
+   ```bash
+   git clone <repository-url>
+   cd insta-video
+   ```
+
+2. 安装依赖：
+   ```bash
+   npm install
+   ```
+
+3. 启动开发服务器：
+   ```bash
+   npm run dev
+   ```
+
+4. 打开浏览器并访问 `http://localhost:5173`。
+
+## 项目结构
+
+```text
+src/
+├── assets/         # 静态资源（图片、字体等）
+├── components/     # React 组件
+│   ├── canvas/     # 无限画布和 React Flow 配置
+│   ├── layout/     # 主要布局组件（工具栏、面板、时间轴）
+│   ├── nodes/      # 自定义 React Flow 节点（文生图、图生图等）
+│   └── ui/         # 可复用的 UI 组件和对话框
+├── services/       # 外部 API 和大模型集成（Gemini、自定义）
+├── stores/         # Zustand 状态存储（画布、设置、主题等）
+├── types/          # TypeScript 类型定义
+└── utils/          # 辅助函数和示例数据
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 可用脚本
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `npm run dev` - 启动 Vite 开发服务器。
+- `npm run build` - 编译 TypeScript 并构建生产版本。
+- `npm run lint` - 运行 ESLint 检查代码质量问题。
+- `npm run preview` - 在本地预览生产构建版本。
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 许可证
+
+本项目为私有及机密项目。
