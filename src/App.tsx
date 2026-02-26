@@ -18,6 +18,34 @@ function App() {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if the user is typing in an input or textarea
+      if (
+        document.activeElement?.tagName === 'INPUT' ||
+        document.activeElement?.tagName === 'TEXTAREA' ||
+        (document.activeElement as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        if (e.altKey) {
+          // Ctrl + Alt + B: Toggle right panel
+          setRightPanelOpen(!rightPanelOpen);
+        } else {
+          // Ctrl + B: Toggle left panel
+          setLeftPanelOpen((prev) => !prev);
+        }
+      }
+    };
+
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => globalThis.removeEventListener('keydown', handleKeyDown);
+  }, [rightPanelOpen, setRightPanelOpen]);
+
   return (
     <ReactFlowProvider>
       <div className="h-screen w-screen flex flex-col bg-canvas-bg dark:bg-canvas-bg-dark overflow-hidden">

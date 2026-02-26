@@ -20,7 +20,13 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-white dark:bg-zinc-950 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col">
+      <button
+        type="button"
+        className="absolute inset-0 w-full h-full cursor-default"
+        onClick={onClose}
+        aria-label="Close settings dialog"
+      />
+      <div className="relative w-full max-w-sm bg-white dark:bg-zinc-950 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-1.5 text-zinc-900 dark:text-zinc-100 text-sm font-semibold">
@@ -38,9 +44,9 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
           <div className="mb-4">
-            <label className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
+            <div className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
               默认模型提供商
-            </label>
+            </div>
             <div className="flex gap-1.5">
               <button
                 onClick={() => {
@@ -100,7 +106,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
             {activeTab === 'gemini' && (
               <>
                 <div>
-                  <label className={labelClass}>API Key</label>
+                  <div className={labelClass}>API Key</div>
                   <input
                     type="password"
                     value={gemini.apiKey}
@@ -110,7 +116,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Base URL</label>
+                  <div className={labelClass}>Base URL</div>
                   <input
                     type="text"
                     value={gemini.baseUrl}
@@ -120,7 +126,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>图像模型</label>
+                  <div className={labelClass}>图像模型</div>
                   <select
                     value={gemini.model}
                     onChange={(e) => updateGeminiSettings({ model: e.target.value })}
@@ -139,7 +145,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
             {activeTab === 'custom' && (
               <>
                 <div>
-                  <label className={labelClass}>API Key</label>
+                  <div className={labelClass}>API Key</div>
                   <input
                     type="password"
                     value={custom.apiKey}
@@ -149,7 +155,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Base URL</label>
+                  <div className={labelClass}>Base URL</div>
                   <input
                     type="text"
                     value={custom.baseUrl}
@@ -159,7 +165,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Model</label>
+                  <div className={labelClass}>Model</div>
                   <input
                     type="text"
                     value={custom.model}

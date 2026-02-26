@@ -1,17 +1,18 @@
 import { useState, useRef } from 'react';
-import { Settings as SettingsIcon, ChevronRight, Cpu } from 'lucide-react';
+import { Settings as SettingsIcon, ChevronRight, Cpu, Keyboard } from 'lucide-react';
 import SettingsDialog from './SettingsDialog';
+import ShortcutsDialog from './ShortcutsDialog';
 
 interface MenuItemProps {
-  icon?: React.ReactNode;
-  label: string;
-  onClick?: () => void;
-  children?: React.ReactNode;
+  readonly icon?: React.ReactNode;
+  readonly label: string;
+  readonly onClick?: () => void;
+  readonly children?: React.ReactNode;
 }
 
 function MenuItem({ icon, label, onClick, children }: MenuItemProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -54,6 +55,7 @@ function MenuItem({ icon, label, onClick, children }: MenuItemProps) {
 export default function SettingsMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -86,6 +88,14 @@ export default function SettingsMenu() {
                 setIsOpen(false);
               }}
             />
+            <MenuItem
+              icon={<Keyboard size={16} className="text-text-secondary dark:text-text-secondary-dark" />}
+              label="快捷键"
+              onClick={() => {
+                setIsShortcutsOpen(true);
+                setIsOpen(false);
+              }}
+            />
             {/* Future multi-level menus can be added here like this:
             <MenuItem label="更多设置" icon={<SettingsIcon size={16} />}>
               <MenuItem label="二级菜单 1" />
@@ -99,6 +109,7 @@ export default function SettingsMenu() {
       )}
 
       <SettingsDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+      <ShortcutsDialog isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
     </div>
   );
 }
