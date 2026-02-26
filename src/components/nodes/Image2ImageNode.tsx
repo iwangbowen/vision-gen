@@ -50,9 +50,9 @@ function Image2ImageNode({ id, data }: NodeProps) {
   };
 
   return (
-    <div className="node-card w-56 rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
+    <div className="node-card w-56 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
       {/* Header - icon only */}
-      <div className="flex items-center justify-between px-2.5 py-1.5 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
+      <div className="flex items-center justify-between px-2.5 py-1.5 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark rounded-t-xl">
         <div className="flex items-center gap-1.5">
           <ImageIcon size={12} className="text-emerald-500" />
           {nodeData.status === 'generating' && (
@@ -80,14 +80,14 @@ function Image2ImageNode({ id, data }: NodeProps) {
             image={nodeData.sourceImage}
             sourceNodeId={id}
             label={nodeData.label || '参考图'}
-            className="w-full rounded-lg overflow-hidden border border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group"
+            className="w-full rounded-lg border border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group"
           >
             <ImageEditOverlay
               imageUrl={nodeData.sourceImage}
               onCropComplete={handleCropComplete}
             >
-              <img src={nodeData.sourceImage} alt="source" className="w-full aspect-video object-cover" />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none">
+              <img src={nodeData.sourceImage} alt="source" className="w-full aspect-video object-cover rounded-lg" />
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none rounded-lg">
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}

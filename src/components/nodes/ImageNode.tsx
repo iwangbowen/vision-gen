@@ -15,9 +15,9 @@ function ImageNode({ id, data }: NodeProps) {
   };
 
   return (
-    <div className="node-card w-44 rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
+    <div className="node-card w-44 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
       {/* Header - compact */}
-      <div className="flex items-center px-2 py-1 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
+      <div className="flex items-center px-2 py-1 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark rounded-t-xl">
         <div className="flex items-center gap-1">
           <ImageIcon size={10} className="text-amber-500" />
           {nodeData.status === 'generating' && (
@@ -41,7 +41,7 @@ function ImageNode({ id, data }: NodeProps) {
             image={nodeData.image}
             sourceNodeId={id}
             label={nodeData.label}
-            className="rounded-lg overflow-hidden"
+            className="rounded-lg"
             showAddToTimelineIcon={true}
           >
             <ImageEditOverlay
@@ -51,7 +51,7 @@ function ImageNode({ id, data }: NodeProps) {
               <img
                 src={nodeData.image}
                 alt={nodeData.label}
-                className="w-full aspect-square object-cover"
+                className="w-full aspect-square object-cover rounded-lg"
                 loading="lazy"
               />
             </ImageEditOverlay>

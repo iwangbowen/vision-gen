@@ -49,33 +49,31 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, children }:
 
       {showToolbar && (
         <div
-          className="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 p-2 backdrop-blur-sm transition-all z-10"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 flex items-center justify-center gap-1 p-1.5 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max"
           onPointerDown={(e) => e.stopPropagation()}
         >
-          <div className="flex flex-wrap justify-center gap-2 max-w-[80%]">
-            {[
-              { icon: <Expand size={16} />, label: '扩图', action: 'outpaint' },
-              { icon: <Crop size={16} />, label: '裁剪', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
-              { icon: <Paintbrush size={16} />, label: '重绘', action: 'repaint' },
-              { icon: <Paintbrush size={16} />, label: '局部重绘', action: 'inpaint' },
-              { icon: <Camera size={16} />, label: '镜头角度', action: 'camera' },
-              { icon: <Sun size={16} />, label: '灯光色调', action: 'lighting' },
-            ].map((tool) => (
-              <button
-                key={tool.action}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (tool.onClick) {
-                    tool.onClick();
-                  }
-                }}
-                className="p-2 rounded-full bg-white/90 text-black hover:bg-white hover:scale-110 transition-all shadow-lg"
-                title={tool.onClick ? tool.label : `${tool.label}（功能待接入）`}
-              >
-                {tool.icon}
-              </button>
-            ))}
-          </div>
+          {[
+            { icon: <Expand size={14} />, label: '扩图', action: 'outpaint' },
+            { icon: <Crop size={14} />, label: '裁剪', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
+            { icon: <Paintbrush size={14} />, label: '重绘', action: 'repaint' },
+            { icon: <Paintbrush size={14} />, label: '局部重绘', action: 'inpaint' },
+            { icon: <Camera size={14} />, label: '镜头角度', action: 'camera' },
+            { icon: <Sun size={14} />, label: '灯光色调', action: 'lighting' },
+          ].map((tool) => (
+            <button
+              key={tool.action}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (tool.onClick) {
+                  tool.onClick();
+                }
+              }}
+              className="p-1.5 rounded-md text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
+              title={tool.onClick ? tool.label : `${tool.label}（功能待接入）`}
+            >
+              {tool.icon}
+            </button>
+          ))}
         </div>
       )}
 

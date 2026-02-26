@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Check } from 'lucide-react';
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -79,11 +80,11 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
     handleClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <button
         type="button"
-        className="absolute inset-0 w-full h-full cursor-default"
+        className="absolute inset-0 w-full h-full cursor-default block p-0 m-0 border-none bg-transparent"
         onClick={handleClose}
         aria-label="Close crop dialog"
       />
@@ -138,6 +139,7 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
