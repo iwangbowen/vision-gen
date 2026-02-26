@@ -19,6 +19,7 @@ import {
   IMAGE_SIZE_OPTIONS,
   IMAGE_STYLE_OPTIONS,
 } from '../../utils/constants';
+import CropDialog from '../ui/CropDialog';
 
 export default function PropertyPanel() {
   const { nodes, selectedNodeId, removeNode, setSelectedNodeId, updateNodeData } = useCanvasStore();
@@ -26,6 +27,7 @@ export default function PropertyPanel() {
   const [saveCategory, setSaveCategory] = useState<AssetCategory>('scene');
   const [saveName, setSaveName] = useState('');
   const [showSaveForm, setShowSaveForm] = useState(false);
+  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
 
@@ -58,6 +60,19 @@ export default function PropertyPanel() {
     });
     setShowSaveForm(false);
     setSaveName('');
+  };
+
+  const handleCropComplete = (croppedImageUrl: string) => {
+    if (!selectedNode) return;
+
+    const data = selectedNode.data as Record<string, unknown>;
+    if (data.generatedImage) {
+      updateNodeData(selectedNode.id, { generatedImage: croppedImageUrl });
+    } else if (data.image) {
+      updateNodeData(selectedNode.id, { image: croppedImageUrl });
+    } else if (data.sourceImage) {
+      updateNodeData(selectedNode.id, { sourceImage: croppedImageUrl });
+    }
   };
 
   const isGenerativeNode = selectedNode.type === 'text2image' || selectedNode.type === 'image2image';
@@ -221,7 +236,7 @@ export default function PropertyPanel() {
             <div className="grid grid-cols-2 gap-1.5">
               {[
                 { icon: <Expand size={14} />, label: '扩图', action: 'outpaint' },
-                { icon: <Crop size={14} />, label: '裁剪', action: 'crop' },
+                { icon: <Crop size={14} />, label: '裁剪', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
                 { icon: <Paintbrush size={14} />, label: '重绘', action: 'repaint' },
                 { icon: <Paintbrush size={14} />, label: '局部重绘', action: 'inpaint' },
                 { icon: <Camera size={14} />, label: '镜头角度', action: 'camera' },
@@ -229,12 +244,13 @@ export default function PropertyPanel() {
               ].map((tool) => (
                 <button
                   key={tool.action}
+                  onClick={tool.onClick}
                   className="flex items-center gap-1.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors
                     bg-canvas-bg dark:bg-canvas-bg-dark
                     text-text-primary dark:text-text-primary-dark
                     hover:bg-accent/10 hover:text-accent
                     border border-border dark:border-border-dark"
-                  title={`${tool.label}（功能待接入）`}
+                  title={tool.onClick ? tool.label : `${tool.label}（功能待接入）`}
                 >
                   {tool.icon}
                   {tool.label}
@@ -337,6 +353,15 @@ export default function PropertyPanel() {
           删除节点
         </button>
       </div>
+
+      {nodeImage && (
+        <CropDialog
+          isOpen={isCropDialogOpen}
+          onClose={() => setIsCropDialogOpen(false)}
+          imageUrl={nodeImage}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 }
