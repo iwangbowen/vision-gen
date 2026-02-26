@@ -42,9 +42,12 @@ export class GeminiImageService implements LLMService {
 
     // Build prompt — include grid context so the LLM returns a single composite grid image
     let prompt = options.prompt;
+    if (options.style) {
+      prompt = `Style: ${options.style}. ${prompt}`;
+    }
     if (options.gridSize && options.gridSize !== '1x1') {
       const size = Number.parseInt(options.gridSize[0], 10);
-      prompt = `Generate a single image that is a ${options.gridSize} grid layout (${size} rows × ${size} columns) of distinct scenes. Each cell should show a different variation of the following description with different compositions or angles. Description: ${options.prompt}`;
+      prompt = `Generate a single image that is a ${options.gridSize} grid layout (${size} rows × ${size} columns) of distinct scenes. Each cell should show a different variation of the following description with different compositions or angles. Description: ${prompt}`;
     }
 
     try {

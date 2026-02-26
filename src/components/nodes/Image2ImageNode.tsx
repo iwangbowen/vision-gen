@@ -5,6 +5,7 @@ import { useCanvasStore } from '../../stores/canvasStore';
 import AssetPickerDialog from '../ui/AssetPickerDialog';
 import ImageContextMenu from '../ui/ImageContextMenu';
 import type { Image2ImageData } from '../../types';
+import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
 function Image2ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as Image2ImageData;
@@ -151,6 +152,12 @@ function Image2ImageNode({ id, data }: NodeProps) {
             <span>{nodeData.aspectRatio || '16:9'}</span>
             <span>·</span>
             <span className="uppercase">{nodeData.imageSize || '1k'}</span>
+            {nodeData.style && (
+              <>
+                <span>·</span>
+                <span>{IMAGE_STYLE_OPTIONS.find(o => o.value === nodeData.style)?.label || nodeData.style}</span>
+              </>
+            )}
           </div>
           <button
             onClick={handleGenerate}

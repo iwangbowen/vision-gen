@@ -20,9 +20,14 @@ export class CustomImageService implements LLMService {
     try {
       const url = `${this.baseUrl.replace(/\/$/, '')}/images/generations`;
 
+      let prompt = options.prompt;
+      if (options.style) {
+        prompt = `Style: ${options.style}. ${prompt}`;
+      }
+
       const payload = {
         model: this.model || 'dall-e-3',
-        prompt: options.prompt,
+        prompt: prompt,
         n: 1,
         size: options.size || '1024x1024',
         response_format: 'b64_json',

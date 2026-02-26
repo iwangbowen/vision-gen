@@ -10,40 +10,15 @@ import {
 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useAssetStore } from '../../stores/assetStore';
-import type { AssetCategory, GridSize, AspectRatio, ImageSize, Text2ImageData, Image2ImageData } from '../../types';
+import type { AssetCategory, Text2ImageData, Image2ImageData } from '../../types';
 import { useState } from 'react';
-
-const ASSET_CATEGORIES: { label: string; value: AssetCategory }[] = [
-  { label: '人物', value: 'character' },
-  { label: '道具', value: 'prop' },
-  { label: '场景', value: 'scene' },
-  { label: '服装', value: 'costume' },
-  { label: '分镜', value: 'storyboard' },
-];
-
-const GRID_OPTIONS: { label: string; value: GridSize }[] = [
-  { label: '1×1', value: '1x1' },
-  { label: '2×2', value: '2x2' },
-  { label: '3×3', value: '3x3' },
-  { label: '4×4', value: '4x4' },
-  { label: '5×5', value: '5x5' },
-];
-
-const ASPECT_RATIO_OPTIONS: { label: string; value: AspectRatio }[] = [
-  { label: '1:1', value: '1:1' },
-  { label: '16:9', value: '16:9' },
-  { label: '9:16', value: '9:16' },
-  { label: '4:3', value: '4:3' },
-  { label: '3:4', value: '3:4' },
-  { label: '3:2', value: '3:2' },
-  { label: '2:3', value: '2:3' },
-];
-
-const IMAGE_SIZE_OPTIONS: { label: string; value: ImageSize }[] = [
-  { label: '1K', value: '1k' },
-  { label: '2K', value: '2k' },
-  { label: '4K', value: '4k' },
-];
+import {
+  ASSET_CATEGORIES,
+  GRID_OPTIONS,
+  ASPECT_RATIO_OPTIONS,
+  IMAGE_SIZE_OPTIONS,
+  IMAGE_STYLE_OPTIONS,
+} from '../../utils/constants';
 
 export default function PropertyPanel() {
   const { nodes, selectedNodeId, removeNode, setSelectedNodeId, updateNodeData } = useCanvasStore();
@@ -196,6 +171,28 @@ export default function PropertyPanel() {
                 ))}
               </div>
             </div>
+
+            {/* Image Style selector */}
+            <div>
+              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                画面风格
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {IMAGE_STYLE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateNodeData(selectedNode.id, { style: opt.value })}
+                    className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
+                      ${(generativeData.style || '') === opt.value
+                        ? 'bg-accent text-white dark:text-black'
+                        : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                      }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -250,16 +247,7 @@ export default function PropertyPanel() {
         {/* Save as asset */}
         {nodeImage && (
           <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-            {!showSaveForm ? (
-              <button
-                onClick={() => setShowSaveForm(true)}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
-                  bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
-              >
-                <Save size={14} />
-                保存为资产
-              </button>
-            ) : (
+            {showSaveForm ? (
               <div className="space-y-2">
                 <input
                   type="text"
@@ -304,6 +292,15 @@ export default function PropertyPanel() {
                   </button>
                 </div>
               </div>
+            ) : (
+              <button
+                onClick={() => setShowSaveForm(true)}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
+                  bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
+              >
+                <Save size={14} />
+                保存为资产
+              </button>
             )}
           </div>
         )}

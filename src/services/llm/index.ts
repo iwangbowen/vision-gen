@@ -3,6 +3,7 @@ export interface GenerateImageOptions {
   aspectRatio?: string;
   size?: string;
   gridSize?: string;
+  style?: string;
   sourceImage?: string;
   [key: string]: unknown;
 }

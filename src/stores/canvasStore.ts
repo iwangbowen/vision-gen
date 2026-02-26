@@ -92,6 +92,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         gridSize: '1x1',
         aspectRatio: '16:9',
         imageSize: '1k',
+        style: '',
       },
     };
     set((state) => ({ nodes: [...state.nodes, newNode] }));
@@ -110,6 +111,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         gridSize: '1x1',
         aspectRatio: '16:9',
         imageSize: '1k',
+        style: '',
         sourceImage: image,
       },
     };
@@ -197,6 +199,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       const aspectRatio = data.aspectRatio || '1:1';
       const imageSize = data.imageSize || '1k';
       const gridSize = data.gridSize || '1x1';
+      const style = data.style || '';
 
       // Call the actual LLM service with all parameters
       const result = await llmService.generateImage({
@@ -204,6 +207,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         aspectRatio,
         size: imageSize,
         gridSize,
+        style,
         sourceImage: (data as Image2ImageData).sourceImage,
       });
 
