@@ -60,9 +60,9 @@ export default function Timeline() {
     const trackRect = trackElement.getBoundingClientRect();
 
     // Calculate the slot position based on mouse X coordinate
-    // Assuming each slot is roughly 80px wide (w-16 = 64px + gap-2 = 8px + padding)
+    // Assuming each slot is roughly 104px wide (w-24 = 96px + gap-2 = 8px + padding)
     // We'll use a fixed slot width for calculation
-    const SLOT_WIDTH = 72;
+    const SLOT_WIDTH = 104;
     const scrollLeft = trackElement.scrollLeft;
     const relativeX = e.clientX - trackRect.left + scrollLeft;
 
@@ -188,7 +188,7 @@ export default function Timeline() {
             {Array.from({ length: Math.max(20, Math.max(...items.map(i => i.position ?? 0)) + 5) }).map((_, i) => (
               <div
                 key={`empty-slot-${i}`}
-                className="w-16 h-16 rounded-lg border-2 border-dashed border-border/80 dark:border-border-dark/50 bg-surface/50 dark:bg-transparent flex items-center justify-center shrink-0"
+                className="w-24 h-16 rounded-lg border-2 border-dashed border-border/80 dark:border-border-dark/50 bg-surface/50 dark:bg-transparent flex items-center justify-center shrink-0"
               >
                 <span className="text-[8px] text-text-secondary/50 dark:text-text-secondary-dark/30">#{i + 1}</span>
               </div>
@@ -207,13 +207,13 @@ export default function Timeline() {
                   className={`absolute top-2 shrink-0 group transition-transform ${
                     dragIndex === idx ? 'opacity-50' : ''
                   } ${dropIndex === idx && dragIndex !== idx ? 'scale-110' : ''}`}
-                  style={{ left: `${pos * 72}px` }} // 72px = 64px (w-16) + 8px (gap-2)
+                  style={{ left: `${pos * 104}px` }} // 104px = 96px (w-24) + 8px (gap-2)
                 >
                   {/* Frame number */}
                   <div className="absolute -top-0.5 left-1 text-[8px] font-bold text-text-secondary dark:text-text-secondary-dark z-10 bg-timeline-bg/80 dark:bg-timeline-bg-dark/80 px-1 rounded">
                     #{pos + 1}
                   </div>
-                  <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-border dark:border-border-dark hover:border-accent transition-colors cursor-grab active:cursor-grabbing relative bg-surface dark:bg-surface-dark">
+                  <div className="w-24 h-16 rounded-lg overflow-hidden border-2 border-border dark:border-border-dark hover:border-accent transition-colors cursor-grab active:cursor-grabbing relative bg-surface dark:bg-surface-dark">
                     <img
                       src={item.image}
                       alt={item.label || `Frame ${pos + 1}`}
@@ -235,7 +235,7 @@ export default function Timeline() {
                     </div>
                   </div>
                   {item.label && (
-                    <p className="text-[8px] text-text-secondary dark:text-text-secondary-dark text-center mt-0.5 truncate w-16 bg-timeline-bg/80 dark:bg-timeline-bg-dark/80 rounded">
+                    <p className="text-[8px] text-text-secondary dark:text-text-secondary-dark text-center mt-0.5 truncate w-24 bg-timeline-bg/80 dark:bg-timeline-bg-dark/80 rounded">
                       {item.label}
                     </p>
                   )}
