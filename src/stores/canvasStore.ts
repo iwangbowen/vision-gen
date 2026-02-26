@@ -57,7 +57,7 @@ interface CanvasState {
     }
   ) => Promise<void>;
   splitGridNode: (nodeId: string) => void;
-  splitGeneratedImage: (nodeId: string) => Promise<void>;
+  splitGeneratedImage: (nodeId: string, customGridSize?: string) => Promise<void>;
   duplicateNode: (nodeId: string) => void;
   duplicateNodes: (nodeIds: string[]) => void;
   removeNode: (nodeId: string) => void;
@@ -550,24 +550,24 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     set((state) => ({ nodes: [...state.nodes, ...newNodes] }));
   },
 
-  splitGeneratedImage: async (nodeId) => {
+  splitGeneratedImage: async (nodeId, customGridSize) => {
     const state = get();
     const node = state.nodes.find((n) => n.id === nodeId);
     if (!node) return;
 
     let generatedImage: string | undefined;
-    let gridSize: GridSize | undefined;
+    let gridSize: string | undefined;
 
     if (node.type === 'text2image') {
       generatedImage = (node.data as Text2ImageData).generatedImage;
-      gridSize = (node.data as Text2ImageData).gridSize;
+      gridSize = customGridSize || (node.data as Text2ImageData).gridSize;
     } else if (node.type === 'image2image') {
       // For image2image, the result is stored in sourceImage (e.g. after repaint) or generatedImage
       generatedImage = (node.data as Image2ImageData).generatedImage || (node.data as Image2ImageData).sourceImage;
-      gridSize = (node.data as Image2ImageData).gridSize;
+      gridSize = customGridSize || (node.data as Image2ImageData).gridSize;
     } else if (node.type === 'image') {
       generatedImage = (node.data as AppImageData).image;
-      gridSize = (node.data as AppImageData).gridSize;
+      gridSize = customGridSize || (node.data as AppImageData).gridSize;
     }
 
     if (!generatedImage || !gridSize || gridSize === '1x1') return;

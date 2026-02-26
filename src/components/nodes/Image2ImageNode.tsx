@@ -118,6 +118,7 @@ function Image2ImageNode({ id, data }: NodeProps) {
                 imageUrl={nodeData.sourceImage}
                 onCropComplete={handleCropComplete}
                 onRepaintComplete={handleRepaintComplete}
+                onSplitComplete={nodeData.status === 'generating' ? undefined : (size) => splitGeneratedImage(id, size)}
               >
                 <img src={nodeData.sourceImage} alt="source" className="w-full h-auto rounded-lg" />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none rounded-lg">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Expand, Crop, Paintbrush, Camera, Sun, Eye } from 'lucide-react';
+import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight } from 'lucide-react';
 import CropDialog from './CropDialog';
 import RepaintDialog from './RepaintDialog';
 import ImagePreviewDialog from './ImagePreviewDialog';
@@ -8,11 +8,13 @@ interface ImageEditOverlayProps {
   readonly imageUrl: string;
   readonly onCropComplete: (croppedImageUrl: string) => void;
   readonly onRepaintComplete?: (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => void;
+  readonly onSplitComplete?: (gridSize?: string) => void;
   readonly children: React.ReactNode;
 }
 
-export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintComplete, children }: ImageEditOverlayProps) {
+export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintComplete, onSplitComplete, children }: ImageEditOverlayProps) {
   const [showToolbar, setShowToolbar] = useState(false);
+  const [showSplitMenu, setShowSplitMenu] = useState(false);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const [isRepaintDialogOpen, setIsRepaintDialogOpen] = useState(false);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
@@ -22,6 +24,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowToolbar(false);
+        setShowSplitMenu(false);
       }
     };
 
@@ -29,6 +32,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
       const customEvent = event as CustomEvent;
       if (customEvent.detail !== containerRef.current) {
         setShowToolbar(false);
+        setShowSplitMenu(false);
       }
     };
 
@@ -91,22 +95,50 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
             },
             { icon: <Crop size={14} />, label: '裁剪', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
             { icon: <Paintbrush size={14} />, label: '重绘', action: 'repaint', onClick: () => setIsRepaintDialogOpen(true) },
+            ...(onSplitComplete ? [{
+              icon: <Scissors size={14} />,
+              label: '切分',
+              action: 'split',
+              onClick: () => setShowSplitMenu(!showSplitMenu),
+              hasSubmenu: true
+            }] : []),
             { icon: <Camera size={14} />, label: '镜头角度', action: 'camera' },
             { icon: <Sun size={14} />, label: '灯光色调', action: 'lighting' },
           ].map((tool) => (
-            <button
-              key={tool.action}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (tool.onClick) {
-                  tool.onClick();
-                }
-              }}
-              className="p-1.5 rounded-md text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
-              title={tool.onClick ? tool.label : `${tool.label}（功能待接入）`}
-            >
-              {tool.icon}
-            </button>
+            <div key={tool.action} className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (tool.onClick) {
+                    tool.onClick();
+                  }
+                }}
+                className={`p-1.5 rounded-md text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors flex items-center gap-1 ${tool.action === 'split' && showSplitMenu ? 'bg-surface-hover dark:bg-surface-hover-dark' : ''}`}
+                title={tool.onClick ? tool.label : `${tool.label}（功能待接入）`}
+              >
+                {tool.icon}
+                {tool.hasSubmenu && <ChevronRight size={10} className={`transition-transform ${showSplitMenu ? '-rotate-90' : 'rotate-90'}`} />}
+              </button>
+
+              {tool.action === 'split' && showSplitMenu && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col">
+                  {['2x2', '3x3', '4x4'].map((size) => (
+                    <button
+                      key={size}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSplitComplete?.(size);
+                        setShowSplitMenu(false);
+                        setShowToolbar(false);
+                      }}
+                      className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left"
+                    >
+                      {size} 宫格
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       )}
