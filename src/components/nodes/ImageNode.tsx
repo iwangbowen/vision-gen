@@ -75,7 +75,7 @@ function ImageNode({ id, data }: NodeProps) {
               <img
                 src={nodeData.image}
                 alt={nodeData.label}
-                className="w-full aspect-square object-cover rounded-lg"
+                className="w-full h-auto rounded-lg"
                 loading="lazy"
               />
             </ImageEditOverlay>
