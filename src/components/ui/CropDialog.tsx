@@ -55,20 +55,25 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
 
   if (!isOpen) return null;
 
+  const applyPercentCrop = (percentCrop: Crop, displayWidth: number, displayHeight: number) => {
+    setCrop(percentCrop);
+    setCompletedCrop({
+      unit: 'px',
+      x: (percentCrop.x / 100) * displayWidth,
+      y: (percentCrop.y / 100) * displayHeight,
+      width: (percentCrop.width / 100) * displayWidth,
+      height: (percentCrop.height / 100) * displayHeight,
+    });
+  };
+
   const handleAspectClick = (newAspect: number | undefined) => {
     setAspect(newAspect);
     if (imgRef.current) {
       const { width, height } = imgRef.current;
       if (newAspect) {
-        setCrop(centerAspectCrop(width, height, newAspect));
+        applyPercentCrop(centerAspectCrop(width, height, newAspect), width, height);
       } else {
-        setCrop({
-          unit: '%',
-          x: 5,
-          y: 5,
-          width: 90,
-          height: 90
-        });
+        applyPercentCrop({ unit: '%', x: 5, y: 5, width: 90, height: 90 }, width, height);
       }
     }
   };
@@ -76,15 +81,9 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
     if (aspect) {
-      setCrop(centerAspectCrop(width, height, aspect));
+      applyPercentCrop(centerAspectCrop(width, height, aspect), width, height);
     } else {
-      setCrop({
-        unit: '%',
-        x: 5,
-        y: 5,
-        width: 90,
-        height: 90
-      });
+      applyPercentCrop({ unit: '%', x: 5, y: 5, width: 90, height: 90 }, width, height);
     }
   };
 
