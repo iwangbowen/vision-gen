@@ -44,7 +44,7 @@ interface CanvasState {
   addGridNode: (position: { x: number; y: number }, gridSize: GridSize, generatedImages?: string[]) => void;
 
   // Node actions
-  updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData>) => void;
+  updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData | MultiInputData>) => void;
   simulateGenerate: (nodeId: string) => Promise<void>;
   generateRepaint: (nodeId: string, sourceImage: string, maskImage: string, prompt: string) => Promise<void>;
   generateRepaintToImage2Image: (
@@ -249,18 +249,18 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const node = get().nodes.find((n) => n.id === nodeId);
     if (!node) return;
 
-    const data = node.data as Text2ImageData | Image2ImageData;
+    const data = node.data as Text2ImageData | Image2ImageData | MultiInputData;
     const prompt = data.prompt || '';
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
     useTaskStore.getState().addTask({
       id: taskId,
       nodeId,
-      type: node.type as 'text2image' | 'image2image',
+      type: node.type as 'text2image' | 'image2image' | 'multiInput',
       prompt,
     });
 
-    updateNodeData(nodeId, { status: 'generating' } as Partial<Text2ImageData>);
+    updateNodeData(nodeId, { status: 'generating' } as Partial<Text2ImageData | Image2ImageData | MultiInputData>);
 
     // Create a placeholder node for the generated image
     const outgoingEdges = get().edges.filter(e => e.source === nodeId);
@@ -342,7 +342,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         image = String(result);
       }
 
-      updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
+      updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData | Image2ImageData | MultiInputData>);
 
       // Update the result node with the generated image as sourceImage
       updateNodeData(newNodeId, {
@@ -375,7 +375,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
           if (node.type === 'text2image' || node.type === 'image2image' || node.type === 'multiInput') {
             const image = getRandomSampleImage();
-            updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
+            updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData | Image2ImageData | MultiInputData>);
 
             // Update the result node with the generated image as sourceImage
             updateNodeData(newNodeId, {

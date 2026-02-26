@@ -27,10 +27,15 @@ function MultiInputNode({ id, data }: NodeProps) {
 
   // Update node data when source images change
   useEffect(() => {
-    if (sourceImages.length > 0) {
+    // Check if sourceImages actually changed to prevent infinite loops
+    const currentImages = nodeData.sourceImages || [];
+    const isDifferent = sourceImages.length !== currentImages.length ||
+      sourceImages.some((img, i) => img !== currentImages[i]);
+
+    if (isDifferent) {
       updateNodeData(id, { sourceImages });
     }
-  }, [sourceImages.length, id, updateNodeData, sourceImages]);
+  }, [sourceImages, id, updateNodeData, nodeData.sourceImages]);
 
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -72,9 +77,9 @@ function MultiInputNode({ id, data }: NodeProps) {
   const handleRepaintComplete = (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => {
     const store = useCanvasStore.getState();
     const node = store.nodes.find(n => n.id === id);
-    if (node && nodeData.sourceImage) {
+    if (node && nodeData.generatedImage) {
       // Generate repaint, then create an Image2Image node with the result as sourceImage
-      store.generateRepaintToImage2Image(id, nodeData.sourceImage, maskImageUrl, prompt, nodeData.label || '参考图', options);
+      store.generateRepaintToImage2Image(id, nodeData.generatedImage, maskImageUrl, prompt, nodeData.label || '融合结果', options);
     }
   };
 

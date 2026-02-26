@@ -3,7 +3,7 @@ import { create } from 'zustand';
 export interface Task {
   id: string;
   nodeId: string;
-  type: 'text2image' | 'image2image';
+  type: 'text2image' | 'image2image' | 'multiInput';
   prompt: string;
   status: 'generating' | 'done' | 'error';
   progress: number; // 0 to 100
