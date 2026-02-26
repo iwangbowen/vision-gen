@@ -88,15 +88,15 @@ function Text2ImageNode({ id, data }: NodeProps) {
             disabled={nodeData.status === 'generating'}
             aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
             title={nodeData.status === 'generating' ? '生成中' : '生成'}
-            className="absolute right-1 bottom-1 w-6 h-6 flex items-center justify-center rounded-md
+            className="absolute right-1.5 bottom-1.5 p-1 flex items-center justify-center rounded-md
               transition-colors
-              bg-accent text-white dark:text-black hover:bg-accent-hover
+              text-accent hover:bg-accent/10
               disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {nodeData.status === 'generating' ? (
-              <Loader2 size={12} className="animate-spin" />
+              <Loader2 size={14} className="animate-spin" />
             ) : (
-              <Send size={12} />
+              <Send size={14} />
             )}
           </button>
         </div>

@@ -214,12 +214,12 @@ function Image2ImageNode({ id, data }: NodeProps) {
             disabled={nodeData.status === 'generating'}
             aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
             title={nodeData.status === 'generating' ? '生成中' : '生成'}
-            className="absolute right-1 bottom-1 w-6 h-6 flex items-center justify-center rounded-md transition-colors bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute right-1.5 bottom-1.5 p-1 flex items-center justify-center rounded-md transition-colors text-emerald-500 hover:bg-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {nodeData.status === 'generating' ? (
-              <Loader2 size={12} className="animate-spin" />
+              <Loader2 size={14} className="animate-spin" />
             ) : (
-              <Send size={12} />
+              <Send size={14} />
             )}
           </button>
         </div>
