@@ -188,7 +188,7 @@ function Image2ImageNode({ id, data }: NodeProps) {
 
         {/* Compact settings + generate row */}
         <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-1 px-1.5 py-1 rounded bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark text-[9px] text-text-secondary dark:text-text-secondary-dark">
+          <div className="h-6 flex items-center gap-1 px-1.5 py-1 rounded bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark text-[9px] text-text-secondary dark:text-text-secondary-dark">
             <span>{nodeData.gridSize || '1x1'}</span>
             <span>·</span>
             <span>{nodeData.aspectRatio || '16:9'}</span>
@@ -202,12 +202,18 @@ function Image2ImageNode({ id, data }: NodeProps) {
             )}
           </div>
           <button
+            type="button"
             onClick={handleGenerate}
             disabled={nodeData.status === 'generating'}
-            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-colors bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
+            title={nodeData.status === 'generating' ? '生成中' : '生成'}
+            className="ml-auto shrink-0 w-6 h-6 flex items-center justify-center rounded-lg transition-colors bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Sparkles size={12} />
-            {nodeData.status === 'generating' ? '生成中' : '生成'}
+            {nodeData.status === 'generating' ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <Sparkles size={12} />
+            )}
           </button>
         </div>
           </>
