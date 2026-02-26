@@ -101,6 +101,12 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
     }
   };
 
+  const handleCameraAngleComplete = (prompt: string) => {
+    if (nodeData.generatedImage) {
+      useCanvasStore.getState().generateCameraAngle(id, nodeData.generatedImage, prompt, nodeData.label || '融合结果');
+    }
+  };
+
   return (
     <div className={`node-card w-52 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark shadow-lg overflow-hidden transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
       <Handle
@@ -173,6 +179,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
                 onOutpaintComplete={nodeData.generatedImage && nodeData.status !== 'generating' ? handleOutpaintComplete : undefined}
                 onEnhanceComplete={nodeData.generatedImage && nodeData.status !== 'generating' ? handleEnhanceComplete : undefined}
                 onRemoveWatermarkComplete={nodeData.generatedImage && nodeData.status !== 'generating' ? handleRemoveWatermarkComplete : undefined}
+                onCameraAngleComplete={nodeData.generatedImage && nodeData.status !== 'generating' ? handleCameraAngleComplete : undefined}
                 onSplitComplete={nodeData.status === 'generating' ? undefined : (size) => splitGeneratedImage(id, size)}
               >
                 <img src={nodeData.generatedImage} alt="generated" className="w-full h-auto block" />

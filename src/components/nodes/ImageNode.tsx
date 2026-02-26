@@ -49,6 +49,10 @@ function ImageNode({ id, data, selected }: NodeProps) {
     useCanvasStore.getState().generateRemoveWatermark(id, nodeData.image, nodeData.label);
   };
 
+  const handleCameraAngleComplete = (prompt: string) => {
+    useCanvasStore.getState().generateCameraAngle(id, nodeData.image, prompt, nodeData.label);
+  };
+
   return (
     <div className={`node-card w-44 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark shadow-lg transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
       {/* Header - compact */}
@@ -86,6 +90,7 @@ function ImageNode({ id, data, selected }: NodeProps) {
               onOutpaintComplete={handleOutpaintComplete}
               onEnhanceComplete={handleEnhanceComplete}
               onRemoveWatermarkComplete={handleRemoveWatermarkComplete}
+              onCameraAngleComplete={handleCameraAngleComplete}
               onSplitComplete={(size) => splitGeneratedImage(id, size)}
             >
               <img

@@ -90,6 +90,12 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
     }
   };
 
+  const handleCameraAngleComplete = (prompt: string) => {
+    if (nodeData.sourceImage) {
+      useCanvasStore.getState().generateCameraAngle(id, nodeData.sourceImage, prompt, nodeData.label || '参考图', nodeData.style);
+    }
+  };
+
   return (
     <div className={`node-card w-52 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark shadow-lg overflow-hidden transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
       {/* Header - icon and settings */}
@@ -149,6 +155,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
                 onOutpaintComplete={nodeData.sourceImage && nodeData.status !== 'generating' ? handleOutpaintComplete : undefined}
                 onEnhanceComplete={nodeData.sourceImage && nodeData.status !== 'generating' ? handleEnhanceComplete : undefined}
                 onRemoveWatermarkComplete={nodeData.sourceImage && nodeData.status !== 'generating' ? handleRemoveWatermarkComplete : undefined}
+                onCameraAngleComplete={nodeData.sourceImage && nodeData.status !== 'generating' ? handleCameraAngleComplete : undefined}
                 onSplitComplete={nodeData.status === 'generating' ? undefined : (size) => splitGeneratedImage(id, size)}
               >
                 <img src={nodeData.sourceImage} alt="source" className="w-full h-auto block" />

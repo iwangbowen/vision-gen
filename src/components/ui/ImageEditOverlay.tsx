@@ -4,6 +4,7 @@ import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight, Mor
 import CropDialog from './CropDialog';
 import RepaintDialog from './RepaintDialog';
 import ImagePreviewDialog from './ImagePreviewDialog';
+import CameraAngleDialog from './CameraAngleDialog';
 import { ASPECT_RATIO_OPTIONS } from '../../utils/constants';
 
 interface ImageEditOverlayProps {
@@ -14,10 +15,11 @@ interface ImageEditOverlayProps {
   readonly onEnhanceComplete?: () => void;
   readonly onRemoveWatermarkComplete?: () => void;
   readonly onSplitComplete?: (gridSize?: string) => void;
+  readonly onCameraAngleComplete?: (prompt: string) => void;
   readonly children: React.ReactNode;
 }
 
-export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintComplete, onOutpaintComplete, onEnhanceComplete, onRemoveWatermarkComplete, onSplitComplete, children }: ImageEditOverlayProps) {
+export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintComplete, onOutpaintComplete, onEnhanceComplete, onRemoveWatermarkComplete, onSplitComplete, onCameraAngleComplete, children }: ImageEditOverlayProps) {
   const [showToolbar, setShowToolbar] = useState(false);
   const [showSplitMenu, setShowSplitMenu] = useState(false);
   const [showOutpaintMenu, setShowOutpaintMenu] = useState(false);
@@ -25,6 +27,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const [isRepaintDialogOpen, setIsRepaintDialogOpen] = useState(false);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [isCameraAngleDialogOpen, setIsCameraAngleDialogOpen] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -232,7 +235,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
                     <Eraser size={12} />去水印
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
+                    onClick={(e) => { e.stopPropagation(); setIsCameraAngleDialogOpen(true); setShowMoreMenu(false); setShowToolbar(false); }}
                     className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
                   >
                     <Camera size={12} />镜头角度
@@ -272,6 +275,16 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         images={[{ url: imageUrl }]}
         currentIndex={0}
         onIndexChange={() => {}}
+      />
+
+      <CameraAngleDialog
+        isOpen={isCameraAngleDialogOpen}
+        imageUrl={imageUrl}
+        onClose={() => setIsCameraAngleDialogOpen(false)}
+        onConfirm={(prompt) => {
+          setIsCameraAngleDialogOpen(false);
+          onCameraAngleComplete?.(prompt);
+        }}
       />
     </div>
   );
