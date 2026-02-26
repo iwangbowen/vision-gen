@@ -43,7 +43,19 @@ interface CanvasState {
   updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData>) => void;
   simulateGenerate: (nodeId: string) => Promise<void>;
   generateRepaint: (nodeId: string, sourceImage: string, maskImage: string, prompt: string) => Promise<void>;
-  generateRepaintToImage2Image: (sourceNodeId: string, sourceImage: string, maskImage: string, prompt: string, label: string) => Promise<void>;
+  generateRepaintToImage2Image: (
+    sourceNodeId: string,
+    sourceImage: string,
+    maskImage: string,
+    prompt: string,
+    label: string,
+    options?: {
+      gridSize?: string;
+      aspectRatio?: string;
+      imageSize?: string;
+      style?: string;
+    }
+  ) => Promise<void>;
   splitGridNode: (nodeId: string) => void;
   splitGeneratedImage: (nodeId: string) => Promise<void>;
   duplicateNode: (nodeId: string) => void;
@@ -414,7 +426,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     }
   },
 
-  generateRepaintToImage2Image: async (sourceNodeId, sourceImage, maskImage, prompt, label) => {
+  generateRepaintToImage2Image: async (sourceNodeId, sourceImage, maskImage, prompt, label, options) => {
     const node = get().nodes.find((n) => n.id === sourceNodeId);
     if (!node) return;
 
@@ -457,6 +469,10 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         prompt,
         sourceImage,
         maskImage,
+        gridSize: options?.gridSize,
+        aspectRatio: options?.aspectRatio,
+        size: options?.imageSize,
+        style: options?.style,
       });
 
       clearInterval(progressInterval);

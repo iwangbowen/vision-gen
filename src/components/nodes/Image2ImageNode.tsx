@@ -63,12 +63,12 @@ function Image2ImageNode({ id, data }: NodeProps) {
     }
   };
 
-  const handleRepaintComplete = (maskImageUrl: string, prompt: string) => {
+  const handleRepaintComplete = (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => {
     const store = useCanvasStore.getState();
     const node = store.nodes.find(n => n.id === id);
     if (node && nodeData.sourceImage) {
       // Generate repaint, then create an Image2Image node with the result as sourceImage
-      store.generateRepaintToImage2Image(id, nodeData.sourceImage, maskImageUrl, prompt, nodeData.label || '参考图');
+      store.generateRepaintToImage2Image(id, nodeData.sourceImage, maskImageUrl, prompt, nodeData.label || '参考图', options);
     }
   };
 

@@ -7,7 +7,7 @@ import ImagePreviewDialog from './ImagePreviewDialog';
 interface ImageEditOverlayProps {
   readonly imageUrl: string;
   readonly onCropComplete: (croppedImageUrl: string) => void;
-  readonly onRepaintComplete?: (maskImageUrl: string, prompt: string) => void;
+  readonly onRepaintComplete?: (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => void;
   readonly children: React.ReactNode;
 }
 
@@ -49,9 +49,9 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
     setShowToolbar(false);
   };
 
-  const handleRepaintComplete = (maskImageUrl: string, prompt: string) => {
+  const handleRepaintComplete = (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => {
     if (onRepaintComplete) {
-      onRepaintComplete(maskImageUrl, prompt);
+      onRepaintComplete(maskImageUrl, prompt, options);
     }
     setIsRepaintDialogOpen(false);
     setShowToolbar(false);

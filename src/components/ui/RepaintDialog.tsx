@@ -2,12 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Check, Eraser, Undo, Paintbrush, ZoomIn, ZoomOut, Move } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
+import { GRID_OPTIONS, ASPECT_RATIO_OPTIONS, IMAGE_SIZE_OPTIONS, IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
 interface RepaintDialogProps {
   isOpen: boolean;
   onClose: () => void;
   imageUrl: string;
-  onRepaintComplete: (maskImageUrl: string, prompt: string) => void;
+  onRepaintComplete: (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => void;
 }
 
 const BRUSH_COLORS = ['#FFFFFF', '#EF4444', '#F59E0B', '#22C55E', '#3B82F6', '#A855F7'];
@@ -20,6 +21,13 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
   const [isDraggingCanvas, setIsDraggingCanvas] = useState(false);
   const [brushColor, setBrushColor] = useState('#FFFFFF');
   const [zoom, setZoom] = useState(1);
+
+  // Generation options
+  const [gridSize, setGridSize] = useState('1x1');
+  const [aspectRatio, setAspectRatio] = useState('16:9');
+  const [imageSize, setImageSize] = useState('1k');
+  const [style, setStyle] = useState('');
+
   const sigCanvas = useRef<SignatureCanvas>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pendingSnapshotRef = useRef<string | null>(null);
@@ -109,7 +117,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
 
         ctx.putImageData(maskImage, 0, 0);
         const maskImageUrl = maskCanvas.toDataURL('image/png');
-        onRepaintComplete(maskImageUrl, prompt);
+        onRepaintComplete(maskImageUrl, prompt, { gridSize, aspectRatio, imageSize, style });
       }
     }
     handleClose();
@@ -216,85 +224,74 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
         {/* Content */}
         <div className="flex-1 overflow-hidden flex flex-col md:flex-row min-w-0 min-h-0">
           {/* Canvas Area */}
-          <div
-            ref={containerRef}
-            onWheel={handleCanvasWheel}
-            onPointerDown={handleCanvasPointerDown}
-            onPointerMove={handleCanvasPointerMove}
-            onPointerUp={stopCanvasDrag}
-            onPointerCancel={stopCanvasDrag}
-            onPointerLeave={stopCanvasDrag}
-            className={`flex-1 min-w-0 p-4 bg-canvas-bg dark:bg-canvas-bg-dark relative overflow-auto min-h-75 ${panCursorClass}`}
-          >
-            {dimensions.width > 0 && (
-              <div className={`min-w-full min-h-full flex ${zoom > 1 ? 'items-start justify-start' : 'items-center justify-center'}`}>
-                <div
-                  className="relative shrink-0"
-                  style={{
-                    width: renderWidth,
-                    height: renderHeight,
-                    backgroundImage: `url(${imageUrl})`,
-                    backgroundSize: 'contain',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat'
-                  }}
-                >
-                  <SignatureCanvas
-                    ref={sigCanvas}
-                    penColor={brushColor}
-                    canvasProps={{
+          <div className="flex-1 min-w-0 flex flex-col relative">
+            <div
+              ref={containerRef}
+              onWheel={handleCanvasWheel}
+              onPointerDown={handleCanvasPointerDown}
+              onPointerMove={handleCanvasPointerMove}
+              onPointerUp={stopCanvasDrag}
+              onPointerCancel={stopCanvasDrag}
+              onPointerLeave={stopCanvasDrag}
+              className={`flex-1 min-w-0 p-4 bg-canvas-bg dark:bg-canvas-bg-dark relative overflow-auto min-h-75 ${panCursorClass}`}
+            >
+              {dimensions.width > 0 && (
+                <div className={`min-w-full min-h-full flex ${zoom > 1 ? 'items-start justify-start' : 'items-center justify-center'}`}>
+                  <div
+                    className="relative shrink-0"
+                    style={{
                       width: renderWidth,
                       height: renderHeight,
-                      className: `absolute inset-0 ${isPanMode ? 'pointer-events-none cursor-grab' : 'cursor-crosshair'}`
+                      backgroundImage: `url(${imageUrl})`,
+                      backgroundSize: 'contain',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat'
                     }}
-                    minWidth={brushSize}
-                    maxWidth={brushSize}
-                    dotSize={brushSize}
-                    velocityFilterWeight={0}
-                  />
+                  >
+                    <SignatureCanvas
+                      ref={sigCanvas}
+                      penColor={brushColor}
+                      canvasProps={{
+                        width: renderWidth,
+                        height: renderHeight,
+                        className: `absolute inset-0 ${isPanMode ? 'pointer-events-none cursor-grab' : 'cursor-crosshair'}`
+                      }}
+                      minWidth={brushSize}
+                      maxWidth={brushSize}
+                      dotSize={brushSize}
+                      velocityFilterWeight={0}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
+            {/* Zoom Controls (Bottom of Canvas) */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 p-1.5 rounded-lg bg-surface/90 dark:bg-surface-dark/90 backdrop-blur-sm border border-border dark:border-border-dark shadow-lg">
+              <button
+                type="button"
+                onClick={() => setZoomClamped(zoom - 0.1)}
+                className="p-1.5 rounded-md bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
+                title="缩小"
+              >
+                <ZoomOut size={14} />
+              </button>
+              <span className="text-xs font-medium text-text-primary dark:text-text-primary-dark min-w-[3ch] text-center">
+                {Math.round(zoom * 100)}%
+              </span>
+              <button
+                type="button"
+                onClick={() => setZoomClamped(zoom + 0.1)}
+                className="p-1.5 rounded-md bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
+                title="放大"
+              >
+                <ZoomIn size={14} />
+              </button>
+            </div>
           </div>
 
           {/* Controls Area */}
-          <div className="w-full md:w-60 md:shrink-0 p-3 border-t md:border-t-0 md:border-l border-border dark:border-border-dark flex flex-col gap-2.5 bg-surface dark:bg-surface-dark">
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
-                图片缩放（{Math.round(zoom * 100)}%）
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setZoomClamped(zoom - 0.1)}
-                  className="p-1.5 rounded-md bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
-                  title="缩小"
-                >
-                  <ZoomOut size={14} />
-                </button>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="3"
-                  step="0.1"
-                  value={zoom}
-                  onChange={(e) => setZoomClamped(Number(e.target.value))}
-                  className="w-full accent-accent"
-                />
-                <button
-                  type="button"
-                  onClick={() => setZoomClamped(zoom + 0.1)}
-                  className="p-1.5 rounded-md bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
-                  title="放大"
-                >
-                  <ZoomIn size={14} />
-                </button>
-              </div>
-              <p className="text-[10px] leading-snug text-text-secondary dark:text-text-secondary-dark">
-                支持滚轮缩放；放大后可切到“移动”模式拖拽查看细节。
-              </p>
-            </div>
-
+          <div className="w-full md:w-64 md:shrink-0 p-3 border-t md:border-t-0 md:border-l border-border dark:border-border-dark flex flex-col gap-3 bg-surface dark:bg-surface-dark overflow-y-auto">
             <div className="space-y-1.5">
               <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
                 画笔大小
@@ -392,7 +389,102 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
               清除蒙版
             </button>
 
-            <div className="space-y-2 flex-1 flex flex-col">
+            {/* Generation Settings */}
+            <div className="space-y-3 pt-3 border-t border-border dark:border-border-dark">
+              {/* Grid size selector */}
+              <div>
+                <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                  生成规格
+                </p>
+                <div className="flex gap-1.5 flex-wrap">
+                  {GRID_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setGridSize(opt.value)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors
+                        ${gridSize === opt.value
+                          ? 'bg-accent text-white dark:text-black'
+                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                        }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Aspect Ratio selector */}
+              <div>
+                <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                  画面比例
+                </p>
+                <div className="flex gap-1.5 flex-wrap">
+                  {ASPECT_RATIO_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setAspectRatio(opt.value)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors
+                        ${aspectRatio === opt.value
+                          ? 'bg-accent text-white dark:text-black'
+                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                        }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Image Size selector */}
+              <div>
+                <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                  图片尺寸
+                </p>
+                <div className="flex gap-1.5 flex-wrap">
+                  {IMAGE_SIZE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setImageSize(opt.value)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors
+                        ${imageSize === opt.value
+                          ? 'bg-accent text-white dark:text-black'
+                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                        }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Image Style selector */}
+              <div>
+                <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                  画面风格
+                </p>
+                <div className="flex gap-1.5 flex-wrap">
+                  {IMAGE_STYLE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setStyle(opt.value)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors
+                        ${style === opt.value
+                          ? 'bg-accent text-white dark:text-black'
+                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                        }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 flex-1 flex flex-col pt-3 border-t border-border dark:border-border-dark">
               <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
                 重绘提示词
               </p>
@@ -400,7 +492,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="描述你想要在涂抹区域生成的内容..."
-                className="w-full flex-1 min-h-25 p-2 text-sm bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-accent text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
+                className="w-full flex-1 min-h-20 p-2 text-sm bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-accent text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
               />
             </div>
           </div>
