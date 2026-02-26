@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight, MoreHorizontal, Sparkles, Eraser } from 'lucide-react';
+import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight, Sparkles, Eraser } from 'lucide-react';
 import CropDialog from './CropDialog';
 import RepaintDialog from './RepaintDialog';
 import ImagePreviewDialog from './ImagePreviewDialog';
@@ -169,7 +169,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
               onClick: () => { setIsCameraAngleDialogOpen(true); setShowToolbar(false); },
             }] : []),
             {
-              icon: <MoreHorizontal size={14} />,
+              icon: null,
               label: '更多',
               action: 'more',
               onClick: () => { setShowMoreMenu(!showMoreMenu); setShowSplitMenu(false); setShowOutpaintMenu(false); },
