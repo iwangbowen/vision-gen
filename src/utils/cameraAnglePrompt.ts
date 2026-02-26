@@ -5,6 +5,7 @@
 export interface CameraAngle {
   azimuth: number;   // -180 ~ 180, 0 = 正前方
   elevation: number; // -90 ~ 90, 0 = 平视, 90 = 俯视
+  zoom?: number;     // 1 ~ 10, default 5 (1=远景, 10=特写)
 }
 
 export interface AnglePreset {
@@ -48,11 +49,23 @@ function getVerticalDescription(elevation: number): string {
   return "worm's eye view";
 }
 
+function getZoomDescription(zoom: number): string {
+  if (zoom <= 2) return 'extreme wide shot';
+  if (zoom <= 3) return 'wide shot';
+  if (zoom <= 5) return 'medium shot';
+  if (zoom <= 7) return 'medium close-up';
+  if (zoom <= 9) return 'close-up shot';
+  return 'extreme close-up';
+}
+
 export function generateAnglePrompt(angle: CameraAngle): string {
-  const parts: string[] = [];
-  parts.push(getHorizontalDescription(angle.azimuth));
-  parts.push(getVerticalDescription(angle.elevation));
-  parts.push(`camera azimuth ${angle.azimuth}°, elevation ${angle.elevation}°`);
+  const zoom = angle.zoom ?? 5;
+  const parts = [
+    getHorizontalDescription(angle.azimuth),
+    getVerticalDescription(angle.elevation),
+    ...(zoom === 5 ? [] : [getZoomDescription(zoom)]),
+    `camera azimuth ${angle.azimuth}°, elevation ${angle.elevation}°, zoom ${zoom}`,
+  ];
   return parts.join(', ');
 }
 

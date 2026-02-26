@@ -23,11 +23,12 @@ const CY = SCENE_H / 2 - 10;
 const HANDLE_R = 7;
 
 export default function CameraAngleDialog({ isOpen, imageUrl, onClose, onConfirm }: CameraAngleDialogProps) {
-  const [angle, setAngle] = useState<CameraAngle>({ azimuth: 45, elevation: -30 });
+  const [angle, setAngle] = useState<CameraAngle>({ azimuth: 45, elevation: -30, zoom: 5 });
   const [dragging, setDragging] = useState<'orbit' | 'arc' | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const prompt = generateAnglePrompt(angle);
+  const zoom = angle.zoom ?? 5;
 
   const clampElevation = (v: number) => Math.max(-90, Math.min(90, v));
   const wrapAzimuth = (v: number) => {
@@ -141,11 +142,12 @@ export default function CameraAngleDialog({ isOpen, imageUrl, onClose, onConfirm
 
   if (!isOpen) return null;
 
-  // 3D transform for the image card
-  const imageTransform = `perspective(800px) rotateY(${-angle.azimuth * 0.3}deg) rotateX(${angle.elevation * 0.2}deg)`;
+  // 3D transform for the image card — zoom scales image size
+  const zoomScale = 0.6 + (zoom / 10) * 0.8; // range 0.7 ~ 1.4
+  const imageTransform = `perspective(800px) rotateY(${-angle.azimuth * 0.3}deg) rotateX(${angle.elevation * 0.2}deg) scale(${zoomScale})`;
 
   return createPortal(
-    <div className="fixed inset-0 z-9999lex items-center justify-center bg-black/80">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80">
       <div
         className="flex flex-col bg-[#1a1a1a] rounded-2xl shadow-2xl border border-white/10 overflow-hidden"
         onPointerDown={e => e.stopPropagation()}
@@ -157,11 +159,11 @@ export default function CameraAngleDialog({ isOpen, imageUrl, onClose, onConfirm
             <X size={14} className="text-white/60" />
           </button>
           <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-white/10 text-white/90 text-xs font-mono">
-            H:{angle.azimuth} V:{angle.elevation}
+            H:{angle.azimuth} V:{angle.elevation} zoom:{zoom}
           </div>
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setAngle({ azimuth: 45, elevation: -30 })}
+              onClick={() => setAngle({ azimuth: 45, elevation: -30, zoom: 5 })}
               className="p-1.5 rounded-md hover:bg-white/10 transition-colors"
               title="重置"
             >
@@ -258,6 +260,20 @@ export default function CameraAngleDialog({ isOpen, imageUrl, onClose, onConfirm
           {/* Bottom hint */}
           <div className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-white/40">
             拖拽锚点调整镜头位置和角度
+          </div>
+
+          {/* Zoom slider (vertical, right side) */}
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1">
+            <span className="text-[9px] text-white/40 font-mono">远</span>
+            <input
+              type="range"
+              min={1} max={10} step={1}
+              value={zoom}
+              onChange={e => setAngle(prev => ({ ...prev, zoom: Number(e.target.value) }))}
+              className="h-28 appearance-none accent-accent cursor-pointer"
+              style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
+            />
+            <span className="text-[9px] text-white/40 font-mono">近</span>
           </div>
         </div>
 
