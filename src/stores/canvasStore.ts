@@ -605,7 +605,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       img.src = generatedImage;
     });
 
-    const cellSpacing = 210;
+    const cellSpacing = 250; // Increased spacing for image2image nodes
     const padding = 20;
     const groupWidth = size * cellSpacing + padding * 2;
     const groupHeight = size * cellSpacing + padding * 2 + 40; // extra 40 for label
