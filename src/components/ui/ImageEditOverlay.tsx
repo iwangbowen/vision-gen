@@ -63,8 +63,8 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
 
   return (
     <div className="relative group w-full h-full" ref={containerRef}>
-      <button
-        type="button"
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <div
         className="w-full h-full cursor-pointer block p-0 m-0 border-none bg-transparent text-left"
         onClick={() => {
           const newShowToolbar = !showToolbar;
@@ -75,7 +75,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         }}
       >
         {children}
-      </button>
+      </div>
 
       {showToolbar && (
         <div

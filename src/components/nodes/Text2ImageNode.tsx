@@ -28,12 +28,12 @@ function Text2ImageNode({ id, data }: NodeProps) {
   };
 
   return (
-    <div className="node-card w-56 rounded-xl border-2 overflow-hidden
+    <div className="node-card w-52 rounded-xl border-2 overflow-hidden
       bg-node-bg dark:bg-node-bg-dark
       border-node-border dark:border-node-border-dark
       shadow-lg">
       {/* Header - icon and settings */}
-      <div className="flex items-center justify-between px-2.5 py-1.5
+      <div className="flex items-center justify-between px-1.5 py-1
         bg-surface dark:bg-surface-dark
         border-b border-border dark:border-border-dark">
         <div className="flex items-center gap-1.5">
@@ -66,7 +66,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
       </div>
 
       {/* Body */}
-      <div className="p-2">
+      <div className="p-1">
         <div className="relative">
           <textarea
             ref={textareaRef}
@@ -74,13 +74,13 @@ function Text2ImageNode({ id, data }: NodeProps) {
             onChange={(e) => setLocalPrompt(e.target.value)}
             placeholder="描述想要生成的画面..."
             rows={2}
-            className="w-full pl-2 pr-8 py-1.5 rounded-lg text-[11px] resize-none
+            className="w-full pl-1.5 pr-7 py-1 rounded-md text-[10px] resize-none
               bg-canvas-bg dark:bg-canvas-bg-dark
               text-text-primary dark:text-text-primary-dark
               border border-border dark:border-border-dark
               focus:outline-none focus:border-accent
               placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark
-              min-h-10 max-h-40 overflow-y-auto custom-scrollbar"
+              min-h-8 max-h-40 overflow-y-auto custom-scrollbar"
           />
           <button
             type="button"
@@ -88,15 +88,15 @@ function Text2ImageNode({ id, data }: NodeProps) {
             disabled={nodeData.status === 'generating'}
             aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
             title={nodeData.status === 'generating' ? '生成中' : '生成'}
-            className="absolute right-1.5 bottom-1.5 p-1 flex items-center justify-center rounded-md
+            className="absolute right-2 bottom-2 p-0.5 flex items-center justify-center rounded
               transition-colors
               text-accent hover:bg-accent/10
               disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {nodeData.status === 'generating' ? (
-              <Loader2 size={14} className="animate-spin" />
+              <Loader2 size={12} className="animate-spin" />
             ) : (
-              <Send size={14} />
+              <Send size={12} />
             )}
           </button>
         </div>
