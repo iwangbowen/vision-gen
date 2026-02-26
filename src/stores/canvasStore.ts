@@ -615,7 +615,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const groupNode: AppNode = {
       id: groupId,
       type: 'splitGroup',
-      position: { x: node.position.x, y: node.position.y + 500 },
+      position: { x: node.position.x + 300, y: node.position.y },
       data: {
         label: `切分组 ${gridSize}`,
       },
