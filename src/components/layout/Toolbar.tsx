@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import {
   Type,
   ImageIcon,
@@ -6,10 +6,9 @@ import {
   PanelLeftClose,
   PanelRightOpen,
   PanelRightClose,
-  Settings as SettingsIcon,
 } from 'lucide-react';
 import ThemeToggle from '../ui/ThemeToggle';
-import SettingsDialog from '../ui/SettingsDialog';
+import SettingsMenu from '../ui/SettingsMenu';
 import NotificationCenter from '../ui/NotificationCenter';
 import { useCanvasStore } from '../../stores/canvasStore';
 
@@ -27,7 +26,6 @@ export default function Toolbar({
   onToggleRightPanel,
 }: ToolbarProps) {
   const { addText2ImageNode, addImage2ImageNode } = useCanvasStore();
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleAddText2Image = useCallback(() => {
     addText2ImageNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 });
@@ -88,15 +86,7 @@ export default function Toolbar({
       {/* Right section */}
       <div className="flex items-center gap-2">
         <NotificationCenter />
-        <button
-          onClick={() => setSettingsOpen(true)}
-          className="p-2 rounded-lg transition-colors
-            hover:bg-surface-hover dark:hover:bg-surface-hover-dark
-            text-text-secondary dark:text-text-secondary-dark"
-          title="设置"
-        >
-          <SettingsIcon size={18} />
-        </button>
+        <SettingsMenu />
         <ThemeToggle />
         <div className="w-px h-6 bg-border dark:bg-border-dark mx-1" />
         <button
@@ -109,8 +99,6 @@ export default function Toolbar({
           {rightPanelOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
         </button>
       </div>
-
-      <SettingsDialog isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 }
