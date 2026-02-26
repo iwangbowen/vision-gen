@@ -43,6 +43,7 @@ interface CanvasState {
   updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData>) => void;
   simulateGenerate: (nodeId: string) => Promise<void>;
   generateRepaint: (nodeId: string, sourceImage: string, maskImage: string, prompt: string) => Promise<void>;
+  generateRepaintToImage2Image: (sourceNodeId: string, sourceImage: string, maskImage: string, prompt: string, label: string) => Promise<void>;
   splitGridNode: (nodeId: string) => void;
   splitGeneratedImage: (nodeId: string) => Promise<void>;
   duplicateNode: (nodeId: string) => void;
@@ -406,6 +407,97 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
         alert(`重绘图片失败: ${errorMessage}`);
         updateNodeData(nodeId, { status: 'idle' } as Partial<AppImageData>);
+      }
+    }
+  },
+
+  generateRepaintToImage2Image: async (sourceNodeId, sourceImage, maskImage, prompt, label) => {
+    const node = get().nodes.find((n) => n.id === sourceNodeId);
+    if (!node) return;
+
+    // Create a placeholder Image2Image node immediately (shown as generating)
+    const newNodeId = get().addImage2ImageNode(
+      { x: node.position.x + 250, y: node.position.y },
+      '', // No source image yet — will be set after generation
+      `${label} (重绘)`
+    );
+
+    get().updateNodeData(newNodeId, { status: 'generating' } as Partial<Image2ImageData>);
+
+    get().onConnect({
+      source: sourceNodeId,
+      target: newNodeId,
+      sourceHandle: null,
+      targetHandle: null
+    });
+
+    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    useTaskStore.getState().addTask({
+      id: taskId,
+      nodeId: newNodeId,
+      type: 'image2image',
+      prompt,
+    });
+
+    const progressInterval = setInterval(() => {
+      const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
+      if (task?.status === 'generating' && task.progress < 90) {
+        useTaskStore.getState().updateTask(taskId, { progress: task.progress + Math.floor(Math.random() * 10) + 5 });
+      }
+    }, 500);
+
+    try {
+      const { getLLMService } = await import('../services/llm/factory');
+      const llmService = getLLMService();
+
+      const result = await llmService.generateImage({
+        prompt,
+        sourceImage,
+        maskImage,
+      });
+
+      clearInterval(progressInterval);
+      useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+
+      let image: string;
+      if (typeof result === 'string') {
+        image = result;
+      } else if (Array.isArray(result)) {
+        image = result[0];
+      } else {
+        image = String(result);
+      }
+
+      // Set the repaint result as sourceImage on the Image2Image node
+      get().updateNodeData(newNodeId, {
+        sourceImage: image,
+        status: 'idle',
+      } as Partial<Image2ImageData>);
+
+    } catch (error) {
+      console.error('Failed to generate repaint image:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      if (errorMessage.includes('not configured')) {
+        setTimeout(() => {
+          clearInterval(progressInterval);
+          useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+
+          const image = getRandomSampleImage();
+          get().updateNodeData(newNodeId, {
+            sourceImage: image,
+            status: 'idle',
+          } as Partial<Image2ImageData>);
+        }, 1500);
+      } else {
+        clearInterval(progressInterval);
+        useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
+        alert(`重绘图片失败: ${errorMessage}`);
+        // Remove the placeholder node on error
+        set((state) => ({
+          nodes: state.nodes.filter(n => n.id !== newNodeId),
+          edges: state.edges.filter(e => e.target !== newNodeId)
+        }));
       }
     }
   },
