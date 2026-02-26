@@ -81,7 +81,7 @@ export default function PropertyPanel() {
       const result = await analyzeImageWithGemini({
         apiKey: gemini.apiKey,
         baseUrl: gemini.baseUrl,
-        textModel: gemini.textModel,
+        textModel: gemini.textModel || 'gemini-3-flash-preview',
         prompt: analysisPrompt,
         imageUrl: nodeImage,
       });

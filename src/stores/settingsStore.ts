@@ -48,6 +48,15 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'instavideo-settings',
+      merge: (persistedState, currentState) => {
+        const ps = persistedState as Partial<SettingsState>;
+        return {
+          ...currentState,
+          ...ps,
+          gemini: { ...currentState.gemini, ...ps?.gemini },
+          custom: { ...currentState.custom, ...ps?.custom },
+        };
+      },
     }
   )
 );
