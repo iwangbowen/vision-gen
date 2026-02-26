@@ -5,6 +5,11 @@ import {
   ScanSearch,
   Loader2,
   SlidersHorizontal,
+  Type,
+  ImageIcon,
+  Layers,
+  Grid3X3,
+  Group,
 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useAssetStore } from '../../stores/assetStore';
@@ -120,18 +125,24 @@ export default function PropertyPanel() {
       bg-panel-bg dark:bg-panel-bg-dark
       border-l border-border dark:border-border-dark">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-border dark:border-border-dark
+      <div className="px-4 py-2 border-b border-border dark:border-border-dark
         flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium uppercase
-              bg-accent/10 text-accent">
-              {selectedNode.type}
-            </span>
-          </div>
-          <p className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
+        <div className="flex items-center gap-2">
+          {(() => {
+            const iconClass = "text-accent";
+            const iconSize = 16;
+            switch (selectedNode.type) {
+              case 'text2image': return <Type size={iconSize} className={iconClass} />;
+              case 'image2image': return <ImageIcon size={iconSize} className={iconClass} />;
+              case 'multiInput': return <Layers size={iconSize} className={iconClass} />;
+              case 'grid': return <Grid3X3 size={iconSize} className={iconClass} />;
+              case 'splitGroup': return <Group size={iconSize} className={iconClass} />;
+              default: return <ImageIcon size={iconSize} className={iconClass} />;
+            }
+          })()}
+          <span className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
             {(selectedNode.data as { label: string }).label}
-          </p>
+          </span>
         </div>
         <button
           onClick={() => setSelectedNodeId(null)}
