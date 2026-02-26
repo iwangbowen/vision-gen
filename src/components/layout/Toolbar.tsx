@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import {
   Type,
   ImageIcon,
+  Layers,
   PanelLeftOpen,
   PanelLeftClose,
   PanelRightOpen,
@@ -25,7 +26,7 @@ export default function Toolbar({
   onToggleLeftPanel,
   onToggleRightPanel,
 }: ToolbarProps) {
-  const { addText2ImageNode, addImage2ImageNode } = useCanvasStore();
+  const { addText2ImageNode, addImage2ImageNode, addMultiInputNode } = useCanvasStore();
 
   const handleAddText2Image = useCallback(() => {
     addText2ImageNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 });
@@ -34,6 +35,10 @@ export default function Toolbar({
   const handleAddImage2Image = useCallback(() => {
     addImage2ImageNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 });
   }, [addImage2ImageNode]);
+
+  const handleAddMultiInput = useCallback(() => {
+    addMultiInputNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 });
+  }, [addMultiInputNode]);
 
   return (
     <div className="h-12 flex items-center justify-between px-4
@@ -80,6 +85,15 @@ export default function Toolbar({
         >
           <ImageIcon size={16} />
           <span className="hidden sm:inline">图生图</span>
+        </button>
+
+        <button
+          onClick={handleAddMultiInput}
+          className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors
+            bg-purple-500/10 text-purple-500 hover:bg-purple-500/20"
+        >
+          <Layers size={16} />
+          <span className="hidden sm:inline">多图融合</span>
         </button>
       </div>
 

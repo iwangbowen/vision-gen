@@ -43,6 +43,19 @@ export interface Image2ImageData {
   status: NodeStatus;
 }
 
+export interface MultiInputData {
+  [key: string]: unknown;
+  label: string;
+  prompt: string;
+  sourceImages?: string[];
+  generatedImage?: string;
+  gridSize?: GridSize;
+  aspectRatio?: AspectRatio;
+  imageSize?: ImageSize;
+  style?: ImageStyle;
+  status: NodeStatus;
+}
+
 export interface ImageData {
   [key: string]: unknown;
   label: string;
@@ -79,10 +92,11 @@ export interface SplitGroupData {
 export type Text2ImageNode = Node<Text2ImageData, 'text2image'>;
 export type Image2ImageNode = Node<Image2ImageData, 'image2image'>;
 export type ImageNode = Node<ImageData, 'image'>;
+export type MultiInputNode = Node<MultiInputData, 'multiInput'>;
 export type GridNode = Node<GridData, 'grid'>;
 export type SplitGroupNode = Node<SplitGroupData, 'splitGroup'>;
 
-export type AppNode = Text2ImageNode | Image2ImageNode | ImageNode | GridNode | SplitGroupNode;
+export type AppNode = Text2ImageNode | Image2ImageNode | ImageNode | MultiInputNode | GridNode | SplitGroupNode;
 export type AppEdge = Edge;
 
 // ===== Timeline =====

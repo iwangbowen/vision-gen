@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Copy, Trash2, ArrowDownToLine, Scissors } from 'lucide-react';
+import { Copy, Trash2, ArrowDownToLine, Scissors, Layers } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useTimelineStore } from '../../stores/timelineStore';
 import type { ImageData, GridData, GridCell } from '../../types';
@@ -13,7 +13,7 @@ interface ContextMenuProps {
 
 export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { nodes, removeNodes, duplicateNodes, splitGridNode } = useCanvasStore();
+  const { nodes, removeNodes, duplicateNodes, splitGridNode, createMultiInputFromSelection } = useCanvasStore();
   const { addItem } = useTimelineStore();
 
   const targetNodes = nodes.filter((n) => nodeIds.includes(n.id));
@@ -87,7 +87,13 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
     onClose();
   };
 
+  const handleCreateMultiInput = () => {
+    createMultiInputFromSelection(nodeIds);
+    onClose();
+  };
+
   const hasImageNodes = targetNodes.some(n => n.type === 'image');
+  const canCreateMultiInput = targetNodes.length > 1;
 
   return (
     <div
@@ -143,6 +149,18 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
             全部添加到轨道
           </button>
         </>
+      )}
+
+      {/* Multi-input creation */}
+      {canCreateMultiInput && (
+        <button
+          onClick={handleCreateMultiInput}
+          className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors
+            text-purple-500 hover:bg-purple-500/10"
+        >
+          <Layers size={14} />
+          将选中的 {targetNodes.length} 个节点融合生成
+        </button>
       )}
 
       {/* Divider */}

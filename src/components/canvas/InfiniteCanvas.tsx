@@ -15,6 +15,7 @@ import { useThemeStore } from '../../stores/themeStore';
 import Text2ImageNode from '../nodes/Text2ImageNode';
 import Image2ImageNode from '../nodes/Image2ImageNode';
 import ImageNode from '../nodes/ImageNode';
+import MultiInputNode from '../nodes/MultiInputNode';
 import GridNode from '../nodes/GridNode';
 import SplitGroupNode from '../nodes/SplitGroupNode';
 import NodeContextMenu from '../ui/NodeContextMenu';
@@ -24,6 +25,7 @@ const nodeTypes = {
   text2image: Text2ImageNode,
   image2image: Image2ImageNode,
   image: ImageNode,
+  multiInput: MultiInputNode,
   grid: GridNode,
   splitGroup: SplitGroupNode,
 };

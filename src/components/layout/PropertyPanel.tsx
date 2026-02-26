@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useAssetStore } from '../../stores/assetStore';
-import type { AssetCategory, Text2ImageData, Image2ImageData } from '../../types';
+import type { AssetCategory, Text2ImageData, Image2ImageData, MultiInputData } from '../../types';
 import { useState } from 'react';
 import {
   ASSET_CATEGORIES,
@@ -55,8 +55,8 @@ export default function PropertyPanel() {
     setSaveName('');
   };
 
-  const isGenerativeNode = selectedNode.type === 'text2image' || selectedNode.type === 'image2image';
-  const generativeData = isGenerativeNode ? (selectedNode.data as unknown as Text2ImageData | Image2ImageData) : null;
+  const isGenerativeNode = selectedNode.type === 'text2image' || selectedNode.type === 'image2image' || selectedNode.type === 'multiInput';
+  const generativeData = isGenerativeNode ? (selectedNode.data as unknown as Text2ImageData | Image2ImageData | MultiInputData) : null;
 
   return (
     <div className="w-72 h-full flex flex-col

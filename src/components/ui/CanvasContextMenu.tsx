@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Type, ImageIcon } from 'lucide-react';
+import { Type, ImageIcon, Layers } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useReactFlow } from '@xyflow/react';
 
@@ -11,7 +11,7 @@ interface CanvasContextMenuProps {
 
 export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { addText2ImageNode, addImage2ImageNode } = useCanvasStore();
+  const { addText2ImageNode, addImage2ImageNode, addMultiInputNode } = useCanvasStore();
   const { screenToFlowPosition } = useReactFlow();
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuPr
     };
   }, [onClose]);
 
-  const handleAddNode = (type: 'text2image' | 'image2image') => {
+  const handleAddNode = (type: 'text2image' | 'image2image' | 'multiInput') => {
     const position = screenToFlowPosition({ x, y });
 
     switch (type) {
@@ -40,6 +40,9 @@ export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuPr
         break;
       case 'image2image':
         addImage2ImageNode(position);
+        break;
+      case 'multiInput':
+        addMultiInputNode(position);
         break;
     }
     onClose();
@@ -75,6 +78,16 @@ export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuPr
       >
         <ImageIcon size={14} className="text-emerald-500" />
         图生图
+      </button>
+
+      <button
+        onClick={() => handleAddNode('multiInput')}
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors
+          text-text-primary dark:text-text-primary-dark
+          hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
+      >
+        <Layers size={14} className="text-purple-500" />
+        多图融合
       </button>
     </div>
   );

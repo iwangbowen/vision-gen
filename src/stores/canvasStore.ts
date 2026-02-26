@@ -12,6 +12,7 @@ import type {
   AppEdge,
   Text2ImageData,
   Image2ImageData,
+  MultiInputData,
   ImageData as AppImageData,
   GridSize,
   GridCell,
@@ -38,6 +39,8 @@ interface CanvasState {
   addText2ImageNode: (position: { x: number; y: number }) => void;
   addImage2ImageNode: (position: { x: number; y: number }, image?: string, label?: string) => string;
   addImageNode: (position: { x: number; y: number }, image: string, label?: string) => string;
+  addMultiInputNode: (position: { x: number; y: number }) => string;
+  createMultiInputFromSelection: (nodeIds: string[]) => void;
   addGridNode: (position: { x: number; y: number }, gridSize: GridSize, generatedImages?: string[]) => void;
 
   // Node actions
@@ -148,6 +151,63 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     };
     set((state) => ({ nodes: [...state.nodes, newNode] }));
     return id;
+  },
+
+  addMultiInputNode: (position) => {
+    const id = getNodeId();
+    const newNode: AppNode = {
+      id,
+      type: 'multiInput',
+      position,
+      data: {
+        label: '多图融合',
+        prompt: '',
+        status: 'idle',
+        gridSize: '1x1',
+        aspectRatio: '16:9',
+        imageSize: '1k',
+        style: '',
+      },
+    };
+    set((state) => ({ nodes: [...state.nodes, newNode] }));
+    return id;
+  },
+
+  createMultiInputFromSelection: (nodeIds) => {
+    const state = get();
+    const selectedNodes = state.nodes.filter(n => nodeIds.includes(n.id));
+    if (selectedNodes.length === 0) return;
+
+    // Calculate position (right of the rightmost selected node)
+    let maxX = -Infinity;
+    let avgY = 0;
+    selectedNodes.forEach(n => {
+      if (n.position.x > maxX) maxX = n.position.x;
+      avgY += n.position.y;
+    });
+    avgY /= selectedNodes.length;
+
+    const position = { x: maxX + 400, y: avgY };
+    const newId = get().addMultiInputNode(position);
+
+    // Create edges
+    const newEdges = selectedNodes.map(n => ({
+      id: `e_${n.id}_${newId}`,
+      source: n.id,
+      target: newId,
+      animated: true,
+      style: { strokeWidth: 2 },
+    }));
+
+    set((state) => ({
+      edges: [...state.edges, ...newEdges],
+      // Deselect old nodes, select new node
+      nodes: state.nodes.map(n => ({
+        ...n,
+        selected: n.id === newId
+      })),
+      selectedNodeId: newId
+    }));
   },
 
   addGridNode: (position, gridSize, generatedImages) => {
@@ -266,6 +326,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         style,
         sourceImage: (data as Image2ImageData).sourceImage,
         maskImage: (data as Image2ImageData).maskImage,
+        sourceImages: (data as MultiInputData).sourceImages,
       });
 
       clearInterval(progressInterval);
@@ -312,7 +373,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
           const node = get().nodes.find((n) => n.id === nodeId);
           if (!node) return;
 
-          if (node.type === 'text2image' || node.type === 'image2image') {
+          if (node.type === 'text2image' || node.type === 'image2image' || node.type === 'multiInput') {
             const image = getRandomSampleImage();
             updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
 

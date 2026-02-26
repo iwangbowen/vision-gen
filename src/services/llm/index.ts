@@ -5,6 +5,7 @@ export interface GenerateImageOptions {
   gridSize?: string;
   style?: string;
   sourceImage?: string;
+  sourceImages?: string[];
   maskImage?: string;
   [key: string]: unknown;
 }

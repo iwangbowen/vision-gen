@@ -51,7 +51,7 @@ export class GeminiImageService implements LLMService {
     }
 
     try {
-      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, options.sourceImage, options.maskImage);
+      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, options.sourceImage, options.maskImage, options.sourceImages);
     } catch (error) {
       if (error instanceof LLMServiceError) {
         throw error;
@@ -63,7 +63,7 @@ export class GeminiImageService implements LLMService {
     }
   }
 
-  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, sourceImage?: string, maskImage?: string): Promise<string> {
+  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, sourceImage?: string, maskImage?: string, sourceImages?: string[]): Promise<string> {
     const url = `${this.baseUrl}/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
     const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [{ text: prompt }];
@@ -109,6 +109,20 @@ export class GeminiImageService implements LLMService {
             data
           }
         });
+      }
+    }
+
+    if (sourceImages && sourceImages.length > 0) {
+      for (const img of sourceImages) {
+        const { mimeType, data } = await processImage(img);
+        if (data) {
+          parts.push({
+            inlineData: {
+              mimeType,
+              data
+            }
+          });
+        }
       }
     }
 
