@@ -144,46 +144,46 @@ export default function Timeline() {
   return (
     <div
       className={`border-t border-border dark:border-border-dark bg-timeline-bg dark:bg-timeline-bg-dark transition-all ${
-        collapsed ? 'h-7' : 'h-28'
+        collapsed ? 'h-6' : 'h-24'
       }`}
     >
       {/* Header */}
-      <div className="h-7 flex items-center justify-between px-3 border-b border-border dark:border-border-dark">
-        <div className="flex items-center gap-1.5">
-          <Film size={12} className="text-accent" />
-          <span className="text-xs font-semibold text-text-primary dark:text-text-primary-dark">
+      <div className="h-6 flex items-center justify-between px-2 border-b border-border dark:border-border-dark">
+        <div className="flex items-center gap-1">
+          <Film size={11} className="text-accent" />
+          <span className="text-[11px] font-semibold text-text-primary dark:text-text-primary-dark">
             轨道
           </span>
           <span className="text-[10px] text-text-secondary dark:text-text-secondary-dark">
             ({items.length} 帧)
           </span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           {items.length > 0 && (
             <>
               <button
                 onClick={() => {
                   /* Export placeholder */
                 }}
-                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+                className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
               >
-                <Download size={12} />
+                <Download size={10} />
                 导出
               </button>
               <button
                 onClick={clearTimeline}
-                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
+                className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
               >
-                <Trash2 size={12} />
+                <Trash2 size={10} />
                 清空
               </button>
             </>
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-1 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark"
+            className="p-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark"
           >
-            {collapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {collapsed ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
           </button>
         </div>
       </div>
@@ -191,7 +191,7 @@ export default function Timeline() {
       {/* Timeline track */}
       {!collapsed && (
         <section
-          className="h-[calc(100%-28px)] flex items-center px-4 overflow-x-auto relative"
+          className="h-[calc(100%-24px)] flex items-center px-4 overflow-x-auto relative"
           onDragOver={handleTrackDragOver}
           onDrop={handleTrackDrop}
           aria-label="Timeline Track"
