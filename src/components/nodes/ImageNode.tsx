@@ -71,7 +71,7 @@ function ImageNode({ id, data }: NodeProps) {
               imageUrl={nodeData.image}
               onCropComplete={handleCropComplete}
               onRepaintComplete={handleRepaintComplete}
-              onSplitComplete={nodeData.status === 'generating' ? undefined : (size) => splitGeneratedImage(id, size)}
+              onSplitComplete={(size) => splitGeneratedImage(id, size)}
             >
               <img
                 src={nodeData.image}

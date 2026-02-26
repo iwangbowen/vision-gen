@@ -18,6 +18,8 @@ import type {
   GridCell,
   ImageStyle,
 } from '../types';
+
+type GenerativeNodeData = Text2ImageData | Image2ImageData | MultiInputData;
 import { getRandomSampleImage, getGridSampleImages } from '../utils/sampleData';
 
 import { useTaskStore } from './taskStore';
@@ -44,7 +46,7 @@ interface CanvasState {
   addGridNode: (position: { x: number; y: number }, gridSize: GridSize, generatedImages?: string[]) => void;
 
   // Node actions
-  updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData | MultiInputData>) => void;
+  updateNodeData: (nodeId: string, data: Partial<GenerativeNodeData>) => void;
   simulateGenerate: (nodeId: string) => Promise<void>;
   generateRepaint: (nodeId: string, sourceImage: string, maskImage: string, prompt: string) => Promise<void>;
   generateRepaintToImage2Image: (
@@ -249,7 +251,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const node = get().nodes.find((n) => n.id === nodeId);
     if (!node) return;
 
-    const data = node.data as Text2ImageData | Image2ImageData | MultiInputData;
+    const data = node.data as GenerativeNodeData;
     const prompt = data.prompt || '';
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
@@ -260,7 +262,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       prompt,
     });
 
-    updateNodeData(nodeId, { status: 'generating' } as Partial<Text2ImageData | Image2ImageData | MultiInputData>);
+    updateNodeData(nodeId, { status: 'generating' } as Partial<GenerativeNodeData>);
 
     // Create a placeholder node for the generated image
     const outgoingEdges = get().edges.filter(e => e.source === nodeId);
@@ -342,7 +344,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         image = String(result);
       }
 
-      updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData | Image2ImageData | MultiInputData>);
+      updateNodeData(nodeId, { status: 'done' } as Partial<GenerativeNodeData>);
 
       // Update the result node with the generated image as sourceImage
       updateNodeData(newNodeId, {
@@ -375,7 +377,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
           if (node.type === 'text2image' || node.type === 'image2image' || node.type === 'multiInput') {
             const image = getRandomSampleImage();
-            updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData | Image2ImageData | MultiInputData>);
+            updateNodeData(nodeId, { status: 'done' } as Partial<GenerativeNodeData>);
 
             // Update the result node with the generated image as sourceImage
             updateNodeData(newNodeId, {
@@ -398,7 +400,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
         alert(`生成图片失败: ${errorMessage}`);
-        updateNodeData(nodeId, { status: 'idle' } as Partial<Text2ImageData>);
+        updateNodeData(nodeId, { status: 'idle' } as Partial<GenerativeNodeData>);
 
         // Remove the placeholder node and edge on error
         set((state) => ({
