@@ -47,6 +47,7 @@ export interface ImageData {
   image: string;
   width?: number;
   height?: number;
+  gridSize?: GridSize;
 }
 
 export type GridSize = '1x1' | '2x2' | '3x3' | '4x4' | '5x5';

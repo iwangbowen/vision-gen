@@ -223,7 +223,41 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       } else {
         image = String(result);
       }
-      updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
+
+      updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
+
+      const outgoingEdges = get().edges.filter(e => e.source === nodeId);
+      const yOffset = outgoingEdges.length * 150;
+
+      const newNodeId = getNodeId();
+      const newNodePosition = {
+        x: node.position.x + 300,
+        y: node.position.y + yOffset
+      };
+
+      const newNode: AppNode = {
+        id: newNodeId,
+        type: 'image',
+        position: newNodePosition,
+        data: {
+          label: prompt || '生成的图片',
+          image: image,
+          gridSize: gridSize,
+        },
+      };
+
+      const newEdge: AppEdge = {
+        id: `edge_${nodeId}_${newNodeId}`,
+        source: nodeId,
+        target: newNodeId,
+        animated: true,
+        style: { strokeWidth: 2 }
+      };
+
+      set((state) => ({
+        nodes: [...state.nodes, newNode],
+        edges: [...state.edges, newEdge]
+      }));
     } catch (error) {
       console.error('Failed to generate image:', error);
 
@@ -240,7 +274,40 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
           if (node.type === 'text2image' || node.type === 'image2image') {
             const image = getRandomSampleImage();
-            updateNodeData(nodeId, { status: 'done', generatedImage: image } as Partial<Text2ImageData>);
+            updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
+
+            const outgoingEdges = get().edges.filter(e => e.source === nodeId);
+            const yOffset = outgoingEdges.length * 150;
+
+            const newNodeId = getNodeId();
+            const newNodePosition = {
+              x: node.position.x + 300,
+              y: node.position.y + yOffset
+            };
+
+            const newNode: AppNode = {
+              id: newNodeId,
+              type: 'image',
+              position: newNodePosition,
+              data: {
+                label: prompt || '生成的图片',
+                image: image,
+                gridSize: (node.data as Text2ImageData).gridSize || '1x1',
+              },
+            };
+
+            const newEdge: AppEdge = {
+              id: `edge_${nodeId}_${newNodeId}`,
+              source: nodeId,
+              target: newNodeId,
+              animated: true,
+              style: { strokeWidth: 2 }
+            };
+
+            set((state) => ({
+              nodes: [...state.nodes, newNode],
+              edges: [...state.edges, newEdge]
+            }));
           }
         }, 1500);
       } else {
@@ -282,11 +349,19 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   splitGeneratedImage: async (nodeId) => {
     const state = get();
     const node = state.nodes.find((n) => n.id === nodeId);
-    if (!node || (node.type !== 'text2image' && node.type !== 'image2image')) return;
+    if (!node) return;
 
-    const data = node.data;
-    const generatedImage = (data as Text2ImageData).generatedImage;
-    const gridSize = (data as Text2ImageData).gridSize;
+    let generatedImage: string | undefined;
+    let gridSize: GridSize | undefined;
+
+    if (node.type === 'text2image' || node.type === 'image2image') {
+      generatedImage = (node.data as Text2ImageData).generatedImage;
+      gridSize = (node.data as Text2ImageData).gridSize;
+    } else if (node.type === 'image') {
+      generatedImage = (node.data as ImageData).image;
+      gridSize = (node.data as ImageData).gridSize;
+    }
+
     if (!generatedImage || !gridSize || gridSize === '1x1') return;
 
     const size = Number.parseInt(gridSize[0]);

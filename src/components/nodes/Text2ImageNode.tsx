@@ -1,14 +1,13 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { Type, Sparkles, Loader2, Settings2, Scissors } from 'lucide-react';
+import { Type, Sparkles, Loader2, Settings2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
-import ImageContextMenu from '../ui/ImageContextMenu';
 import type { Text2ImageData } from '../../types';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
 function Text2ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as Text2ImageData;
-  const { updateNodeData, simulateGenerate, splitGeneratedImage, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
+  const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -100,34 +99,6 @@ function Text2ImageNode({ id, data }: NodeProps) {
             {nodeData.status === 'generating' ? '生成中' : '生成'}
           </button>
         </div>
-
-        {/* Generated image preview */}
-        {nodeData.generatedImage && (
-          <div className="space-y-1">
-            <ImageContextMenu
-              image={nodeData.generatedImage}
-              sourceNodeId={id}
-              label={nodeData.prompt || '生成图片'}
-              className="rounded-lg overflow-hidden border border-border dark:border-border-dark"
-              showAddToTimelineIcon={true}
-            >
-              <img
-                src={nodeData.generatedImage}
-                alt="generated"
-                className="w-full aspect-square object-cover"
-              />
-            </ImageContextMenu>
-            {nodeData.gridSize && nodeData.gridSize !== '1x1' && (
-              <button
-                onClick={() => splitGeneratedImage(id)}
-                className="w-full flex items-center justify-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-colors bg-pink-500/10 text-pink-500 hover:bg-pink-500/20"
-              >
-                <Scissors size={10} />
-                切分
-              </button>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Handles */}
