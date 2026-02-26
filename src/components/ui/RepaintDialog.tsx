@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Eraser, Undo, Paintbrush, ZoomIn, ZoomOut, Move } from 'lucide-react';
+import { X, Check, Eraser, Undo, Paintbrush, ZoomIn, ZoomOut, Move, ChevronDown, ChevronRight } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import { GRID_OPTIONS, ASPECT_RATIO_OPTIONS, IMAGE_SIZE_OPTIONS, IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
@@ -27,6 +27,10 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
   const [aspectRatio, setAspectRatio] = useState('16:9');
   const [imageSize, setImageSize] = useState('1k');
   const [style, setStyle] = useState('');
+
+  // Collapsible sections state
+  const [isBrushSettingsOpen, setIsBrushSettingsOpen] = useState(true);
+  const [isGenSettingsOpen, setIsGenSettingsOpen] = useState(false);
 
   const sigCanvas = useRef<SignatureCanvas>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -291,209 +295,236 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
           </div>
 
           {/* Controls Area */}
-          <div className="w-full md:w-64 md:shrink-0 p-3 border-t md:border-t-0 md:border-l border-border dark:border-border-dark flex flex-col gap-3 bg-surface dark:bg-surface-dark overflow-y-auto">
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
-                画笔大小
-              </p>
-              <input
-                type="range"
-                min="5"
-                max="50"
-                value={brushSize}
-                onChange={(e) => setBrushSize(Number(e.target.value))}
-                className="w-full accent-accent"
-              />
-            </div>
+          <div className="w-full md:w-72 md:shrink-0 border-t md:border-t-0 md:border-l border-border dark:border-border-dark flex flex-col bg-surface dark:bg-surface-dark overflow-y-auto">
 
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
-                画笔颜色
-              </p>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {BRUSH_COLORS.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => {
-                      setIsPanMode(false);
-                      setIsErasing(false);
-                      setBrushColor(color);
-                    }}
-                    className={`w-5 h-5 rounded-full border transition-transform ${
-                      brushColor === color && !isErasing
-                        ? 'ring-2 ring-accent scale-105 border-white'
-                        : 'border-border dark:border-border-dark'
-                    }`}
-                    style={{ backgroundColor: color }}
-                    title={`选择颜色 ${color}`}
-                  />
-                ))}
-              </div>
-              <p className="text-[10px] leading-snug text-text-secondary dark:text-text-secondary-dark">
-                颜色用于区分涂抹区域；提交时会统一作为重绘区域。
-              </p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-1.5">
-              <button
-                type="button"
-                onClick={() => setIsPanMode(true)}
-                className={`w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors ${
-                  isPanMode
-                    ? 'bg-accent text-white dark:text-black'
-                    : 'bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark'
-                }`}
-              >
-                <Move size={14} />
-                移动
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsPanMode(false);
-                  setIsErasing(false);
-                }}
-                className={`w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors ${
-                  isErasing || isPanMode
-                    ? 'bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark'
-                    : 'bg-accent text-white dark:text-black'
-                }`}
-              >
-                <Paintbrush size={14} />
-                画笔
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsPanMode(false);
-                  setIsErasing(true);
-                }}
-                className={`w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors ${
-                  isErasing && !isPanMode
-                    ? 'bg-accent text-white dark:text-black'
-                    : 'bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark'
-                }`}
-              >
-                <Eraser size={14} />
-                擦除
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleClear}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-[11px] font-medium bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
-            >
-              <Undo size={14} />
-              清除蒙版
-            </button>
-
-            {/* Generation Settings */}
-            <div className="space-y-3 pt-3 border-t border-border dark:border-border-dark">
-              {/* Grid size selector */}
-              <div>
-                <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                  生成规格
-                </p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {GRID_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setGridSize(opt.value)}
-                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors
-                        ${gridSize === opt.value
-                          ? 'bg-accent text-white dark:text-black'
-                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                        }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Aspect Ratio selector */}
-              <div>
-                <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                  画面比例
-                </p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {ASPECT_RATIO_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setAspectRatio(opt.value)}
-                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors
-                        ${aspectRatio === opt.value
-                          ? 'bg-accent text-white dark:text-black'
-                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                        }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Image Size selector */}
-              <div>
-                <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                  图片尺寸
-                </p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {IMAGE_SIZE_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setImageSize(opt.value)}
-                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors
-                        ${imageSize === opt.value
-                          ? 'bg-accent text-white dark:text-black'
-                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                        }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Image Style selector */}
-              <div>
-                <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                  画面风格
-                </p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {IMAGE_STYLE_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setStyle(opt.value)}
-                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors
-                        ${style === opt.value
-                          ? 'bg-accent text-white dark:text-black'
-                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                        }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2 flex-1 flex flex-col pt-3 border-t border-border dark:border-border-dark">
-              <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
+            {/* Prompt Section (Top) */}
+            <div className="p-4 border-b border-border dark:border-border-dark space-y-2">
+              <p className="text-xs font-medium text-text-primary dark:text-text-primary-dark">
                 重绘提示词
               </p>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="描述你想要在涂抹区域生成的内容..."
-                className="w-full flex-1 min-h-20 p-2 text-sm bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-accent text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
+                className="w-full min-h-20 p-2.5 text-sm bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-accent text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
               />
+            </div>
+
+            {/* Brush Settings (Collapsible) */}
+            <div className="border-b border-border dark:border-border-dark">
+              <button
+                type="button"
+                onClick={() => setIsBrushSettingsOpen(!isBrushSettingsOpen)}
+                className="w-full flex items-center justify-between p-4 hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
+              >
+                <span className="text-xs font-medium text-text-primary dark:text-text-primary-dark">画笔设置</span>
+                {isBrushSettingsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+
+              {isBrushSettingsOpen && (
+                <div className="px-4 pb-4 space-y-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsPanMode(true)}
+                      className={`w-full flex items-center justify-center gap-1.5 px-2 py-2 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
+                        isPanMode
+                          ? 'bg-accent text-white dark:text-black'
+                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                      }`}
+                    >
+                      <Move size={14} />
+                      移动
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsPanMode(false);
+                        setIsErasing(false);
+                      }}
+                      className={`w-full flex items-center justify-center gap-1.5 px-2 py-2 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
+                        !isErasing && !isPanMode
+                          ? 'bg-accent text-white dark:text-black'
+                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                      }`}
+                    >
+                      <Paintbrush size={14} />
+                      画笔
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsPanMode(false);
+                        setIsErasing(true);
+                      }}
+                      className={`w-full flex items-center justify-center gap-1.5 px-2 py-2 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
+                        isErasing && !isPanMode
+                          ? 'bg-accent text-white dark:text-black'
+                          : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                      }`}
+                    >
+                      <Eraser size={14} />
+                      擦除
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-text-secondary dark:text-text-secondary-dark">画笔大小</p>
+                      <span className="text-xs text-text-secondary dark:text-text-secondary-dark">{brushSize}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="5"
+                      max="50"
+                      value={brushSize}
+                      onChange={(e) => setBrushSize(Number(e.target.value))}
+                      className="w-full accent-accent"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-xs text-text-secondary dark:text-text-secondary-dark">画笔颜色</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {BRUSH_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => {
+                            setIsPanMode(false);
+                            setIsErasing(false);
+                            setBrushColor(color);
+                          }}
+                          className={`w-6 h-6 rounded-full border transition-transform ${
+                            brushColor === color && !isErasing
+                              ? 'ring-2 ring-accent scale-110 border-white'
+                              : 'border-border dark:border-border-dark hover:scale-105'
+                          }`}
+                          style={{ backgroundColor: color }}
+                          title={`选择颜色 ${color}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark hover:border-accent/50 transition-colors"
+                  >
+                    <Undo size={14} />
+                    清除蒙版
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Generation Settings (Collapsible) */}
+            <div className="border-b border-border dark:border-border-dark">
+              <button
+                type="button"
+                onClick={() => setIsGenSettingsOpen(!isGenSettingsOpen)}
+                className="w-full flex items-center justify-between p-4 hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
+              >
+                <span className="text-xs font-medium text-text-primary dark:text-text-primary-dark">生成规格</span>
+                {isGenSettingsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+
+              {isGenSettingsOpen && (
+                <div className="px-4 pb-4 space-y-4">
+                  {/* Grid size selector */}
+                  <div>
+                    <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-2">
+                      生成数量
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {GRID_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setGridSize(opt.value)}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
+                            ${gridSize === opt.value
+                              ? 'bg-accent text-white dark:text-black'
+                              : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                            }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Aspect Ratio selector */}
+                  <div>
+                    <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-2">
+                      画面比例
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {ASPECT_RATIO_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setAspectRatio(opt.value)}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
+                            ${aspectRatio === opt.value
+                              ? 'bg-accent text-white dark:text-black'
+                              : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                            }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Image Size selector */}
+                  <div>
+                    <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-2">
+                      图片尺寸
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {IMAGE_SIZE_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setImageSize(opt.value)}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
+                            ${imageSize === opt.value
+                              ? 'bg-accent text-white dark:text-black'
+                              : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                            }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Image Style selector */}
+                  <div>
+                    <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-2">
+                      画面风格
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {IMAGE_STYLE_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setStyle(opt.value)}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
+                            ${style === opt.value
+                              ? 'bg-accent text-white dark:text-black'
+                              : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                            }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
