@@ -144,13 +144,13 @@ export default function Timeline() {
   return (
     <div
       className={`border-t border-border dark:border-border-dark bg-timeline-bg dark:bg-timeline-bg-dark transition-all ${
-        collapsed ? 'h-8' : 'h-28'
+        collapsed ? 'h-7' : 'h-28'
       }`}
     >
       {/* Header */}
-      <div className="h-8 flex items-center justify-between px-4 border-b border-border dark:border-border-dark">
-        <div className="flex items-center gap-2">
-          <Film size={14} className="text-accent" />
+      <div className="h-7 flex items-center justify-between px-3 border-b border-border dark:border-border-dark">
+        <div className="flex items-center gap-1.5">
+          <Film size={12} className="text-accent" />
           <span className="text-xs font-semibold text-text-primary dark:text-text-primary-dark">
             轨道
           </span>
@@ -191,7 +191,7 @@ export default function Timeline() {
       {/* Timeline track */}
       {!collapsed && (
         <section
-          className="h-[calc(100%-32px)] flex items-center px-4 overflow-x-auto relative"
+          className="h-[calc(100%-28px)] flex items-center px-4 overflow-x-auto relative"
           onDragOver={handleTrackDragOver}
           onDrop={handleTrackDrop}
           aria-label="Timeline Track"
