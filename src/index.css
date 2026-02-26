@@ -105,3 +105,11 @@ body {
 .react-flow__background {
   opacity: 0.5;
 }
+
+/* Disable React Flow default selected outline — we handle it in node components */
+.react-flow__node.selected,
+.react-flow__node.selected:focus,
+.react-flow__node.selected:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

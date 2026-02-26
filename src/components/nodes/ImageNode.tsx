@@ -6,7 +6,7 @@ import ImageContextMenu from '../ui/ImageContextMenu';
 import ImageEditOverlay from '../ui/ImageEditOverlay';
 import type { ImageData } from '../../types';
 
-function ImageNode({ id, data }: NodeProps) {
+function ImageNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as ImageData;
   const { splitGeneratedImage } = useCanvasStore();
 
@@ -38,7 +38,7 @@ function ImageNode({ id, data }: NodeProps) {
   };
 
   return (
-    <div className="node-card w-44 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
+    <div className={`node-card w-44 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark shadow-lg transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
       {/* Header - compact */}
       <div className="flex items-center px-2 py-1 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark rounded-t-xl">
         <div className="flex items-center gap-1">

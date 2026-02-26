@@ -7,7 +7,7 @@ import ImageEditOverlay from '../ui/ImageEditOverlay';
 import type { MultiInputData, ImageData, Image2ImageData } from '../../types';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
-function MultiInputNode({ id, data }: NodeProps) {
+function MultiInputNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as MultiInputData;
   const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen, splitGeneratedImage } = useCanvasStore();
 
@@ -84,7 +84,7 @@ function MultiInputNode({ id, data }: NodeProps) {
   };
 
   return (
-    <div className="node-card w-52 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg overflow-hidden">
+    <div className={`node-card w-52 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark shadow-lg overflow-hidden transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
       <Handle
         type="target"
         position={Position.Left}

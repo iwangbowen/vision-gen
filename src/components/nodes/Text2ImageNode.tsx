@@ -5,7 +5,7 @@ import { useCanvasStore } from '../../stores/canvasStore';
 import type { Text2ImageData } from '../../types';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
-function Text2ImageNode({ id, data }: NodeProps) {
+function Text2ImageNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as Text2ImageData;
   const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
@@ -28,10 +28,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
   };
 
   return (
-    <div className="node-card w-52 rounded-xl border-2 overflow-hidden
-      bg-node-bg dark:bg-node-bg-dark
-      border-node-border dark:border-node-border-dark
-      shadow-lg">
+    <div className={`node-card w-52 rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark shadow-lg transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
       {/* Header - icon and settings */}
       <div className="flex items-center justify-between px-1.5 py-1
         bg-surface dark:bg-surface-dark
