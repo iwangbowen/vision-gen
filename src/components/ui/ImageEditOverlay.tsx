@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight } from 'lucide-react';
+import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight, MoreHorizontal, Sparkles, Eraser } from 'lucide-react';
 import CropDialog from './CropDialog';
 import RepaintDialog from './RepaintDialog';
 import ImagePreviewDialog from './ImagePreviewDialog';
@@ -19,6 +19,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
   const [showToolbar, setShowToolbar] = useState(false);
   const [showSplitMenu, setShowSplitMenu] = useState(false);
   const [showOutpaintMenu, setShowOutpaintMenu] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const [isRepaintDialogOpen, setIsRepaintDialogOpen] = useState(false);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
@@ -31,6 +32,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         setShowToolbar(false);
         setShowSplitMenu(false);
         setShowOutpaintMenu(false);
+        setShowMoreMenu(false);
       }
     };
 
@@ -40,6 +42,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         setShowToolbar(false);
         setShowSplitMenu(false);
         setShowOutpaintMenu(false);
+        setShowMoreMenu(false);
       }
     };
 
@@ -90,6 +93,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
           if (!newShowToolbar) {
             setShowSplitMenu(false);
             setShowOutpaintMenu(false);
+            setShowMoreMenu(false);
           }
         }}
       >
@@ -111,14 +115,6 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
           onMouseDown={(e) => e.stopPropagation()}
         >
           {[
-            ...(onOutpaintComplete ? [{
-              icon: <Expand size={14} />,
-              label: '扩图',
-              action: 'outpaint',
-              onClick: () => { setShowOutpaintMenu(!showOutpaintMenu); setShowSplitMenu(false); },
-              hasSubmenu: true,
-              showSubmenu: showOutpaintMenu,
-            }] : []),
             {
               icon: <Eye size={14} />,
               label: '预览',
@@ -130,16 +126,30 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
             },
             { icon: <Crop size={14} />, label: '裁剪', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
             { icon: <Paintbrush size={14} />, label: '重绘', action: 'repaint', onClick: () => setIsRepaintDialogOpen(true) },
+            ...(onOutpaintComplete ? [{
+              icon: <Expand size={14} />,
+              label: '扩图',
+              action: 'outpaint',
+              onClick: () => { setShowOutpaintMenu(!showOutpaintMenu); setShowSplitMenu(false); setShowMoreMenu(false); },
+              hasSubmenu: true,
+              showSubmenu: showOutpaintMenu,
+            }] : []),
             ...(onSplitComplete ? [{
               icon: <Scissors size={14} />,
               label: '切分',
               action: 'split',
-              onClick: () => { setShowSplitMenu(!showSplitMenu); setShowOutpaintMenu(false); },
+              onClick: () => { setShowSplitMenu(!showSplitMenu); setShowOutpaintMenu(false); setShowMoreMenu(false); },
               hasSubmenu: true,
               showSubmenu: showSplitMenu,
             }] : []),
-            { icon: <Camera size={14} />, label: '镜头角度', action: 'camera' },
-            { icon: <Sun size={14} />, label: '灯光色调', action: 'lighting' },
+            {
+              icon: <MoreHorizontal size={14} />,
+              label: '更多',
+              action: 'more',
+              onClick: () => { setShowMoreMenu(!showMoreMenu); setShowSplitMenu(false); setShowOutpaintMenu(false); },
+              hasSubmenu: true,
+              showSubmenu: showMoreMenu,
+            },
           ].map((tool) => (
             <div key={tool.action} className="relative">
               <button
@@ -150,7 +160,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
                   }
                 }}
                 className={`p-1.5 rounded-md text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors flex items-center gap-1 ${'showSubmenu' in tool && tool.showSubmenu ? 'bg-surface-hover dark:bg-surface-hover-dark' : ''}`}
-                title={tool.onClick ? tool.label : `${tool.label}（功能待接入）`}
+                title={tool.label}
               >
                 {tool.icon}
                 {tool.hasSubmenu && <ChevronRight size={10} className={`transition-transform ${'showSubmenu' in tool && tool.showSubmenu ? '-rotate-90' : 'rotate-90'}`} />}
@@ -191,6 +201,35 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
                       {size} 宫格
                     </button>
                   ))}
+                </div>
+              )}
+
+              {tool.action === 'more' && showMoreMenu && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
+                    className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
+                  >
+                    <Sparkles size={12} />变清晰
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
+                    className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
+                  >
+                    <Eraser size={12} />去水印
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
+                    className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
+                  >
+                    <Camera size={12} />镜头角度
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
+                    className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
+                  >
+                    <Sun size={12} />灯光色调
+                  </button>
                 </div>
               )}
             </div>
