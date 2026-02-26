@@ -29,6 +29,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
   const [isCameraAngleDialogOpen, setIsCameraAngleDialogOpen] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const [submenuDirection, setSubmenuDirection] = useState<'up' | 'down'>('up');
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -89,8 +90,11 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
           if (newShowToolbar && containerRef.current) {
             // Calculate toolbar position
             const rect = containerRef.current.getBoundingClientRect();
+            const toolbarTop = rect.top - 10;
+            // If less than 200px above the toolbar, expand submenus downward
+            setSubmenuDirection(toolbarTop < 200 ? 'down' : 'up');
             setToolbarPosition({
-              top: rect.top - 10, // 10px above the image
+              top: toolbarTop,
               left: rect.left + rect.width / 2,
             });
             document.dispatchEvent(new CustomEvent('imageEditToolbarOpened', { detail: containerRef.current }));
@@ -158,6 +162,12 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
               hasSubmenu: true,
               showSubmenu: showSplitMenu,
             }] : []),
+            ...(onCameraAngleComplete ? [{
+              icon: <Camera size={14} />,
+              label: '镜头角度',
+              action: 'cameraAngle',
+              onClick: () => { setIsCameraAngleDialogOpen(true); setShowToolbar(false); },
+            }] : []),
             {
               icon: <MoreHorizontal size={14} />,
               label: '更多',
@@ -183,7 +193,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
               </button>
 
               {tool.action === 'outpaint' && showOutpaintMenu && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col">
+                <div className={`absolute left-1/2 -translate-x-1/2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col ${submenuDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
                   {ASPECT_RATIO_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
@@ -202,7 +212,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
               )}
 
               {tool.action === 'split' && showSplitMenu && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col">
+                <div className={`absolute left-1/2 -translate-x-1/2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col ${submenuDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
                   {['2x2', '3x3', '4x4'].map((size) => (
                     <button
                       key={size}
@@ -221,7 +231,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
               )}
 
               {tool.action === 'more' && showMoreMenu && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col">
+                <div className={`absolute left-1/2 -translate-x-1/2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col ${submenuDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
                   <button
                     onClick={(e) => { e.stopPropagation(); onEnhanceComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
                     className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
@@ -233,12 +243,6 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
                     className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
                   >
                     <Eraser size={12} />去水印
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setIsCameraAngleDialogOpen(true); setShowMoreMenu(false); setShowToolbar(false); }}
-                    className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
-                  >
-                    <Camera size={12} />镜头角度
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
