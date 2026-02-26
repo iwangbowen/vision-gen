@@ -109,6 +109,7 @@ function Text2ImageNode({ id, data }: NodeProps) {
               sourceNodeId={id}
               label={nodeData.prompt || '生成图片'}
               className="rounded-lg overflow-hidden border border-border dark:border-border-dark"
+              showAddToTimelineIcon={true}
             >
               <img
                 src={nodeData.generatedImage}

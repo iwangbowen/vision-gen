@@ -26,6 +26,7 @@ function ImageNode({ id, data }: NodeProps) {
           sourceNodeId={id}
           label={nodeData.label}
           className="rounded-lg overflow-hidden"
+          showAddToTimelineIcon={true}
         >
           <img
             src={nodeData.image}
