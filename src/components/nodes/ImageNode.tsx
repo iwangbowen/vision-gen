@@ -41,6 +41,14 @@ function ImageNode({ id, data, selected }: NodeProps) {
     useCanvasStore.getState().generateOutpaint(id, nodeData.image, aspectRatio, nodeData.label);
   };
 
+  const handleEnhanceComplete = () => {
+    useCanvasStore.getState().generateEnhance(id, nodeData.image, nodeData.label);
+  };
+
+  const handleRemoveWatermarkComplete = () => {
+    useCanvasStore.getState().generateRemoveWatermark(id, nodeData.image, nodeData.label);
+  };
+
   return (
     <div className={`node-card w-44 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark shadow-lg transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
       {/* Header - compact */}
@@ -76,6 +84,8 @@ function ImageNode({ id, data, selected }: NodeProps) {
               onCropComplete={handleCropComplete}
               onRepaintComplete={handleRepaintComplete}
               onOutpaintComplete={handleOutpaintComplete}
+              onEnhanceComplete={handleEnhanceComplete}
+              onRemoveWatermarkComplete={handleRemoveWatermarkComplete}
               onSplitComplete={(size) => splitGeneratedImage(id, size)}
             >
               <img

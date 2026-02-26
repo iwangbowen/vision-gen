@@ -89,6 +89,18 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
     }
   };
 
+  const handleEnhanceComplete = () => {
+    if (nodeData.generatedImage) {
+      useCanvasStore.getState().generateEnhance(id, nodeData.generatedImage, nodeData.label || '融合结果');
+    }
+  };
+
+  const handleRemoveWatermarkComplete = () => {
+    if (nodeData.generatedImage) {
+      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.generatedImage, nodeData.label || '融合结果');
+    }
+  };
+
   return (
     <div className={`node-card w-52 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark shadow-lg overflow-hidden transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
       <Handle
@@ -159,6 +171,8 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
                 onCropComplete={handleCropComplete}
                 onRepaintComplete={handleRepaintComplete}
                 onOutpaintComplete={nodeData.generatedImage && nodeData.status !== 'generating' ? handleOutpaintComplete : undefined}
+                onEnhanceComplete={nodeData.generatedImage && nodeData.status !== 'generating' ? handleEnhanceComplete : undefined}
+                onRemoveWatermarkComplete={nodeData.generatedImage && nodeData.status !== 'generating' ? handleRemoveWatermarkComplete : undefined}
                 onSplitComplete={nodeData.status === 'generating' ? undefined : (size) => splitGeneratedImage(id, size)}
               >
                 <img src={nodeData.generatedImage} alt="generated" className="w-full h-auto block" />

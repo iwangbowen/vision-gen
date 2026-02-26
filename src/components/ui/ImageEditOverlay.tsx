@@ -11,11 +11,13 @@ interface ImageEditOverlayProps {
   readonly onCropComplete: (croppedImageUrl: string) => void;
   readonly onRepaintComplete?: (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => void;
   readonly onOutpaintComplete?: (targetAspectRatio: string) => void;
+  readonly onEnhanceComplete?: () => void;
+  readonly onRemoveWatermarkComplete?: () => void;
   readonly onSplitComplete?: (gridSize?: string) => void;
   readonly children: React.ReactNode;
 }
 
-export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintComplete, onOutpaintComplete, onSplitComplete, children }: ImageEditOverlayProps) {
+export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintComplete, onOutpaintComplete, onEnhanceComplete, onRemoveWatermarkComplete, onSplitComplete, children }: ImageEditOverlayProps) {
   const [showToolbar, setShowToolbar] = useState(false);
   const [showSplitMenu, setShowSplitMenu] = useState(false);
   const [showOutpaintMenu, setShowOutpaintMenu] = useState(false);
@@ -207,13 +209,13 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
               {tool.action === 'more' && showMoreMenu && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col">
                   <button
-                    onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
+                    onClick={(e) => { e.stopPropagation(); onEnhanceComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
                     className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
                   >
                     <Sparkles size={12} />变清晰
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
+                    onClick={(e) => { e.stopPropagation(); onRemoveWatermarkComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
                     className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
                   >
                     <Eraser size={12} />去水印

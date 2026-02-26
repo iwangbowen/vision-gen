@@ -65,6 +65,8 @@ interface CanvasState {
   splitGridNode: (nodeId: string) => void;
   splitGeneratedImage: (nodeId: string, customGridSize?: string) => Promise<void>;
   generateOutpaint: (sourceNodeId: string, sourceImage: string, targetAspectRatio: string, label: string, style?: string) => Promise<void>;
+  generateEnhance: (sourceNodeId: string, sourceImage: string, label: string, style?: string) => Promise<void>;
+  generateRemoveWatermark: (sourceNodeId: string, sourceImage: string, label: string) => Promise<void>;
   duplicateNode: (nodeId: string) => void;
   duplicateNodes: (nodeIds: string[]) => void;
   removeNode: (nodeId: string) => void;
@@ -650,6 +652,114 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
         alert(`扩图失败: ${errorMessage}`);
+        set((state) => ({
+          nodes: state.nodes.filter(n => n.id !== newNodeId),
+          edges: state.edges.filter(e => e.target !== newNodeId),
+        }));
+      }
+    }
+  },
+
+  generateEnhance: async (sourceNodeId, sourceImage, label, style) => {
+    const node = get().nodes.find((n) => n.id === sourceNodeId);
+    if (!node) return;
+
+    const newNodeId = get().addImage2ImageNode(
+      { x: node.position.x + 280, y: node.position.y },
+      '',
+      `${label} (变清晰)`
+    );
+    get().updateNodeData(newNodeId, { status: 'generating' } as Partial<Image2ImageData>);
+    get().onConnect({ source: sourceNodeId, target: newNodeId, sourceHandle: null, targetHandle: null });
+
+    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    useTaskStore.getState().addTask({ id: taskId, nodeId: newNodeId, type: 'image2image', prompt: '变清晰' });
+
+    const progressInterval = setInterval(() => {
+      const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
+      if (task?.status === 'generating' && task.progress < 90) {
+        useTaskStore.getState().updateTask(taskId, { progress: task.progress + Math.floor(Math.random() * 10) + 5 });
+      }
+    }, 500);
+
+    const enhancePrompt = 'Enhance and sharpen this image. Make it clearer, more detailed, with improved resolution and sharpness while maintaining the original composition, colors, and style.';
+
+    try {
+      const { getLLMService } = await import('../services/llm/factory');
+      const llmService = getLLMService();
+      const result = await llmService.generateImage({ prompt: enhancePrompt, sourceImage, style });
+
+      clearInterval(progressInterval);
+      useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+      const image = typeof result === 'string' ? result : Array.isArray(result) ? result[0] : String(result);
+      get().updateNodeData(newNodeId, { sourceImage: image, status: 'idle' } as Partial<Image2ImageData>);
+    } catch (error) {
+      console.error('Failed to enhance image:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('not configured')) {
+        setTimeout(() => {
+          clearInterval(progressInterval);
+          useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+          get().updateNodeData(newNodeId, { sourceImage: getRandomSampleImage(), status: 'idle' } as Partial<Image2ImageData>);
+        }, 1500);
+      } else {
+        clearInterval(progressInterval);
+        useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
+        alert(`变清晰失败: ${errorMessage}`);
+        set((state) => ({
+          nodes: state.nodes.filter(n => n.id !== newNodeId),
+          edges: state.edges.filter(e => e.target !== newNodeId),
+        }));
+      }
+    }
+  },
+
+  generateRemoveWatermark: async (sourceNodeId, sourceImage, label) => {
+    const node = get().nodes.find((n) => n.id === sourceNodeId);
+    if (!node) return;
+
+    const newNodeId = get().addImage2ImageNode(
+      { x: node.position.x + 280, y: node.position.y },
+      '',
+      `${label} (去水印)`
+    );
+    get().updateNodeData(newNodeId, { status: 'generating' } as Partial<Image2ImageData>);
+    get().onConnect({ source: sourceNodeId, target: newNodeId, sourceHandle: null, targetHandle: null });
+
+    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    useTaskStore.getState().addTask({ id: taskId, nodeId: newNodeId, type: 'image2image', prompt: '去水印' });
+
+    const progressInterval = setInterval(() => {
+      const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
+      if (task?.status === 'generating' && task.progress < 90) {
+        useTaskStore.getState().updateTask(taskId, { progress: task.progress + Math.floor(Math.random() * 10) + 5 });
+      }
+    }, 500);
+
+    const removeWatermarkPrompt = 'Remove all watermarks, logos, text overlays, and stamps from this image. Seamlessly restore the underlying content behind the removed elements, maintaining a natural and coherent appearance.';
+
+    try {
+      const { getLLMService } = await import('../services/llm/factory');
+      const llmService = getLLMService();
+      const result = await llmService.generateImage({ prompt: removeWatermarkPrompt, sourceImage });
+
+      clearInterval(progressInterval);
+      useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+      const image = typeof result === 'string' ? result : Array.isArray(result) ? result[0] : String(result);
+      get().updateNodeData(newNodeId, { sourceImage: image, status: 'idle' } as Partial<Image2ImageData>);
+    } catch (error) {
+      console.error('Failed to remove watermark:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('not configured')) {
+        setTimeout(() => {
+          clearInterval(progressInterval);
+          useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+          get().updateNodeData(newNodeId, { sourceImage: getRandomSampleImage(), status: 'idle' } as Partial<Image2ImageData>);
+        }, 1500);
+      } else {
+        clearInterval(progressInterval);
+        useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
+        alert(`去水印失败: ${errorMessage}`);
         set((state) => ({
           nodes: state.nodes.filter(n => n.id !== newNodeId),
           edges: state.edges.filter(e => e.target !== newNodeId),
