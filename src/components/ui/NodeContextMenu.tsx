@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Copy, Trash2, ArrowDownToLine, Scissors, Layers, ClipboardCopy, ClipboardX } from 'lucide-react';
+import { Copy, Trash2, ArrowDownToLine, Scissors, Layers, ClipboardCopy, ClipboardX, Ungroup } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useTimelineStore } from '../../stores/timelineStore';
 import type { ImageData, GridData, GridCell } from '../../types';
@@ -13,7 +13,7 @@ interface ContextMenuProps {
 
 export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { nodes, removeNodes, duplicateNodes, splitGridNode, createMultiInputFromSelection, copyNodes, cutNodes } = useCanvasStore();
+  const { nodes, removeNodes, duplicateNodes, splitGridNode, ungroupSplitGroup, createMultiInputFromSelection, copyNodes, cutNodes } = useCanvasStore();
   const { addItem } = useTimelineStore();
 
   const targetNodes = nodes.filter((n) => nodeIds.includes(n.id));
@@ -102,6 +102,13 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
     onClose();
   };
 
+  const handleUngroupSplitGroup = () => {
+    if (isSingleNode && node?.type === 'splitGroup') {
+      ungroupSplitGroup(node.id);
+    }
+    onClose();
+  };
+
   const hasImageNodes = targetNodes.some(n => n.type === 'image');
   const canCreateMultiInput = targetNodes.length > 1;
 
@@ -181,6 +188,18 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
             全部添加到轨道
           </button>
         </>
+      )}
+
+      {/* Ungroup split group */}
+      {isSingleNode && node?.type === 'splitGroup' && (
+        <button
+          onClick={handleUngroupSplitGroup}
+          className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors
+            text-pink-500 hover:bg-pink-500/10"
+        >
+          <Ungroup size={14} />
+          取消分组
+        </button>
       )}
 
       {/* Multi-input creation */}

@@ -63,6 +63,7 @@ interface CanvasState {
     }
   ) => Promise<void>;
   splitGridNode: (nodeId: string) => void;
+  ungroupSplitGroup: (groupId: string) => void;
   splitGeneratedImage: (nodeId: string, customGridSize?: string) => Promise<void>;
   generateOutpaint: (sourceNodeId: string, sourceImage: string, targetAspectRatio: string, label: string, style?: string) => Promise<void>;
   generateEnhance: (sourceNodeId: string, sourceImage: string, label: string, style?: string) => Promise<void>;
@@ -800,6 +801,32 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     }));
 
     set((state) => ({ nodes: [...state.nodes, ...newNodes] }));
+  },
+
+  ungroupSplitGroup: (groupId) => {
+    const state = get();
+    const groupNode = state.nodes.find((n) => n.id === groupId);
+    if (!groupNode || groupNode.type !== 'splitGroup') return;
+
+    const childNodes = state.nodes.filter((n) => n.parentId === groupId);
+    const groupPos = groupNode.position;
+
+    // Detach children: convert relative positions to absolute and remove parentId/extent
+    const updatedChildren = childNodes.map((child) => ({
+      ...child,
+      position: {
+        x: groupPos.x + child.position.x,
+        y: groupPos.y + child.position.y,
+      },
+      parentId: undefined,
+      extent: undefined,
+    } as AppNode));
+
+    set((s) => ({
+      nodes: s.nodes
+        .filter((n) => n.id !== groupId && n.parentId !== groupId)
+        .concat(updatedChildren),
+    }));
   },
 
   splitGeneratedImage: async (nodeId, customGridSize) => {
