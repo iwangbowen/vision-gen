@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { ImageIcon, Scissors } from 'lucide-react';
+import { ImageIcon, Scissors, Loader2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import ImageContextMenu from '../ui/ImageContextMenu';
 import type { ImageData } from '../../types';
@@ -15,6 +15,9 @@ function ImageNode({ id, data }: NodeProps) {
       <div className="flex items-center px-2 py-1 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
         <div className="flex items-center gap-1">
           <ImageIcon size={10} className="text-amber-500" />
+          {nodeData.status === 'generating' && (
+            <Loader2 size={10} className="animate-spin text-amber-500" />
+          )}
           <span className="text-[10px] font-medium text-text-primary dark:text-text-primary-dark truncate max-w-25">
             {nodeData.label}
           </span>
@@ -23,21 +26,28 @@ function ImageNode({ id, data }: NodeProps) {
 
       {/* Image */}
       <div className="p-1.5 space-y-1">
-        <ImageContextMenu
-          image={nodeData.image}
-          sourceNodeId={id}
-          label={nodeData.label}
-          className="rounded-lg overflow-hidden"
-          showAddToTimelineIcon={true}
-        >
-          <img
-            src={nodeData.image}
-            alt={nodeData.label}
-            className="w-full aspect-square object-cover"
-            loading="lazy"
-          />
-        </ImageContextMenu>
-        {nodeData.gridSize && nodeData.gridSize !== '1x1' && (
+        {nodeData.status === 'generating' ? (
+          <div className="w-full aspect-square rounded-lg border border-dashed border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark flex flex-col items-center justify-center gap-2 text-text-secondary dark:text-text-secondary-dark">
+            <Loader2 size={24} className="animate-spin text-accent" />
+            <span className="text-xs">生成中...</span>
+          </div>
+        ) : (
+          <ImageContextMenu
+            image={nodeData.image}
+            sourceNodeId={id}
+            label={nodeData.label}
+            className="rounded-lg overflow-hidden"
+            showAddToTimelineIcon={true}
+          >
+            <img
+              src={nodeData.image}
+              alt={nodeData.label}
+              className="w-full aspect-square object-cover"
+              loading="lazy"
+            />
+          </ImageContextMenu>
+        )}
+        {nodeData.gridSize && nodeData.gridSize !== '1x1' && nodeData.status !== 'generating' && (
           <button
             onClick={() => splitGeneratedImage(id)}
             className="w-full flex items-center justify-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-colors bg-pink-500/10 text-pink-500 hover:bg-pink-500/20"

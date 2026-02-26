@@ -15,6 +15,7 @@ export interface Asset {
 export type AspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:4' | '3:2' | '2:3';
 export type ImageSize = '1k' | '2k' | '4k';
 export type ImageStyle = '' | 'photorealistic' | 'concept-art' | 'sketch' | 'comic-book' | 'anime' | '3d-render' | 'watercolor' | 'oil-painting' | 'cyberpunk' | 'ink-wash';
+export type NodeStatus = 'idle' | 'generating' | 'done';
 
 export interface Text2ImageData {
   [key: string]: unknown;
@@ -25,7 +26,7 @@ export interface Text2ImageData {
   aspectRatio?: AspectRatio;
   imageSize?: ImageSize;
   style?: ImageStyle;
-  status: 'idle' | 'generating' | 'done';
+  status: NodeStatus;
 }
 
 export interface Image2ImageData {
@@ -38,7 +39,7 @@ export interface Image2ImageData {
   aspectRatio?: AspectRatio;
   imageSize?: ImageSize;
   style?: ImageStyle;
-  status: 'idle' | 'generating' | 'done';
+  status: NodeStatus;
 }
 
 export interface ImageData {
@@ -48,6 +49,7 @@ export interface ImageData {
   width?: number;
   height?: number;
   gridSize?: GridSize;
+  status?: NodeStatus;
 }
 
 export type GridSize = '1x1' | '2x2' | '3x3' | '4x4' | '5x5';

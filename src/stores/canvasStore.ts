@@ -184,6 +184,39 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
     updateNodeData(nodeId, { status: 'generating' } as Partial<Text2ImageData>);
 
+    // Create a placeholder node for the generated image
+    const outgoingEdges = get().edges.filter(e => e.source === nodeId);
+    const yOffset = outgoingEdges.length * 150;
+    const newNodeId = getNodeId();
+    const newNodePosition = {
+      x: node.position.x + 300,
+      y: node.position.y + yOffset
+    };
+
+    const newNode: AppNode = {
+      id: newNodeId,
+      type: 'image',
+      position: newNodePosition,
+      data: {
+        label: prompt || '生成中...',
+        image: '', // Empty image initially
+        status: 'generating',
+      },
+    };
+
+    const newEdge: AppEdge = {
+      id: `edge_${nodeId}_${newNodeId}`,
+      source: nodeId,
+      target: newNodeId,
+      animated: true,
+      style: { strokeWidth: 2, stroke: '#3b82f6' } // Blue animated line to indicate working
+    };
+
+    set((state) => ({
+      nodes: [...state.nodes, newNode],
+      edges: [...state.edges, newEdge]
+    }));
+
     // Simulate progress
     const progressInterval = setInterval(() => {
       const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
@@ -226,37 +259,21 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
       updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
 
-      const outgoingEdges = get().edges.filter(e => e.source === nodeId);
-      const yOffset = outgoingEdges.length * 150;
+      // Update the placeholder node with the generated image
+      updateNodeData(newNodeId, {
+        label: prompt || '生成的图片',
+        image: image,
+        gridSize: gridSize,
+        status: 'done',
+      } as Partial<ImageData>);
 
-      const newNodeId = getNodeId();
-      const newNodePosition = {
-        x: node.position.x + 300,
-        y: node.position.y + yOffset
-      };
-
-      const newNode: AppNode = {
-        id: newNodeId,
-        type: 'image',
-        position: newNodePosition,
-        data: {
-          label: prompt || '生成的图片',
-          image: image,
-          gridSize: gridSize,
-        },
-      };
-
-      const newEdge: AppEdge = {
-        id: `edge_${nodeId}_${newNodeId}`,
-        source: nodeId,
-        target: newNodeId,
-        animated: true,
-        style: { strokeWidth: 2 }
-      };
-
+      // Update edge to normal state
       set((state) => ({
-        nodes: [...state.nodes, newNode],
-        edges: [...state.edges, newEdge]
+        edges: state.edges.map(e =>
+          e.id === `edge_${nodeId}_${newNodeId}`
+            ? { ...e, animated: false, style: { strokeWidth: 2 } }
+            : e
+        )
       }));
     } catch (error) {
       console.error('Failed to generate image:', error);
@@ -276,37 +293,21 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
             const image = getRandomSampleImage();
             updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
 
-            const outgoingEdges = get().edges.filter(e => e.source === nodeId);
-            const yOffset = outgoingEdges.length * 150;
+            // Update the placeholder node with the generated image
+            updateNodeData(newNodeId, {
+              label: prompt || '生成的图片',
+              image: image,
+              gridSize: (node.data as Text2ImageData).gridSize || '1x1',
+              status: 'done',
+            } as Partial<ImageData>);
 
-            const newNodeId = getNodeId();
-            const newNodePosition = {
-              x: node.position.x + 300,
-              y: node.position.y + yOffset
-            };
-
-            const newNode: AppNode = {
-              id: newNodeId,
-              type: 'image',
-              position: newNodePosition,
-              data: {
-                label: prompt || '生成的图片',
-                image: image,
-                gridSize: (node.data as Text2ImageData).gridSize || '1x1',
-              },
-            };
-
-            const newEdge: AppEdge = {
-              id: `edge_${nodeId}_${newNodeId}`,
-              source: nodeId,
-              target: newNodeId,
-              animated: true,
-              style: { strokeWidth: 2 }
-            };
-
+            // Update edge to normal state
             set((state) => ({
-              nodes: [...state.nodes, newNode],
-              edges: [...state.edges, newEdge]
+              edges: state.edges.map(e =>
+                e.id === `edge_${nodeId}_${newNodeId}`
+                  ? { ...e, animated: false, style: { strokeWidth: 2 } }
+                  : e
+              )
             }));
           }
         }, 1500);
@@ -315,6 +316,12 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
         alert(`生成图片失败: ${errorMessage}`);
         updateNodeData(nodeId, { status: 'idle' } as Partial<Text2ImageData>);
+
+        // Remove the placeholder node and edge on error
+        set((state) => ({
+          nodes: state.nodes.filter(n => n.id !== newNodeId),
+          edges: state.edges.filter(e => e.id !== `edge_${nodeId}_${newNodeId}`)
+        }));
       }
     }
   },
