@@ -1,15 +1,9 @@
 import {
   Save,
   Trash2,
-  X,
   ScanSearch,
   Loader2,
   SlidersHorizontal,
-  Type,
-  ImageIcon,
-  Layers,
-  Grid3X3,
-  Group,
 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useAssetStore } from '../../stores/assetStore';
@@ -124,35 +118,6 @@ export default function PropertyPanel() {
     <div className="w-72 h-full flex flex-col
       bg-panel-bg dark:bg-panel-bg-dark
       border-l border-border dark:border-border-dark">
-      {/* Header */}
-      <div className="px-4 py-2 border-b border-border dark:border-border-dark
-        flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {(() => {
-            const iconClass = "text-accent";
-            const iconSize = 16;
-            switch (selectedNode.type) {
-              case 'text2image': return <Type size={iconSize} className={iconClass} />;
-              case 'image2image': return <ImageIcon size={iconSize} className={iconClass} />;
-              case 'multiInput': return <Layers size={iconSize} className={iconClass} />;
-              case 'grid': return <Grid3X3 size={iconSize} className={iconClass} />;
-              case 'splitGroup': return <Group size={iconSize} className={iconClass} />;
-              default: return <ImageIcon size={iconSize} className={iconClass} />;
-            }
-          })()}
-          <span className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
-            {(selectedNode.data as { label: string }).label}
-          </span>
-        </div>
-        <button
-          onClick={() => setSelectedNodeId(null)}
-          className="p-1 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark
-            text-text-secondary dark:text-text-secondary-dark"
-        >
-          <X size={16} />
-        </button>
-      </div>
-
       {/* Tab bar */}
       <div className="flex border-b border-border dark:border-border-dark bg-panel-bg dark:bg-panel-bg-dark">
         <button className={tabClass('properties')} onClick={() => setActiveTab('properties')}>
