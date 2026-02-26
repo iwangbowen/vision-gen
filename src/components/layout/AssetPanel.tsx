@@ -1,7 +1,10 @@
 import { useCallback } from 'react';
+import { Images } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import AssetBrowser from '../ui/AssetBrowser';
 import type { Asset } from '../../types';
+
+type AssetTab = 'assets';
 
 export default function AssetPanel() {
   const handleDragStart = (e: React.DragEvent, image: string, name: string) => {
@@ -18,15 +21,25 @@ export default function AssetPanel() {
     );
   }, []);
 
+  const activeTab: AssetTab = 'assets';
+
+  const tabClass = (tab: AssetTab) =>
+    `flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium border-b-2 transition-colors ${
+      activeTab === tab
+        ? 'border-accent text-accent'
+        : 'border-transparent text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
+    }`;
+
   return (
     <div className="w-64 h-full flex flex-col
       bg-panel-bg dark:bg-panel-bg-dark
       border-r border-border dark:border-border-dark">
-      {/* Header */}
-      <div className="px-3 py-3 border-b border-border dark:border-border-dark">
-        <h2 className="text-sm font-semibold text-text-primary dark:text-text-primary-dark">
-          资产库
-        </h2>
+      {/* Tab bar */}
+      <div className="flex border-b border-border dark:border-border-dark bg-panel-bg dark:bg-panel-bg-dark">
+        <button className={tabClass('assets')}>
+          <Images size={12} />
+          素材库
+        </button>
       </div>
 
       {/* Asset browser */}
