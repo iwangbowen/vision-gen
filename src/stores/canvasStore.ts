@@ -15,6 +15,7 @@ import type {
   ImageData as AppImageData,
   GridSize,
   GridCell,
+  ImageStyle,
 } from '../types';
 import { getRandomSampleImage, getGridSampleImages } from '../utils/sampleData';
 
@@ -557,14 +558,17 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
     let generatedImage: string | undefined;
     let gridSize: string | undefined;
+    let parentStyle: string | undefined = '';
 
     if (node.type === 'text2image') {
       generatedImage = (node.data as Text2ImageData).generatedImage;
       gridSize = customGridSize || (node.data as Text2ImageData).gridSize;
+      parentStyle = (node.data as Text2ImageData).style;
     } else if (node.type === 'image2image') {
       // For image2image, the result is stored in sourceImage (e.g. after repaint) or generatedImage
       generatedImage = (node.data as Image2ImageData).generatedImage || (node.data as Image2ImageData).sourceImage;
       gridSize = customGridSize || (node.data as Image2ImageData).gridSize;
+      parentStyle = (node.data as Image2ImageData).style;
     } else if (node.type === 'image') {
       generatedImage = (node.data as AppImageData).image;
       gridSize = customGridSize || (node.data as AppImageData).gridSize;
@@ -641,7 +645,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         gridSize: '1x1',
         aspectRatio: '16:9',
         imageSize: '1k',
-        style: 'anime',
+        style: parentStyle as ImageStyle || '',
       },
     }));
 
