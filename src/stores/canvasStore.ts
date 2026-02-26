@@ -491,6 +491,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       get().updateNodeData(newNodeId, {
         sourceImage: image,
         status: 'idle',
+        gridSize: options?.gridSize || '1x1',
       } as Partial<Image2ImageData>);
 
     } catch (error) {
@@ -506,6 +507,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
           get().updateNodeData(newNodeId, {
             sourceImage: image,
             status: 'idle',
+            gridSize: options?.gridSize || '1x1',
           } as Partial<Image2ImageData>);
         }, 1500);
       } else {
@@ -556,9 +558,13 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     let generatedImage: string | undefined;
     let gridSize: GridSize | undefined;
 
-    if (node.type === 'text2image' || node.type === 'image2image') {
+    if (node.type === 'text2image') {
       generatedImage = (node.data as Text2ImageData).generatedImage;
       gridSize = (node.data as Text2ImageData).gridSize;
+    } else if (node.type === 'image2image') {
+      // For image2image, the result is stored in sourceImage (e.g. after repaint) or generatedImage
+      generatedImage = (node.data as Image2ImageData).generatedImage || (node.data as Image2ImageData).sourceImage;
+      gridSize = (node.data as Image2ImageData).gridSize;
     } else if (node.type === 'image') {
       generatedImage = (node.data as AppImageData).image;
       gridSize = (node.data as AppImageData).gridSize;
