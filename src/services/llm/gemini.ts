@@ -69,13 +69,40 @@ export class GeminiImageService implements LLMService {
     const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [{ text: prompt }];
 
     if (sourceImage) {
-      const regex = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/;
-      const match = regex.exec(sourceImage);
-      if (match) {
+      let mimeType = 'image/jpeg';
+      let data = '';
+
+      if (sourceImage.startsWith('data:')) {
+        const regex = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/;
+        const match = regex.exec(sourceImage);
+        if (match) {
+          mimeType = match[1];
+          data = match[2];
+        }
+      } else if (sourceImage.startsWith('http')) {
+        try {
+          const response = await fetch(sourceImage);
+          const blob = await response.blob();
+          mimeType = blob.type || 'image/jpeg';
+
+          // Convert blob to base64
+          const buffer = await blob.arrayBuffer();
+          const bytes = new Uint8Array(buffer);
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCodePoint(bytes[i]);
+          }
+          data = btoa(binary);
+        } catch (error) {
+          console.error('Failed to fetch source image:', error);
+        }
+      }
+
+      if (data) {
         parts.push({
           inlineData: {
-            mimeType: match[1],
-            data: match[2]
+            mimeType,
+            data
           }
         });
       }
