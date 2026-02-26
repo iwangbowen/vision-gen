@@ -66,7 +66,9 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
         className="w-full h-full cursor-pointer block p-0 m-0 border-none bg-transparent text-left"
-        onClick={() => {
+        onPointerDown={(e) => {
+          // Use onPointerDown instead of onClick to capture the event before React Flow's drag/select handlers
+          e.stopPropagation();
           const newShowToolbar = !showToolbar;
           setShowToolbar(newShowToolbar);
           if (newShowToolbar) {
