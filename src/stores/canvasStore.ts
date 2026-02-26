@@ -605,10 +605,11 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       img.src = generatedImage;
     });
 
-    const cellSpacing = 250; // Increased spacing for image2image nodes
+    const cellSpacingX = 250; // Increased spacing for image2image nodes
+    const cellSpacingY = 300; // Increased vertical spacing for image2image nodes
     const padding = 20;
-    const groupWidth = size * cellSpacing + padding * 2;
-    const groupHeight = size * cellSpacing + padding * 2 + 40; // extra 40 for label
+    const groupWidth = size * cellSpacingX + padding * 2;
+    const groupHeight = size * cellSpacingY + padding * 2 + 40; // extra 40 for label
 
     // Create a group node as the parent
     const groupId = getNodeId();
@@ -627,8 +628,8 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       id: getNodeId(),
       type: 'image2image' as const,
       position: {
-        x: padding + (idx % size) * cellSpacing,
-        y: padding + 40 + Math.floor(idx / size) * cellSpacing,
+        x: padding + (idx % size) * cellSpacingX,
+        y: padding + 40 + Math.floor(idx / size) * cellSpacingY,
       },
       parentId: groupId,
       extent: 'parent' as const,
