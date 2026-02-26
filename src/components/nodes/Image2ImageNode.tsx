@@ -1,6 +1,6 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { ImageIcon, Sparkles, Loader2, Settings2, Upload, Library } from 'lucide-react';
+import { ImageIcon, Sparkles, Loader2, Settings2, Upload, Library, Scissors } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import AssetPickerDialog from '../ui/AssetPickerDialog';
 import ImageContextMenu from '../ui/ImageContextMenu';
@@ -10,7 +10,7 @@ import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
 function Image2ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as Image2ImageData;
-  const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
+  const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen, splitGeneratedImage } = useCanvasStore();
 
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const [showAssetPicker, setShowAssetPicker] = useState(false);
@@ -107,38 +107,49 @@ function Image2ImageNode({ id, data }: NodeProps) {
           <>
         {/* Source image */}
         {nodeData.sourceImage ? (
-          <ImageContextMenu
-            image={nodeData.sourceImage}
-            sourceNodeId={id}
-            label={nodeData.label || '参考图'}
-            className="w-full rounded-lg border border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group"
-          >
-            <ImageEditOverlay
-              imageUrl={nodeData.sourceImage}
-              onCropComplete={handleCropComplete}
-              onRepaintComplete={handleRepaintComplete}
+          <div className="space-y-1">
+            <ImageContextMenu
+              image={nodeData.sourceImage}
+              sourceNodeId={id}
+              label={nodeData.label || '参考图'}
+              className="w-full rounded-lg border border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group"
             >
-              <img src={nodeData.sourceImage} alt="source" className="w-full h-auto rounded-lg" />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none rounded-lg">
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                  className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors pointer-events-auto"
-                  title="本地上传"
-                >
-                  <Upload size={10} />
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setShowAssetPicker(true); }}
-                  className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors pointer-events-auto"
-                  title="从资产库选择"
-                >
-                  <Library size={10} />
-                </button>
-              </div>
-            </ImageEditOverlay>
-          </ImageContextMenu>
+              <ImageEditOverlay
+                imageUrl={nodeData.sourceImage}
+                onCropComplete={handleCropComplete}
+                onRepaintComplete={handleRepaintComplete}
+              >
+                <img src={nodeData.sourceImage} alt="source" className="w-full h-auto rounded-lg" />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none rounded-lg">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                    className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors pointer-events-auto"
+                    title="本地上传"
+                  >
+                    <Upload size={10} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setShowAssetPicker(true); }}
+                    className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors pointer-events-auto"
+                    title="从资产库选择"
+                  >
+                    <Library size={10} />
+                  </button>
+                </div>
+              </ImageEditOverlay>
+            </ImageContextMenu>
+            {nodeData.gridSize && nodeData.gridSize !== '1x1' && nodeData.status !== 'generating' && (
+              <button
+                onClick={() => splitGeneratedImage(id)}
+                className="w-full flex items-center justify-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-colors bg-pink-500/10 text-pink-500 hover:bg-pink-500/20"
+              >
+                <Scissors size={10} />
+                切分
+              </button>
+            )}
+          </div>
         ) : (
           <div className="w-full rounded-lg border border-dashed border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark">
             <div className="w-full aspect-video flex items-center justify-center gap-2 p-2">
