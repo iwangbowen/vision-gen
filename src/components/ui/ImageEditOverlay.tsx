@@ -93,7 +93,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
           style={{
             top: `${toolbarPosition.top}px`,
             left: `${toolbarPosition.left}px`,
-            transform: 'translateX(-50%)',
+            transform: 'translate(-50%, -100%)',
           }}
           onPointerDown={(e) => e.stopPropagation()}
         >
