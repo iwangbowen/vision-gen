@@ -28,6 +28,34 @@ function ImageNode({ id, data }: NodeProps) {
     }
   };
 
+  const handleRepaintComplete = (maskImageUrl: string, prompt: string) => {
+    const store = useCanvasStore.getState();
+    const node = store.nodes.find(n => n.id === id);
+    if (node) {
+      const newNodeId = store.addImage2ImageNode(
+        { x: node.position.x + 200, y: node.position.y },
+        nodeData.image,
+        `${nodeData.label} (重绘)`
+      );
+
+      // Update the new node with mask and prompt
+      store.updateNodeData(newNodeId, {
+        prompt,
+        maskImage: maskImageUrl
+      });
+
+      store.onConnect({
+        source: id,
+        target: newNodeId,
+        sourceHandle: null,
+        targetHandle: null
+      });
+
+      // Automatically trigger generation
+      store.simulateGenerate(newNodeId);
+    }
+  };
+
   return (
     <div className="node-card w-44 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
       {/* Header - compact */}
@@ -61,6 +89,7 @@ function ImageNode({ id, data }: NodeProps) {
             <ImageEditOverlay
               imageUrl={nodeData.image}
               onCropComplete={handleCropComplete}
+              onRepaintComplete={handleRepaintComplete}
             >
               <img
                 src={nodeData.image}

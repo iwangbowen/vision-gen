@@ -25,13 +25,21 @@ export class CustomImageService implements LLMService {
         prompt = `Style: ${options.style}. ${prompt}`;
       }
 
-      const payload = {
+      const payload: Record<string, unknown> = {
         model: this.model || 'dall-e-3',
         prompt: prompt,
         n: 1,
         size: options.size || '1024x1024',
         response_format: 'b64_json',
       };
+
+      if (options.sourceImage) {
+        payload.image = options.sourceImage;
+      }
+
+      if (options.maskImage) {
+        payload.mask = options.maskImage;
+      }
 
       const response = await fetch(url, {
         method: 'POST',

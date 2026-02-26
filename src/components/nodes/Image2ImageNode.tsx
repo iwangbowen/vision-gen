@@ -63,6 +63,34 @@ function Image2ImageNode({ id, data }: NodeProps) {
     }
   };
 
+  const handleRepaintComplete = (maskImageUrl: string, prompt: string) => {
+    const store = useCanvasStore.getState();
+    const node = store.nodes.find(n => n.id === id);
+    if (node && nodeData.sourceImage) {
+      const newNodeId = store.addImage2ImageNode(
+        { x: node.position.x + 250, y: node.position.y },
+        nodeData.sourceImage,
+        `${nodeData.label || '参考图'} (重绘)`
+      );
+
+      // Update the new node with mask and prompt
+      store.updateNodeData(newNodeId, {
+        prompt,
+        maskImage: maskImageUrl
+      });
+
+      store.onConnect({
+        source: id,
+        target: newNodeId,
+        sourceHandle: null,
+        targetHandle: null
+      });
+
+      // Automatically trigger generation
+      store.simulateGenerate(newNodeId);
+    }
+  };
+
   return (
     <div className="node-card w-56 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
       {/* Header - icon only */}
@@ -99,6 +127,7 @@ function Image2ImageNode({ id, data }: NodeProps) {
             <ImageEditOverlay
               imageUrl={nodeData.sourceImage}
               onCropComplete={handleCropComplete}
+              onRepaintComplete={handleRepaintComplete}
             >
               <img src={nodeData.sourceImage} alt="source" className="w-full aspect-video object-cover rounded-lg" />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none rounded-lg">

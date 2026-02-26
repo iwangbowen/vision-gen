@@ -51,7 +51,7 @@ export class GeminiImageService implements LLMService {
     }
 
     try {
-      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, options.sourceImage);
+      return await this.generateWithGeminiAPI(prompt, aspectRatio, imageSize, options.sourceImage, options.maskImage);
     } catch (error) {
       if (error instanceof LLMServiceError) {
         throw error;
@@ -63,25 +63,25 @@ export class GeminiImageService implements LLMService {
     }
   }
 
-  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, sourceImage?: string): Promise<string> {
+  private async generateWithGeminiAPI(prompt: string, aspectRatio: string, imageSize: string, sourceImage?: string, maskImage?: string): Promise<string> {
     const url = `${this.baseUrl}/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
     const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [{ text: prompt }];
 
-    if (sourceImage) {
+    const processImage = async (imageUrl: string) => {
       let mimeType = 'image/jpeg';
       let data = '';
 
-      if (sourceImage.startsWith('data:')) {
+      if (imageUrl.startsWith('data:')) {
         const regex = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/;
-        const match = regex.exec(sourceImage);
+        const match = regex.exec(imageUrl);
         if (match) {
           mimeType = match[1];
           data = match[2];
         }
-      } else if (sourceImage.startsWith('http')) {
+      } else if (imageUrl.startsWith('http')) {
         try {
-          const response = await fetch(sourceImage);
+          const response = await fetch(imageUrl);
           const blob = await response.blob();
           mimeType = blob.type || 'image/jpeg';
 
@@ -94,10 +94,26 @@ export class GeminiImageService implements LLMService {
           }
           data = btoa(binary);
         } catch (error) {
-          console.error('Failed to fetch source image:', error);
+          console.error('Failed to fetch image:', error);
         }
       }
+      return { mimeType, data };
+    };
 
+    if (sourceImage) {
+      const { mimeType, data } = await processImage(sourceImage);
+      if (data) {
+        parts.push({
+          inlineData: {
+            mimeType,
+            data
+          }
+        });
+      }
+    }
+
+    if (maskImage) {
+      const { mimeType, data } = await processImage(maskImage);
       if (data) {
         parts.push({
           inlineData: {

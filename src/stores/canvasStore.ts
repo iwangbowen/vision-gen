@@ -244,6 +244,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         gridSize,
         style,
         sourceImage: (data as Image2ImageData).sourceImage,
+        maskImage: (data as Image2ImageData).maskImage,
       });
 
       clearInterval(progressInterval);

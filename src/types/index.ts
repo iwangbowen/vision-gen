@@ -34,6 +34,7 @@ export interface Image2ImageData {
   label: string;
   prompt: string;
   sourceImage?: string;
+  maskImage?: string;
   generatedImage?: string;
   gridSize?: GridSize;
   aspectRatio?: AspectRatio;

@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { Expand, Crop, Paintbrush, Camera, Sun } from 'lucide-react';
 import CropDialog from './CropDialog';
+import RepaintDialog from './RepaintDialog';
 
 interface ImageEditOverlayProps {
   readonly imageUrl: string;
   readonly onCropComplete: (croppedImageUrl: string) => void;
+  readonly onRepaintComplete?: (maskImageUrl: string, prompt: string) => void;
   readonly children: React.ReactNode;
 }
 
-export default function ImageEditOverlay({ imageUrl, onCropComplete, children }: ImageEditOverlayProps) {
+export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintComplete, children }: ImageEditOverlayProps) {
   const [showToolbar, setShowToolbar] = useState(false);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
+  const [isRepaintDialogOpen, setIsRepaintDialogOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,6 +47,14 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, children }:
     setShowToolbar(false);
   };
 
+  const handleRepaintComplete = (maskImageUrl: string, prompt: string) => {
+    if (onRepaintComplete) {
+      onRepaintComplete(maskImageUrl, prompt);
+    }
+    setIsRepaintDialogOpen(false);
+    setShowToolbar(false);
+  };
+
   return (
     <div className="relative group w-full h-full" ref={containerRef}>
       <button
@@ -68,8 +79,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, children }:
           {[
             { icon: <Expand size={14} />, label: '扩图', action: 'outpaint' },
             { icon: <Crop size={14} />, label: '裁剪', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
-            { icon: <Paintbrush size={14} />, label: '重绘', action: 'repaint' },
-            { icon: <Paintbrush size={14} />, label: '局部重绘', action: 'inpaint' },
+            { icon: <Paintbrush size={14} />, label: '重绘', action: 'repaint', onClick: () => setIsRepaintDialogOpen(true) },
             { icon: <Camera size={14} />, label: '镜头角度', action: 'camera' },
             { icon: <Sun size={14} />, label: '灯光色调', action: 'lighting' },
           ].map((tool) => (
@@ -95,6 +105,13 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, children }:
         onClose={() => setIsCropDialogOpen(false)}
         imageUrl={imageUrl}
         onCropComplete={handleCropComplete}
+      />
+
+      <RepaintDialog
+        isOpen={isRepaintDialogOpen}
+        onClose={() => setIsRepaintDialogOpen(false)}
+        imageUrl={imageUrl}
+        onRepaintComplete={handleRepaintComplete}
       />
     </div>
   );
