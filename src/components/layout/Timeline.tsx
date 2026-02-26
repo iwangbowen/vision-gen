@@ -9,11 +9,13 @@ import {
   Film,
 } from 'lucide-react';
 import { useTimelineStore } from '../../stores/timelineStore';
+import ImagePreviewDialog from '../ui/ImagePreviewDialog';
 
 export default function Timeline() {
   const { items, removeItem, reorderItems, clearTimeline, collapsed, setCollapsed } = useTimelineStore();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleDragStart = useCallback((e: React.DragEvent, idx: number) => {
     setDragIndex(idx);
@@ -214,22 +216,32 @@ export default function Timeline() {
                     #{pos + 1}
                   </div>
                   <div className="w-24 h-16 rounded-lg overflow-hidden border-2 border-border dark:border-border-dark hover:border-accent transition-colors cursor-grab active:cursor-grabbing relative bg-surface dark:bg-surface-dark">
-                    <img
-                      src={item.image}
-                      alt={item.label || `Frame ${pos + 1}`}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
+                    <button
+                      type="button"
+                      className="w-full h-full p-0 m-0 border-none bg-transparent cursor-pointer block"
+                      onClick={() => setPreviewImage(item.image)}
+                      aria-label={item.label ? `Preview ${item.label}` : `Preview Frame ${pos + 1}`}
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.label || `Frame ${pos + 1}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </button>
                     {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-1">
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-1 pointer-events-none">
                       <button
-                        onClick={() => removeItem(item.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white hover:bg-red-500 transition-all"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeItem(item.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white hover:bg-red-500 transition-all pointer-events-auto"
                         title="移除"
                       >
                         <X size={10} />
                       </button>
-                      <div className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white cursor-grab">
+                      <div className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white cursor-grab pointer-events-auto">
                         <GripVertical size={10} />
                       </div>
                     </div>
@@ -245,6 +257,12 @@ export default function Timeline() {
           </div>
         </section>
       )}
+
+      <ImagePreviewDialog
+        isOpen={!!previewImage}
+        onClose={() => setPreviewImage(null)}
+        imageUrl={previewImage || ''}
+      />
     </div>
   );
 }
