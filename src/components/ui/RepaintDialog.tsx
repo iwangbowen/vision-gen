@@ -98,13 +98,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
 
         for (let i = 0; i < src.length; i += 4) {
           const alpha = src[i + 3];
-          const r = src[i];
-          const g = src[i + 1];
-          const b = src[i + 2];
-
-          const isTransparent = alpha === 0;
-          const isEraserStroke = alpha > 0 && r < 20 && g < 20 && b < 20;
-          const isMasked = !isTransparent && !isEraserStroke;
+          const isMasked = alpha > 0;
           const value = isMasked ? 255 : 0;
 
           dst[i] = value;
@@ -152,6 +146,13 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
       });
     });
   }, [renderWidth, renderHeight, zoom]);
+
+  useEffect(() => {
+    const signaturePad = sigCanvas.current?.getSignaturePad();
+    const padWithContext = signaturePad as unknown as { _ctx?: CanvasRenderingContext2D };
+    if (!padWithContext?._ctx) return;
+    padWithContext._ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+  }, [isErasing, renderWidth, renderHeight]);
 
   const handleCanvasWheel = (event: React.WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -240,7 +241,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                 >
                   <SignatureCanvas
                     ref={sigCanvas}
-                    penColor={isErasing ? '#000000' : brushColor}
+                    penColor={brushColor}
                     canvasProps={{
                       width: renderWidth,
                       height: renderHeight,
@@ -318,6 +319,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                     key={color}
                     type="button"
                     onClick={() => {
+                      setIsPanMode(false);
                       setIsErasing(false);
                       setBrushColor(color);
                     }}
@@ -330,17 +332,6 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                     title={`选择颜色 ${color}`}
                   />
                 ))}
-                <input
-                  type="color"
-                  aria-label="自定义颜色"
-                  value={brushColor}
-                  onChange={(e) => {
-                    setIsErasing(false);
-                    setBrushColor(e.target.value);
-                  }}
-                  className="w-5 h-5 rounded-full border border-border dark:border-border-dark cursor-pointer overflow-hidden"
-                  title="自定义颜色"
-                />
               </div>
               <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark leading-relaxed">
                 颜色用于区分涂抹区域；提交时会统一作为重绘区域。
