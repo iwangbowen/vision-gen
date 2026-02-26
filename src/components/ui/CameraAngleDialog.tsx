@@ -147,7 +147,7 @@ export default function CameraAngleDialog({ isOpen, imageUrl, onClose, onConfirm
   const imageTransform = `perspective(800px) rotateY(${-angle.azimuth * 0.3}deg) rotateX(${angle.elevation * 0.2}deg) scale(${zoomScale})`;
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center">
       <div
         className="flex flex-col bg-[#1a1a1a] rounded-2xl shadow-2xl border border-white/10 overflow-hidden"
         onPointerDown={e => e.stopPropagation()}
