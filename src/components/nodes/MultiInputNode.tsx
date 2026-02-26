@@ -30,7 +30,7 @@ function MultiInputNode({ id, data }: NodeProps) {
     if (sourceImages.length > 0) {
       updateNodeData(id, { sourceImages });
     }
-  }, [sourceImages.length, id, updateNodeData]);
+  }, [sourceImages.length, id, updateNodeData, sourceImages]);
 
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -224,4 +224,4 @@ function MultiInputNode({ id, data }: NodeProps) {
   );
 }
 
-export default memo(Image2ImageNode);
+export default memo(MultiInputNode);

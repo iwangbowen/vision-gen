@@ -79,8 +79,32 @@ export default function InfiniteCanvas() {
 
   const onPaneContextMenu = useCallback((event: React.MouseEvent | MouseEvent) => {
     event.preventDefault();
-    setContextMenu(null);
-    setCanvasContextMenu({ x: event.clientX, y: event.clientY });
+
+    // Check if we have multiple selected nodes
+    const { nodes } = useCanvasStore.getState();
+    const selectedNodes = nodes.filter(n => n.selected);
+
+    if (selectedNodes.length > 1) {
+      setContextMenu({
+        nodeIds: selectedNodes.map(n => n.id),
+        x: event.clientX,
+        y: event.clientY
+      });
+      setCanvasContextMenu(null);
+    } else {
+      setContextMenu(null);
+      setCanvasContextMenu({ x: event.clientX, y: event.clientY });
+    }
+  }, []);
+
+  const onSelectionContextMenu = useCallback((event: React.MouseEvent, nodes: { id: string }[]) => {
+    event.preventDefault();
+    setCanvasContextMenu(null);
+    setContextMenu({
+      nodeIds: nodes.map(n => n.id),
+      x: event.clientX,
+      y: event.clientY
+    });
   }, []);
 
   const onNodeDragStart = useCallback(() => {
@@ -154,6 +178,7 @@ export default function InfiniteCanvas() {
         onConnect={onConnect}
         onSelectionChange={onSelectionChange}
         onNodeContextMenu={onNodeContextMenu}
+        onSelectionContextMenu={onSelectionContextMenu}
         onPaneContextMenu={onPaneContextMenu}
         onNodeDragStart={onNodeDragStart}
         onPaneClick={onPaneClick}
