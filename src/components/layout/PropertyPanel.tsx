@@ -461,7 +461,9 @@ export default function PropertyPanel() {
         <ImagePreviewDialog
           isOpen={isPreviewOpen}
           onClose={() => setIsPreviewOpen(false)}
-          imageUrl={nodeImage}
+          images={[{ url: nodeImage }]}
+          currentIndex={0}
+          onIndexChange={() => {}}
         />
       )}
     </div>

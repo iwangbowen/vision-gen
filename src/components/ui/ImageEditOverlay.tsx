@@ -269,7 +269,9 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
       <ImagePreviewDialog
         isOpen={isPreviewDialogOpen}
         onClose={() => setIsPreviewDialogOpen(false)}
-        imageUrl={imageUrl}
+        images={[{ url: imageUrl }]}
+        currentIndex={0}
+        onIndexChange={() => {}}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   X,
   Download,
@@ -10,12 +10,24 @@ import {
 } from 'lucide-react';
 import { useTimelineStore } from '../../stores/timelineStore';
 import ImagePreviewDialog from '../ui/ImagePreviewDialog';
+import type { PreviewImage } from '../ui/ImagePreviewDialog';
 
 export default function Timeline() {
   const { items, removeItem, reorderItems, clearTimeline, collapsed, setCollapsed } = useTimelineStore();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+
+  // Sort items by position for consistent navigation order
+  const sortedItems = useMemo(
+    () => [...items].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)),
+    [items]
+  );
+
+  const previewImages: PreviewImage[] = useMemo(
+    () => sortedItems.map((item) => ({ url: item.image, label: item.label })),
+    [sortedItems]
+  );
 
   const handleDragStart = useCallback((e: React.DragEvent, idx: number) => {
     setDragIndex(idx);
@@ -219,7 +231,10 @@ export default function Timeline() {
                     <button
                       type="button"
                       className="w-full h-full p-0 m-0 border-none bg-transparent cursor-pointer block"
-                      onClick={() => setPreviewImage(item.image)}
+                      onClick={() => {
+                        const sortedIdx = sortedItems.findIndex((si) => si.id === item.id);
+                        setPreviewIndex(Math.max(0, sortedIdx));
+                      }}
                       aria-label={item.label ? `Preview ${item.label}` : `Preview Frame ${pos + 1}`}
                     >
                       <img
@@ -259,9 +274,11 @@ export default function Timeline() {
       )}
 
       <ImagePreviewDialog
-        isOpen={!!previewImage}
-        onClose={() => setPreviewImage(null)}
-        imageUrl={previewImage || ''}
+        isOpen={previewIndex !== null}
+        onClose={() => setPreviewIndex(null)}
+        images={previewImages}
+        currentIndex={previewIndex ?? 0}
+        onIndexChange={setPreviewIndex}
       />
     </div>
   );
