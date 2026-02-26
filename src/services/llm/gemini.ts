@@ -7,6 +7,91 @@ export const GEMINI_IMAGE_MODELS = [
   { label: 'Gemini 2.5 Flash (Image)', value: 'gemini-2.5-flash-image' },
 ] as const;
 
+// Gemini text/vision models
+export const GEMINI_TEXT_MODELS = [
+  { label: 'Gemini 3 Flash Preview', value: 'gemini-3-flash-preview' },
+  { label: 'Gemini 3.1 Pro Preview', value: 'gemini-3.1-pro-preview' },
+] as const;
+
+// Shared utility: convert an image URL/data-URI to { mimeType, data }
+async function processImageToBase64(imageUrl: string): Promise<{ mimeType: string; data: string }> {
+  let mimeType = 'image/jpeg';
+  let data = '';
+
+  if (imageUrl.startsWith('data:')) {
+    const regex = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/;
+    const match = regex.exec(imageUrl);
+    if (match) {
+      mimeType = match[1];
+      data = match[2];
+    }
+  } else if (imageUrl.startsWith('http')) {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      mimeType = blob.type || 'image/jpeg';
+      const buffer = await blob.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCodePoint(bytes[i]);
+      }
+      data = btoa(binary);
+    } catch (error) {
+      console.error('Failed to fetch image:', error);
+    }
+  }
+  return { mimeType, data };
+}
+
+// Analyze an image using a Gemini text/vision model
+export async function analyzeImageWithGemini(params: {
+  apiKey: string;
+  baseUrl: string;
+  textModel: string;
+  prompt: string;
+  imageUrl: string;
+}): Promise<string> {
+  if (!params.apiKey) {
+    throw new LLMServiceError('Gemini API Key is not configured');
+  }
+
+  const baseUrl = params.baseUrl.replace(/\/+$/, '');
+  const url = `${baseUrl}/v1beta/models/${params.textModel}:generateContent?key=${params.apiKey}`;
+
+  const { mimeType, data } = await processImageToBase64(params.imageUrl);
+
+  const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
+  if (data) {
+    parts.push({ inlineData: { mimeType, data } });
+  }
+  parts.push({ text: params.prompt });
+
+  const payload = { contents: [{ parts }] };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new LLMServiceError(
+      (errorData as { error?: { message?: string } } | null)?.error?.message || `HTTP ${response.status}`
+    );
+  }
+
+  const responseData = await response.json() as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  };
+  const text = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new LLMServiceError('No text response from Gemini API');
+  }
+  return text;
+}
+
 // Map image size from our format to API format
 function mapImageSize(size: string | undefined): string {
   switch (size) {
@@ -68,73 +153,26 @@ export class GeminiImageService implements LLMService {
 
     const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [{ text: prompt }];
 
-    const processImage = async (imageUrl: string) => {
-      let mimeType = 'image/jpeg';
-      let data = '';
-
-      if (imageUrl.startsWith('data:')) {
-        const regex = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/;
-        const match = regex.exec(imageUrl);
-        if (match) {
-          mimeType = match[1];
-          data = match[2];
-        }
-      } else if (imageUrl.startsWith('http')) {
-        try {
-          const response = await fetch(imageUrl);
-          const blob = await response.blob();
-          mimeType = blob.type || 'image/jpeg';
-
-          // Convert blob to base64
-          const buffer = await blob.arrayBuffer();
-          const bytes = new Uint8Array(buffer);
-          let binary = '';
-          for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCodePoint(bytes[i]);
-          }
-          data = btoa(binary);
-        } catch (error) {
-          console.error('Failed to fetch image:', error);
-        }
-      }
-      return { mimeType, data };
-    };
-
     if (sourceImage) {
-      const { mimeType, data } = await processImage(sourceImage);
+      const { mimeType, data } = await processImageToBase64(sourceImage);
       if (data) {
-        parts.push({
-          inlineData: {
-            mimeType,
-            data
-          }
-        });
+        parts.push({ inlineData: { mimeType, data } });
       }
     }
 
     if (sourceImages && sourceImages.length > 0) {
       for (const img of sourceImages) {
-        const { mimeType, data } = await processImage(img);
+        const { mimeType, data } = await processImageToBase64(img);
         if (data) {
-          parts.push({
-            inlineData: {
-              mimeType,
-              data
-            }
-          });
+          parts.push({ inlineData: { mimeType, data } });
         }
       }
     }
 
     if (maskImage) {
-      const { mimeType, data } = await processImage(maskImage);
+      const { mimeType, data } = await processImageToBase64(maskImage);
       if (data) {
-        parts.push({
-          inlineData: {
-            mimeType,
-            data
-          }
-        });
+        parts.push({ inlineData: { mimeType, data } });
       }
     }
 

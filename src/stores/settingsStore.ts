@@ -9,6 +9,7 @@ export interface SettingsState {
     apiKey: string;
     baseUrl: string;
     model: string;
+    textModel: string;
   };
   custom: {
     apiKey: string;
@@ -28,6 +29,7 @@ export const useSettingsStore = create<SettingsState>()(
         apiKey: '',
         baseUrl: 'https://generativelanguage.googleapis.com',
         model: 'gemini-3-pro-image-preview',
+        textModel: 'gemini-3-flash-preview',
       },
       custom: {
         apiKey: '',

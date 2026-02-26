@@ -2,9 +2,13 @@ import {
   Save,
   Trash2,
   X,
+  ScanSearch,
+  Loader2,
 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useAssetStore } from '../../stores/assetStore';
+import { useSettingsStore } from '../../stores/settingsStore';
+import { analyzeImageWithGemini } from '../../services/llm/gemini';
 import type { AssetCategory, Text2ImageData, Image2ImageData, MultiInputData } from '../../types';
 import { useState } from 'react';
 import {
@@ -18,9 +22,14 @@ import {
 export default function PropertyPanel() {
   const { nodes, selectedNodeId, removeNode, setSelectedNodeId, updateNodeData } = useCanvasStore();
   const { addAsset } = useAssetStore();
+  const { provider, gemini } = useSettingsStore();
   const [saveCategory, setSaveCategory] = useState<AssetCategory>('scene');
   const [saveName, setSaveName] = useState('');
   const [showSaveForm, setShowSaveForm] = useState(false);
+  const [analysisPrompt, setAnalysisPrompt] = useState('');
+  const [analysisResult, setAnalysisResult] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState('');
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
 
@@ -53,6 +62,31 @@ export default function PropertyPanel() {
     });
     setShowSaveForm(false);
     setSaveName('');
+  };
+
+  const handleAnalyzeImage = async () => {
+    if (!nodeImage || !analysisPrompt.trim()) return;
+    if (provider !== 'gemini' || !gemini.apiKey) {
+      setAnalysisError('请先在设置中配置 Gemini API Key');
+      return;
+    }
+    setIsAnalyzing(true);
+    setAnalysisResult('');
+    setAnalysisError('');
+    try {
+      const result = await analyzeImageWithGemini({
+        apiKey: gemini.apiKey,
+        baseUrl: gemini.baseUrl,
+        textModel: gemini.textModel,
+        prompt: analysisPrompt,
+        imageUrl: nodeImage,
+      });
+      setAnalysisResult(result);
+    } catch (e) {
+      setAnalysisError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const isGenerativeNode = selectedNode.type === 'text2image' || selectedNode.type === 'image2image' || selectedNode.type === 'multiInput';
@@ -264,6 +298,54 @@ export default function PropertyPanel() {
                 <Save size={14} />
                 保存为资产
               </button>
+            )}
+          </div>
+        )}
+
+        {/* Image analysis */}
+        {nodeImage && (
+          <div className="px-4 py-3 border-b border-border dark:border-border-dark space-y-2">
+            <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark flex items-center gap-1.5">
+              <ScanSearch size={13} />
+              图片分析
+            </p>
+            <textarea
+              placeholder="输入分析提示词，例如：描述这张图片的内容..."
+              value={analysisPrompt}
+              onChange={(e) => setAnalysisPrompt(e.target.value)}
+              rows={2}
+              className="w-full px-3 py-1.5 rounded-md text-xs resize-none
+                bg-canvas-bg dark:bg-canvas-bg-dark
+                text-text-primary dark:text-text-primary-dark
+                border border-border dark:border-border-dark
+                focus:outline-none focus:border-accent
+                placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
+            />
+            <button
+              onClick={handleAnalyzeImage}
+              disabled={isAnalyzing || !analysisPrompt.trim()}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
+                bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isAnalyzing ? (
+                <><Loader2 size={13} className="animate-spin" />分析中...</>
+              ) : (
+                <><ScanSearch size={13} />分析图片</>
+              )}
+            </button>
+            {analysisError && (
+              <p className="text-xs text-danger bg-danger/10 rounded-md px-2.5 py-1.5">
+                {analysisError}
+              </p>
+            )}
+            {analysisResult && (
+              <div className="text-xs text-text-primary dark:text-text-primary-dark
+                bg-canvas-bg dark:bg-canvas-bg-dark rounded-md px-2.5 py-2
+                border border-border dark:border-border-dark
+                max-h-40 overflow-y-auto whitespace-pre-wrap">
+                {analysisResult}
+              </div>
             )}
           </div>
         )}

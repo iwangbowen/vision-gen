@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, Settings as SettingsIcon } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
 import type { LLMProvider } from '../../stores/settingsStore';
-import { GEMINI_IMAGE_MODELS } from '../../services/llm/gemini';
+import { GEMINI_IMAGE_MODELS, GEMINI_TEXT_MODELS } from '../../services/llm/gemini';
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -133,6 +133,20 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                     className={inputClass}
                   >
                     {GEMINI_IMAGE_MODELS.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <div className={labelClass}>文本/视觉模型</div>
+                  <select
+                    value={gemini.textModel}
+                    onChange={(e) => updateGeminiSettings({ textModel: e.target.value })}
+                    className={inputClass}
+                  >
+                    {GEMINI_TEXT_MODELS.map((m) => (
                       <option key={m.value} value={m.value}>
                         {m.label}
                       </option>
