@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check } from 'lucide-react';
+import { X, Check, Square, Monitor, Smartphone, Image as ImageIcon } from 'lucide-react';
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -10,6 +10,15 @@ interface CropDialogProps {
   imageUrl: string;
   onCropComplete: (croppedImageUrl: string) => void;
 }
+
+const ASPECT_RATIOS = [
+  { label: '自由', value: undefined, icon: ImageIcon },
+  { label: '1:1', value: 1, icon: Square },
+  { label: '4:3', value: 4 / 3, icon: Monitor },
+  { label: '16:9', value: 16 / 9, icon: Monitor },
+  { label: '3:4', value: 3 / 4, icon: Smartphone },
+  { label: '9:16', value: 9 / 16, icon: Smartphone },
+];
 
 function centerAspectCrop(
   mediaWidth: number,
@@ -34,20 +43,49 @@ function centerAspectCrop(
 export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }: CropDialogProps) {
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<Crop>();
+  const [aspect, setAspect] = useState<number | undefined>(undefined);
   const imgRef = useRef<HTMLImageElement>(null);
 
   const handleClose = () => {
     setCrop(undefined);
     setCompletedCrop(undefined);
+    setAspect(undefined);
     onClose();
   };
 
   if (!isOpen) return null;
 
+  const handleAspectClick = (newAspect: number | undefined) => {
+    setAspect(newAspect);
+    if (imgRef.current) {
+      const { width, height } = imgRef.current;
+      if (newAspect) {
+        setCrop(centerAspectCrop(width, height, newAspect));
+      } else {
+        setCrop({
+          unit: '%',
+          x: 5,
+          y: 5,
+          width: 90,
+          height: 90
+        });
+      }
+    }
+  };
+
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
-    // Default crop to center 90%
-    setCrop(centerAspectCrop(width, height, 1));
+    if (aspect) {
+      setCrop(centerAspectCrop(width, height, aspect));
+    } else {
+      setCrop({
+        unit: '%',
+        x: 5,
+        y: 5,
+        width: 90,
+        height: 90
+      });
+    }
   };
 
   const handleComplete = async () => {
@@ -108,6 +146,7 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
             crop={crop}
             onChange={(c) => setCrop(c)}
             onComplete={(c) => setCompletedCrop(c)}
+            aspect={aspect}
             className="max-h-full"
           >
             <img
@@ -116,9 +155,31 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
               alt="Crop preview"
               onLoad={onImageLoad}
               crossOrigin="anonymous"
-              className="max-h-[60vh] object-contain"
+              className="max-h-[50vh] object-contain"
             />
           </ReactCrop>
+        </div>
+
+        {/* Aspect Ratio Selector */}
+        <div className="flex items-center justify-center gap-2 px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 overflow-x-auto">
+          {ASPECT_RATIOS.map((ratio) => {
+            const Icon = ratio.icon;
+            const isActive = aspect === ratio.value;
+            return (
+              <button
+                key={ratio.label}
+                onClick={() => handleAspectClick(ratio.value)}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg min-w-15 transition-colors ${
+                  isActive
+                    ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
+                }`}
+              >
+                <Icon size={18} />
+                <span className="text-[10px] font-medium">{ratio.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Footer */}
