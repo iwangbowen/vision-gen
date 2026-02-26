@@ -3,16 +3,19 @@ import type { TimelineItem } from '../types';
 
 interface TimelineState {
   items: TimelineItem[];
+  collapsed: boolean;
 
   addItem: (item: Omit<TimelineItem, 'order'>) => void;
   removeItem: (id: string) => void;
   reorderItems: (items: TimelineItem[]) => void;
   updateItemPosition: (id: string, position: number) => void;
   clearTimeline: () => void;
+  setCollapsed: (collapsed: boolean) => void;
 }
 
 export const useTimelineStore = create<TimelineState>((set, get) => ({
   items: [],
+  collapsed: false,
 
   addItem: (item) => {
     const { items } = get();
@@ -48,4 +51,5 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     })),
 
   clearTimeline: () => set({ items: [] }),
+  setCollapsed: (collapsed) => set({ collapsed }),
 }));

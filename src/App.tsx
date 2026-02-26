@@ -7,10 +7,12 @@ import Timeline from './components/layout/Timeline';
 import InfiniteCanvas from './components/canvas/InfiniteCanvas';
 import { useThemeStore } from './stores/themeStore';
 import { useCanvasStore } from './stores/canvasStore';
+import { useTimelineStore } from './stores/timelineStore';
 
 function App() {
   const [leftPanelOpen, setLeftPanelOpen] = useState(false);
   const { rightPanelOpen, setRightPanelOpen } = useCanvasStore();
+  const { collapsed: timelineCollapsed, setCollapsed: setTimelineCollapsed } = useTimelineStore();
   const { theme } = useThemeStore();
 
   // Initialize dark class on mount
@@ -40,11 +42,17 @@ function App() {
           setLeftPanelOpen((prev) => !prev);
         }
       }
+
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        // Ctrl + Alt + P: Toggle timeline
+        setTimelineCollapsed(!timelineCollapsed);
+      }
     };
 
     globalThis.addEventListener('keydown', handleKeyDown);
     return () => globalThis.removeEventListener('keydown', handleKeyDown);
-  }, [rightPanelOpen, setRightPanelOpen]);
+  }, [rightPanelOpen, setRightPanelOpen, timelineCollapsed, setTimelineCollapsed]);
 
   return (
     <ReactFlowProvider>

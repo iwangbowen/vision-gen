@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   X,
   Download,
@@ -11,8 +11,7 @@ import {
 import { useTimelineStore } from '../../stores/timelineStore';
 
 export default function Timeline() {
-  const { items, removeItem, reorderItems, clearTimeline } = useTimelineStore();
-  const [collapsed, setCollapsed] = useState(false);
+  const { items, removeItem, reorderItems, clearTimeline, collapsed, setCollapsed } = useTimelineStore();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
 

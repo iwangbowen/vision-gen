@@ -11,6 +11,7 @@ export default function ShortcutsDialog({ isOpen, onClose }: ShortcutsDialogProp
   const shortcuts = [
     { keys: ['Ctrl', 'B'], description: '显示/隐藏左侧资产面板' },
     { keys: ['Ctrl', 'Alt', 'B'], description: '显示/隐藏右侧属性面板' },
+    { keys: ['Ctrl', 'Alt', 'P'], description: '显示/隐藏底部轨道面板' },
   ];
 
   return (
