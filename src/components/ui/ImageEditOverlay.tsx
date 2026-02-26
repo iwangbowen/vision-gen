@@ -103,19 +103,30 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
       </div>
 
       {showToolbar && createPortal(
-        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-        <div
-          role="toolbar"
-          aria-label="图片编辑工具栏"
-          className="fixed flex items-center justify-center gap-1 p-1.5 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max"
-          style={{
-            top: `${toolbarPosition.top}px`,
-            left: `${toolbarPosition.left}px`,
-            transform: 'translate(-50%, -100%)',
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
+        <>
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+          <div
+            className="fixed inset-0 z-40"
+            onPointerDown={() => {
+              setShowToolbar(false);
+              setShowSplitMenu(false);
+              setShowOutpaintMenu(false);
+              setShowMoreMenu(false);
+            }}
+          />
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+          <div
+            role="toolbar"
+            aria-label="图片编辑工具栏"
+            className="fixed flex items-center justify-center gap-1 p-1.5 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max"
+            style={{
+              top: `${toolbarPosition.top}px`,
+              left: `${toolbarPosition.left}px`,
+              transform: 'translate(-50%, -100%)',
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
           {[
             {
               icon: <Eye size={14} />,
@@ -236,7 +247,8 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
               )}
             </div>
           ))}
-        </div>,
+        </div>
+        </>,
         document.body
       )}
 
