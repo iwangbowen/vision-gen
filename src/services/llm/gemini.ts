@@ -44,20 +44,21 @@ async function processImageToBase64(imageUrl: string): Promise<{ mimeType: strin
   return { mimeType, data };
 }
 
-// Analyze an image using a Gemini text/vision model
+// Analyze an image using a Gemini text/vision model (streaming)
 export async function analyzeImageWithGemini(params: {
   apiKey: string;
   baseUrl: string;
   textModel: string;
   prompt: string;
   imageUrl: string;
-}): Promise<string> {
+  onChunk: (text: string) => void;
+}): Promise<void> {
   if (!params.apiKey) {
     throw new LLMServiceError('Gemini API Key is not configured');
   }
 
   const baseUrl = params.baseUrl.replace(/\/+$/, '');
-  const url = `${baseUrl}/v1beta/models/${params.textModel}:generateContent?key=${params.apiKey}`;
+  const url = `${baseUrl}/v1beta/models/${params.textModel}:streamGenerateContent?alt=sse&key=${params.apiKey}`;
 
   const { mimeType, data } = await processImageToBase64(params.imageUrl);
 
@@ -82,14 +83,41 @@ export async function analyzeImageWithGemini(params: {
     );
   }
 
-  const responseData = await response.json() as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-  };
-  const text = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new LLMServiceError('No text response from Gemini API');
+  if (!response.body) {
+    throw new LLMServiceError('Streaming not supported by this environment');
   }
-  return text;
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('data:')) continue;
+      const jsonStr = trimmed.slice(5).trim();
+      if (jsonStr === '[DONE]' || !jsonStr) continue;
+
+      try {
+        const chunk = JSON.parse(jsonStr) as {
+          candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } } >;
+        };
+        const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          params.onChunk(text);
+        }
+      } catch {
+        // ignore malformed SSE lines
+      }
+    }
+  }
 }
 
 // Map image size from our format to API format

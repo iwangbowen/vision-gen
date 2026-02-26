@@ -11,7 +11,9 @@ import { useAssetStore } from '../../stores/assetStore';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { analyzeImageWithGemini } from '../../services/llm/gemini';
 import type { AssetCategory, Text2ImageData, Image2ImageData, MultiInputData } from '../../types';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   ASSET_CATEGORIES,
   GRID_OPTIONS,
@@ -34,6 +36,14 @@ export default function PropertyPanel() {
   const [analysisResult, setAnalysisResult] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState('');
+  const resultScrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll result box as content streams in
+  useEffect(() => {
+    if (resultScrollRef.current) {
+      resultScrollRef.current.scrollTop = resultScrollRef.current.scrollHeight;
+    }
+  }, [analysisResult]);
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
 
@@ -78,14 +88,14 @@ export default function PropertyPanel() {
     setAnalysisResult('');
     setAnalysisError('');
     try {
-      const result = await analyzeImageWithGemini({
+      await analyzeImageWithGemini({
         apiKey: gemini.apiKey,
         baseUrl: gemini.baseUrl,
         textModel: gemini.textModel || 'gemini-3-flash-preview',
         prompt: analysisPrompt,
         imageUrl: nodeImage,
+        onChunk: (chunk) => setAnalysisResult((prev) => prev + chunk),
       });
-      setAnalysisResult(result);
     } catch (e) {
       setAnalysisError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -406,16 +416,23 @@ export default function PropertyPanel() {
                 )}
 
                 {/* Result */}
-                {analysisResult && (
+                {(analysisResult || isAnalyzing) && (
                   <div className="space-y-1">
-                    <p className="text-[10px] font-medium text-text-secondary dark:text-text-secondary-dark uppercase tracking-wide">
+                    <p className="text-[10px] font-medium text-text-secondary dark:text-text-secondary-dark uppercase tracking-wide flex items-center gap-1.5">
                       分析结果
+                      {isAnalyzing && <Loader2 size={10} className="animate-spin" />}
                     </p>
-                    <div className="text-xs text-text-primary dark:text-text-primary-dark
-                      bg-canvas-bg dark:bg-canvas-bg-dark rounded-lg px-3 py-2.5
-                      border border-border dark:border-border-dark
-                      whitespace-pre-wrap leading-relaxed">
-                      {analysisResult}
+                    <div
+                      ref={resultScrollRef}
+                      className="text-xs text-text-primary dark:text-text-primary-dark
+                        bg-canvas-bg dark:bg-canvas-bg-dark rounded-lg px-3 py-2.5
+                        border border-border dark:border-border-dark
+                        max-h-64 overflow-y-auto
+                        prose prose-xs dark:prose-invert prose-p:my-1 prose-headings:my-1.5
+                        prose-li:my-0.5 prose-pre:text-[10px] max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {analysisResult || '...'}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 )}
