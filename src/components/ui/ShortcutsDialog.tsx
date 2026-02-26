@@ -9,6 +9,10 @@ export default function ShortcutsDialog({ isOpen, onClose }: ShortcutsDialogProp
   if (!isOpen) return null;
 
   const shortcuts = [
+    { keys: ['Ctrl', 'C'], description: '复制选中节点' },
+    { keys: ['Ctrl', 'X'], description: '剪切选中节点' },
+    { keys: ['Ctrl', 'V'], description: '粘贴节点' },
+    { keys: ['Delete'], description: '删除选中节点' },
     { keys: ['Ctrl', 'B'], description: '显示/隐藏左侧资产面板' },
     { keys: ['Ctrl', 'Alt', 'B'], description: '显示/隐藏右侧属性面板' },
     { keys: ['Ctrl', 'Alt', 'P'], description: '显示/隐藏底部轨道面板' },

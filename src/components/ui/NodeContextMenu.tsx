@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Copy, Trash2, ArrowDownToLine, Scissors, Layers } from 'lucide-react';
+import { Copy, Trash2, ArrowDownToLine, Scissors, Layers, ClipboardCopy, ClipboardX } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useTimelineStore } from '../../stores/timelineStore';
 import type { ImageData, GridData, GridCell } from '../../types';
@@ -13,7 +13,7 @@ interface ContextMenuProps {
 
 export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { nodes, removeNodes, duplicateNodes, splitGridNode, createMultiInputFromSelection } = useCanvasStore();
+  const { nodes, removeNodes, duplicateNodes, splitGridNode, createMultiInputFromSelection, copyNodes, cutNodes } = useCanvasStore();
   const { addItem } = useTimelineStore();
 
   const targetNodes = nodes.filter((n) => nodeIds.includes(n.id));
@@ -39,6 +39,16 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
 
   const isSingleNode = targetNodes.length === 1;
   const node = isSingleNode ? targetNodes[0] : null;
+
+  const handleCopy = () => {
+    copyNodes(nodeIds);
+    onClose();
+  };
+
+  const handleCut = () => {
+    cutNodes(nodeIds);
+    onClose();
+  };
 
   const handleDuplicate = () => {
     duplicateNodes(nodeIds);
@@ -103,6 +113,28 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
         border-border dark:border-border-dark"
       style={{ left: x, top: y }}
     >
+      {/* Copy */}
+      <button
+        onClick={handleCopy}
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors
+          text-text-primary dark:text-text-primary-dark
+          hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
+      >
+        <ClipboardCopy size={14} />
+        {isSingleNode ? '复制节点' : `复制 ${targetNodes.length} 个节点`}
+      </button>
+
+      {/* Cut */}
+      <button
+        onClick={handleCut}
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors
+          text-text-primary dark:text-text-primary-dark
+          hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
+      >
+        <ClipboardX size={14} />
+        {isSingleNode ? '剪切节点' : `剪切 ${targetNodes.length} 个节点`}
+      </button>
+
       {/* Duplicate */}
       <button
         onClick={handleDuplicate}
@@ -111,7 +143,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
           hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
       >
         <Copy size={14} />
-        {isSingleNode ? '复制节点' : `复制 ${targetNodes.length} 个节点`}
+        {isSingleNode ? '克隆节点' : `克隆 ${targetNodes.length} 个节点`}
       </button>
 
       {/* Add to timeline - image node */}

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Type, ImageIcon, Layers } from 'lucide-react';
+import { Type, ImageIcon, Layers, ClipboardPaste } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useReactFlow } from '@xyflow/react';
 
@@ -11,8 +11,10 @@ interface CanvasContextMenuProps {
 
 export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { addText2ImageNode, addImage2ImageNode, addMultiInputNode } = useCanvasStore();
+  const { addText2ImageNode, addImage2ImageNode, addMultiInputNode, clipboard, pasteNodes } = useCanvasStore();
   const { screenToFlowPosition } = useReactFlow();
+
+  const hasClipboard = clipboard.nodes.length > 0;
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -56,6 +58,22 @@ export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuPr
         border-border dark:border-border-dark"
       style={{ left: x, top: y }}
     >
+      {/* Paste */}
+      {hasClipboard && (
+        <>
+          <button
+            onClick={() => { pasteNodes(); onClose(); }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors
+              text-text-primary dark:text-text-primary-dark
+              hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
+          >
+            <ClipboardPaste size={14} className="text-amber-500" />
+            粘贴节点 ({clipboard.nodes.length})
+          </button>
+          <div className="my-1 border-t border-border dark:border-border-dark" />
+        </>
+      )}
+
       <div className="px-3 py-1.5 text-[10px] font-medium text-text-secondary dark:text-text-secondary-dark uppercase tracking-wider">
         添加节点
       </div>

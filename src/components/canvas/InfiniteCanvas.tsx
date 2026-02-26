@@ -1,4 +1,4 @@
-import { useCallback, useRef, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -159,6 +159,34 @@ export default function InfiniteCanvas() {
     },
     [screenToFlowPosition],
   );
+
+  // Keyboard shortcuts for copy / cut / paste
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Skip if focused inside an input / textarea / contenteditable
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable) return;
+
+      const mod = e.ctrlKey || e.metaKey;
+      if (!mod) return;
+
+      const { nodes, copyNodes, cutNodes, pasteNodes } = useCanvasStore.getState();
+      const selectedIds = nodes.filter((n) => n.selected).map((n) => n.id);
+
+      if (e.key === 'c' && selectedIds.length > 0) {
+        e.preventDefault();
+        copyNodes(selectedIds);
+      } else if (e.key === 'x' && selectedIds.length > 0) {
+        e.preventDefault();
+        cutNodes(selectedIds);
+      } else if (e.key === 'v') {
+        e.preventDefault();
+        pasteNodes();
+      }
+    };
+    globalThis.addEventListener('keydown', handler);
+    return () => globalThis.removeEventListener('keydown', handler);
+  }, []);
 
   const defaultEdgeOptions = useMemo(
     () => ({

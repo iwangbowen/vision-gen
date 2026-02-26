@@ -71,6 +71,12 @@ interface CanvasState {
   duplicateNodes: (nodeIds: string[]) => void;
   removeNode: (nodeId: string) => void;
   removeNodes: (nodeIds: string[]) => void;
+
+  // Clipboard operations
+  clipboard: { nodes: AppNode[]; isCut: boolean };
+  copyNodes: (nodeIds: string[]) => void;
+  cutNodes: (nodeIds: string[]) => void;
+  pasteNodes: (offset?: { x: number; y: number }) => void;
 }
 
 let nodeIdCounter = 0;
@@ -81,6 +87,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   edges: [],
   selectedNodeId: null,
   rightPanelOpen: false,
+  clipboard: { nodes: [], isCut: false },
 
   onNodesChange: (changes) =>
     set((state) => ({
@@ -938,4 +945,46 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       nodes: state.nodes.filter((n) => !nodeIds.includes(n.id)),
       edges: state.edges.filter((e) => !nodeIds.includes(e.source) && !nodeIds.includes(e.target)),
     })),
+
+  copyNodes: (nodeIds) => {
+    const state = get();
+    const nodesToCopy = state.nodes.filter((n) => nodeIds.includes(n.id));
+    if (nodesToCopy.length === 0) return;
+    set({ clipboard: { nodes: nodesToCopy.map((n) => ({ ...n, data: { ...n.data } } as AppNode)), isCut: false } });
+  },
+
+  cutNodes: (nodeIds) => {
+    const state = get();
+    const nodesToCut = state.nodes.filter((n) => nodeIds.includes(n.id));
+    if (nodesToCut.length === 0) return;
+    set({
+      clipboard: { nodes: nodesToCut.map((n) => ({ ...n, data: { ...n.data } } as AppNode)), isCut: true },
+      nodes: state.nodes.filter((n) => !nodeIds.includes(n.id)),
+      edges: state.edges.filter((e) => !nodeIds.includes(e.source) && !nodeIds.includes(e.target)),
+    });
+  },
+
+  pasteNodes: (offset) => {
+    const state = get();
+    const { nodes: clipboardNodes, isCut } = state.clipboard;
+    if (clipboardNodes.length === 0) return;
+
+    const dx = offset?.x ?? 50;
+    const dy = offset?.y ?? 50;
+
+    const newNodes: AppNode[] = clipboardNodes.map((node) => ({
+      ...node,
+      id: getNodeId(),
+      position: { x: node.position.x + dx, y: node.position.y + dy },
+      data: { ...node.data },
+      selected: false,
+    } as AppNode));
+
+    set((s) => ({ nodes: [...s.nodes, ...newNodes] }));
+
+    // After paste from cut, clear clipboard so it's a one-time move
+    if (isCut) {
+      set({ clipboard: { nodes: [], isCut: false } });
+    }
+  },
 }));
