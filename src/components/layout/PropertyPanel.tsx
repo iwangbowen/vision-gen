@@ -4,6 +4,7 @@ import {
   X,
   ScanSearch,
   Loader2,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useAssetStore } from '../../stores/assetStore';
@@ -19,10 +20,13 @@ import {
   IMAGE_STYLE_OPTIONS,
 } from '../../utils/constants';
 
+type PanelTab = 'properties' | 'analysis';
+
 export default function PropertyPanel() {
   const { nodes, selectedNodeId, removeNode, setSelectedNodeId, updateNodeData } = useCanvasStore();
   const { addAsset } = useAssetStore();
   const { provider, gemini } = useSettingsStore();
+  const [activeTab, setActiveTab] = useState<PanelTab>('properties');
   const [saveCategory, setSaveCategory] = useState<AssetCategory>('scene');
   const [saveName, setSaveName] = useState('');
   const [showSaveForm, setShowSaveForm] = useState(false);
@@ -92,6 +96,13 @@ export default function PropertyPanel() {
   const isGenerativeNode = selectedNode.type === 'text2image' || selectedNode.type === 'image2image' || selectedNode.type === 'multiInput';
   const generativeData = isGenerativeNode ? (selectedNode.data as unknown as Text2ImageData | Image2ImageData | MultiInputData) : null;
 
+  const tabClass = (tab: PanelTab) =>
+    `flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium border-b-2 transition-colors ${
+      activeTab === tab
+        ? 'border-accent text-accent'
+        : 'border-transparent text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
+    }`;
+
   return (
     <div className="w-72 h-full flex flex-col
       bg-panel-bg dark:bg-panel-bg-dark
@@ -99,9 +110,17 @@ export default function PropertyPanel() {
       {/* Header */}
       <div className="px-4 py-3 border-b border-border dark:border-border-dark
         flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-text-primary dark:text-text-primary-dark">
-          节点属性
-        </h2>
+        <div>
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium uppercase
+              bg-accent/10 text-accent">
+              {selectedNode.type}
+            </span>
+          </div>
+          <p className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
+            {(selectedNode.data as { label: string }).label}
+          </p>
+        </div>
         <button
           onClick={() => setSelectedNodeId(null)}
           className="p-1 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark
@@ -111,277 +130,307 @@ export default function PropertyPanel() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        {/* Node info */}
-        <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium uppercase
-              bg-accent/10 text-accent">
-              {selectedNode.type}
-            </span>
-            <span className="text-xs text-text-secondary dark:text-text-secondary-dark">
-              {selectedNode.id}
-            </span>
+      {/* Tab bar */}
+      <div className="flex border-b border-border dark:border-border-dark bg-panel-bg dark:bg-panel-bg-dark">
+        <button className={tabClass('properties')} onClick={() => setActiveTab('properties')}>
+          <SlidersHorizontal size={12} />
+          属性
+        </button>
+        <button className={tabClass('analysis')} onClick={() => setActiveTab('analysis')}>
+          <ScanSearch size={12} />
+          图片分析
+        </button>
+      </div>
+
+      {/* Tab: Properties */}
+      {activeTab === 'properties' && (
+        <div className="flex-1 overflow-y-auto flex flex-col">
+          <div className="flex-1">
+            {/* Generative Settings */}
+            {isGenerativeNode && generativeData && (
+              <div className="px-4 py-3 border-b border-border dark:border-border-dark space-y-4">
+                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
+                  生成设置
+                </p>
+
+                {/* Grid size selector */}
+                <div>
+                  <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                    生成规格
+                  </p>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {GRID_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => updateNodeData(selectedNode.id, { gridSize: opt.value })}
+                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
+                          ${(generativeData.gridSize || '1x1') === opt.value
+                            ? 'bg-accent text-white dark:text-black'
+                            : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                          }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Aspect Ratio selector */}
+                <div>
+                  <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                    画面比例
+                  </p>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {ASPECT_RATIO_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => updateNodeData(selectedNode.id, { aspectRatio: opt.value })}
+                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
+                          ${(generativeData.aspectRatio || '16:9') === opt.value
+                            ? 'bg-accent text-white dark:text-black'
+                            : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                          }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Image Size selector */}
+                <div>
+                  <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                    图片尺寸
+                  </p>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {IMAGE_SIZE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => updateNodeData(selectedNode.id, { imageSize: opt.value })}
+                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
+                          ${(generativeData.imageSize || '1k') === opt.value
+                            ? 'bg-accent text-white dark:text-black'
+                            : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                          }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Image Style selector */}
+                <div>
+                  <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
+                    画面风格
+                  </p>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {IMAGE_STYLE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => updateNodeData(selectedNode.id, { style: opt.value })}
+                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
+                          ${(generativeData.style || '') === opt.value
+                            ? 'bg-accent text-white dark:text-black'
+                            : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
+                          }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Image preview */}
+            {nodeImage && (
+              <div className="px-4 py-3 border-b border-border dark:border-border-dark">
+                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark mb-2">
+                  预览
+                </p>
+                <div className="rounded-lg overflow-hidden border border-border dark:border-border-dark">
+                  <img
+                    src={nodeImage}
+                    alt="preview"
+                    className="w-full aspect-square object-cover"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Save as asset */}
+            {nodeImage && (
+              <div className="px-4 py-3 border-b border-border dark:border-border-dark">
+                {showSaveForm ? (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="资产名称..."
+                      value={saveName}
+                      onChange={(e) => setSaveName(e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-md text-xs
+                        bg-canvas-bg dark:bg-canvas-bg-dark
+                        text-text-primary dark:text-text-primary-dark
+                        border border-border dark:border-border-dark
+                        focus:outline-none focus:border-accent"
+                    />
+                    <select
+                      value={saveCategory}
+                      onChange={(e) => setSaveCategory(e.target.value as AssetCategory)}
+                      className="w-full px-3 py-1.5 rounded-md text-xs
+                        bg-canvas-bg dark:bg-canvas-bg-dark
+                        text-text-primary dark:text-text-primary-dark
+                        border border-border dark:border-border-dark"
+                    >
+                      {ASSET_CATEGORIES.map((cat) => (
+                        <option key={cat.value} value={cat.value}>{cat.label}</option>
+                      ))}
+                    </select>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={handleSaveAsAsset}
+                        className="flex-1 px-3 py-1.5 rounded-md text-xs font-medium
+                          bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
+                      >
+                        保存
+                      </button>
+                      <button
+                        onClick={() => setShowSaveForm(false)}
+                        className="px-3 py-1.5 rounded-md text-xs font-medium
+                          bg-canvas-bg dark:bg-canvas-bg-dark
+                          text-text-secondary dark:text-text-secondary-dark
+                          hover:bg-surface-hover dark:hover:bg-surface-hover-dark
+                          border border-border dark:border-border-dark"
+                      >
+                        取消
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowSaveForm(true)}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
+                      bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
+                  >
+                    <Save size={14} />
+                    保存为资产
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Position info */}
+            <div className="px-4 py-3 border-b border-border dark:border-border-dark">
+              <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark mb-2">
+                位置
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-xs text-text-primary dark:text-text-primary-dark">
+                <div>
+                  <span className="text-text-secondary dark:text-text-secondary-dark">X: </span>
+                  {Math.round(selectedNode.position.x)}
+                </div>
+                <div>
+                  <span className="text-text-secondary dark:text-text-secondary-dark">Y: </span>
+                  {Math.round(selectedNode.position.y)}
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
-            {(selectedNode.data as { label: string }).label}
-          </p>
+
+          {/* Footer actions */}
+          <div className="px-4 py-3 border-t border-border dark:border-border-dark">
+            <button
+              onClick={() => {
+                removeNode(selectedNode.id);
+                setSelectedNodeId(null);
+              }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
+                bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
+            >
+              <Trash2 size={14} />
+              删除节点
+            </button>
+          </div>
         </div>
+      )}
 
-        {/* Generative Settings */}
-        {isGenerativeNode && generativeData && (
-          <div className="px-4 py-3 border-b border-border dark:border-border-dark space-y-4">
-            <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
-              生成设置
-            </p>
-
-            {/* Grid size selector */}
-            <div>
-              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                生成规格
-              </p>
-              <div className="flex gap-1.5 flex-wrap">
-                {GRID_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => updateNodeData(selectedNode.id, { gridSize: opt.value })}
-                    className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                      ${(generativeData.gridSize || '1x1') === opt.value
-                        ? 'bg-accent text-white dark:text-black'
-                        : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                      }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+      {/* Tab: Image Analysis */}
+      {activeTab === 'analysis' && (
+        <div className="flex-1 overflow-y-auto flex flex-col">
+          {nodeImage ? (
+            <div className="flex-1 flex flex-col gap-0">
+              {/* Thumbnail */}
+              <div className="px-4 py-3 border-b border-border dark:border-border-dark">
+                <div className="rounded-lg overflow-hidden border border-border dark:border-border-dark">
+                  <img src={nodeImage} alt="preview" className="w-full aspect-video object-cover" />
+                </div>
               </div>
-            </div>
 
-            {/* Aspect Ratio selector */}
-            <div>
-              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                画面比例
-              </p>
-              <div className="flex gap-1.5 flex-wrap">
-                {ASPECT_RATIO_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => updateNodeData(selectedNode.id, { aspectRatio: opt.value })}
-                    className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                      ${(generativeData.aspectRatio || '16:9') === opt.value
-                        ? 'bg-accent text-white dark:text-black'
-                        : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                      }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Image Size selector */}
-            <div>
-              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                图片尺寸
-              </p>
-              <div className="flex gap-1.5 flex-wrap">
-                {IMAGE_SIZE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => updateNodeData(selectedNode.id, { imageSize: opt.value })}
-                    className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                      ${(generativeData.imageSize || '1k') === opt.value
-                        ? 'bg-accent text-white dark:text-black'
-                        : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                      }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Image Style selector */}
-            <div>
-              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                画面风格
-              </p>
-              <div className="flex gap-1.5 flex-wrap">
-                {IMAGE_STYLE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => updateNodeData(selectedNode.id, { style: opt.value })}
-                    className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                      ${(generativeData.style || '') === opt.value
-                        ? 'bg-accent text-white dark:text-black'
-                        : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                      }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Image preview */}
-        {nodeImage && (
-          <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-            <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark mb-2">
-              预览
-            </p>
-            <div className="rounded-lg overflow-hidden border border-border dark:border-border-dark">
-              <img
-                src={nodeImage}
-                alt="preview"
-                className="w-full aspect-square object-cover"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Save as asset */}
-        {nodeImage && (
-          <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-            {showSaveForm ? (
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="资产名称..."
-                  value={saveName}
-                  onChange={(e) => setSaveName(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-md text-xs
+              {/* Prompt + button */}
+              <div className="px-4 py-3 space-y-2 flex-1">
+                <p className="text-[10px] font-medium text-text-secondary dark:text-text-secondary-dark uppercase tracking-wide">
+                  分析提示词
+                </p>
+                <textarea
+                  placeholder="输入提示词，例如：描述这张图片的内容、风格和情绪..."
+                  value={analysisPrompt}
+                  onChange={(e) => setAnalysisPrompt(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg text-xs resize-none
                     bg-canvas-bg dark:bg-canvas-bg-dark
                     text-text-primary dark:text-text-primary-dark
                     border border-border dark:border-border-dark
-                    focus:outline-none focus:border-accent"
+                    focus:outline-none focus:border-accent
+                    placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
                 />
-                <select
-                  value={saveCategory}
-                  onChange={(e) => setSaveCategory(e.target.value as AssetCategory)}
-                  className="w-full px-3 py-1.5 rounded-md text-xs
-                    bg-canvas-bg dark:bg-canvas-bg-dark
-                    text-text-primary dark:text-text-primary-dark
-                    border border-border dark:border-border-dark"
+                <button
+                  onClick={handleAnalyzeImage}
+                  disabled={isAnalyzing || !analysisPrompt.trim()}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
+                    bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors
+                    disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {ASSET_CATEGORIES.map((cat) => (
-                    <option key={cat.value} value={cat.value}>{cat.label}</option>
-                  ))}
-                </select>
-                <div className="flex gap-1.5">
-                  <button
-                    onClick={handleSaveAsAsset}
-                    className="flex-1 px-3 py-1.5 rounded-md text-xs font-medium
-                      bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
-                  >
-                    保存
-                  </button>
-                  <button
-                    onClick={() => setShowSaveForm(false)}
-                    className="px-3 py-1.5 rounded-md text-xs font-medium
-                      bg-canvas-bg dark:bg-canvas-bg-dark
-                      text-text-secondary dark:text-text-secondary-dark
-                      hover:bg-surface-hover dark:hover:bg-surface-hover-dark
-                      border border-border dark:border-border-dark"
-                  >
-                    取消
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => setShowSaveForm(true)}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
-                  bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
-              >
-                <Save size={14} />
-                保存为资产
-              </button>
-            )}
-          </div>
-        )}
+                  {isAnalyzing ? (
+                    <><Loader2 size={13} className="animate-spin" />分析中...</>
+                  ) : (
+                    <><ScanSearch size={13} />开始分析</>
+                  )}
+                </button>
 
-        {/* Image analysis */}
-        {nodeImage && (
-          <div className="px-4 py-3 border-b border-border dark:border-border-dark space-y-2">
-            <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark flex items-center gap-1.5">
-              <ScanSearch size={13} />
-              图片分析
-            </p>
-            <textarea
-              placeholder="输入分析提示词，例如：描述这张图片的内容..."
-              value={analysisPrompt}
-              onChange={(e) => setAnalysisPrompt(e.target.value)}
-              rows={2}
-              className="w-full px-3 py-1.5 rounded-md text-xs resize-none
-                bg-canvas-bg dark:bg-canvas-bg-dark
-                text-text-primary dark:text-text-primary-dark
-                border border-border dark:border-border-dark
-                focus:outline-none focus:border-accent
-                placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
-            />
-            <button
-              onClick={handleAnalyzeImage}
-              disabled={isAnalyzing || !analysisPrompt.trim()}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
-                bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors
-                disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isAnalyzing ? (
-                <><Loader2 size={13} className="animate-spin" />分析中...</>
-              ) : (
-                <><ScanSearch size={13} />分析图片</>
-              )}
-            </button>
-            {analysisError && (
-              <p className="text-xs text-danger bg-danger/10 rounded-md px-2.5 py-1.5">
-                {analysisError}
+                {/* Error */}
+                {analysisError && (
+                  <p className="text-xs text-danger bg-danger/10 rounded-lg px-3 py-2">
+                    {analysisError}
+                  </p>
+                )}
+
+                {/* Result */}
+                {analysisResult && (
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-medium text-text-secondary dark:text-text-secondary-dark uppercase tracking-wide">
+                      分析结果
+                    </p>
+                    <div className="text-xs text-text-primary dark:text-text-primary-dark
+                      bg-canvas-bg dark:bg-canvas-bg-dark rounded-lg px-3 py-2.5
+                      border border-border dark:border-border-dark
+                      whitespace-pre-wrap leading-relaxed">
+                      {analysisResult}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-2">
+              <ScanSearch size={32} className="text-text-secondary dark:text-text-secondary-dark opacity-40" />
+              <p className="text-xs text-text-secondary dark:text-text-secondary-dark">
+                当前节点暂无图片，生成图片后可在此进行分析
               </p>
-            )}
-            {analysisResult && (
-              <div className="text-xs text-text-primary dark:text-text-primary-dark
-                bg-canvas-bg dark:bg-canvas-bg-dark rounded-md px-2.5 py-2
-                border border-border dark:border-border-dark
-                max-h-40 overflow-y-auto whitespace-pre-wrap">
-                {analysisResult}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Position info */}
-        <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-          <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark mb-2">
-            位置
-          </p>
-          <div className="grid grid-cols-2 gap-2 text-xs text-text-primary dark:text-text-primary-dark">
-            <div>
-              <span className="text-text-secondary dark:text-text-secondary-dark">X: </span>
-              {Math.round(selectedNode.position.x)}
             </div>
-            <div>
-              <span className="text-text-secondary dark:text-text-secondary-dark">Y: </span>
-              {Math.round(selectedNode.position.y)}
-            </div>
-          </div>
+          )}
         </div>
-      </div>
-
-      {/* Footer actions */}
-      <div className="px-4 py-3 border-t border-border dark:border-border-dark">
-        <button
-          onClick={() => {
-            removeNode(selectedNode.id);
-            setSelectedNodeId(null);
-          }}
-          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
-            bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
-        >
-          <Trash2 size={14} />
-          删除节点
-        </button>
-      </div>
+      )}
     </div>
   );
 }
