@@ -625,7 +625,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     // Create child image nodes with positions relative to the group
     const childNodes: AppNode[] = splitImages.map((imgSrc, idx) => ({
       id: getNodeId(),
-      type: 'image' as const,
+      type: 'image2image' as const,
       position: {
         x: padding + (idx % size) * cellSpacing,
         y: padding + 40 + Math.floor(idx / size) * cellSpacing,
@@ -634,7 +634,13 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       extent: 'parent' as const,
       data: {
         label: `分镜 ${Math.floor(idx / size) + 1}-${(idx % size) + 1}`,
-        image: imgSrc,
+        sourceImage: imgSrc,
+        prompt: '',
+        status: 'idle',
+        gridSize: '1x1',
+        aspectRatio: '16:9',
+        imageSize: '1k',
+        style: 'anime',
       },
     }));
 
