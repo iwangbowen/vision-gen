@@ -200,12 +200,17 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
     const newNode: AppNode = {
       id: newNodeId,
-      type: 'image',
+      type: 'image2image',
       position: newNodePosition,
       data: {
         label: prompt || '生成中...',
-        image: '', // Empty image initially
+        prompt: '',
+        sourceImage: '', // Empty source image initially, will be set after generation
         status: 'generating',
+        gridSize: '1x1',
+        aspectRatio: data.aspectRatio || '16:9',
+        imageSize: data.imageSize || '1k',
+        style: data.style || '',
       },
     };
 
@@ -265,13 +270,12 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
       updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
 
-      // Update the placeholder node with the generated image
+      // Update the result node with the generated image as sourceImage
       updateNodeData(newNodeId, {
         label: prompt || '生成的图片',
-        image: image,
-        gridSize: gridSize,
-        status: 'done',
-      } as Partial<AppImageData>);
+        sourceImage: image,
+        status: 'idle',
+      } as Partial<Image2ImageData>);
 
       // Update edge to normal state
       set((state) => ({
@@ -299,13 +303,12 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
             const image = getRandomSampleImage();
             updateNodeData(nodeId, { status: 'done' } as Partial<Text2ImageData>);
 
-            // Update the placeholder node with the generated image
+            // Update the result node with the generated image as sourceImage
             updateNodeData(newNodeId, {
               label: prompt || '生成的图片',
-              image: image,
-              gridSize: (node.data as Text2ImageData).gridSize || '1x1',
-              status: 'done',
-            } as Partial<AppImageData>);
+              sourceImage: image,
+              status: 'idle',
+            } as Partial<Image2ImageData>);
 
             // Update edge to normal state
             set((state) => ({

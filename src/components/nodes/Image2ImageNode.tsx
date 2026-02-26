@@ -97,7 +97,7 @@ function Image2ImageNode({ id, data }: NodeProps) {
 
       {/* Body */}
       <div className="p-2 space-y-2">
-        {nodeData.status === 'generating' ? (
+        {nodeData.status === 'generating' && !nodeData.sourceImage ? (
           /* Full loading state - hide all inputs during generation */
           <div className="w-full aspect-video rounded-lg border border-dashed border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark flex flex-col items-center justify-center gap-2">
             <Loader2 size={28} className="animate-spin text-emerald-500" />
@@ -203,10 +203,11 @@ function Image2ImageNode({ id, data }: NodeProps) {
           </div>
           <button
             onClick={handleGenerate}
-            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-colors bg-emerald-500 text-white hover:bg-emerald-600"
+            disabled={nodeData.status === 'generating'}
+            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-colors bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Sparkles size={12} />
-            生成
+            {nodeData.status === 'generating' ? '生成中' : '生成'}
           </button>
         </div>
           </>
