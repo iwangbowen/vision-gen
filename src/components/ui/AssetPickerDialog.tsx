@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import AssetBrowser from './AssetBrowser';
 import type { Asset } from '../../types';
 
@@ -16,7 +17,7 @@ export default function AssetPickerDialog({ open, onClose, onSelect }: AssetPick
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <button
@@ -27,7 +28,7 @@ export default function AssetPickerDialog({ open, onClose, onSelect }: AssetPick
       />
 
       {/* Dialog */}
-      <div className="relative w-[480px] max-h-[70vh] rounded-xl border border-border dark:border-border-dark bg-panel-bg dark:bg-panel-bg-dark shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-120 max-h-[70vh] rounded-xl border border-border dark:border-border-dark bg-panel-bg dark:bg-panel-bg-dark shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-border-dark">
           <h3 className="text-sm font-semibold text-text-primary dark:text-text-primary-dark">
@@ -46,6 +47,7 @@ export default function AssetPickerDialog({ open, onClose, onSelect }: AssetPick
           <AssetBrowser onSelect={handleSelect} columns={4} localCategory />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
