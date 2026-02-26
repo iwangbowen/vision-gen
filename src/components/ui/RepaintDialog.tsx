@@ -123,7 +123,6 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   maxWidth={brushSize}
                   dotSize={brushSize}
                   velocityFilterWeight={0}
-                  compositeOperation={isErasing ? 'destination-out' : 'source-over'}
                 />
               </div>
             )}
@@ -186,7 +185,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="描述你想要在涂抹区域生成的内容..."
-                className="w-full flex-1 min-h-[100px] p-2 text-sm bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-accent text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
+                className="w-full flex-1 min-h-25 p-2 text-sm bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-accent text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
               />
             </div>
           </div>

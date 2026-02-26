@@ -32,16 +32,16 @@ function ImageNode({ id, data }: NodeProps) {
     const store = useCanvasStore.getState();
     const node = store.nodes.find(n => n.id === id);
     if (node) {
-      const newNodeId = store.addImage2ImageNode(
+      // Create a new image node directly instead of an image2image node
+      const newNodeId = store.addImageNode(
         { x: node.position.x + 200, y: node.position.y },
-        nodeData.image,
+        '', // Empty image initially
         `${nodeData.label} (重绘)`
       );
 
-      // Update the new node with mask and prompt
+      // Update the new node with generating status
       store.updateNodeData(newNodeId, {
-        prompt,
-        maskImage: maskImageUrl
+        status: 'generating'
       });
 
       store.onConnect({
@@ -51,8 +51,8 @@ function ImageNode({ id, data }: NodeProps) {
         targetHandle: null
       });
 
-      // Automatically trigger generation
-      store.simulateGenerate(newNodeId);
+      // Trigger generation directly with the source image and mask
+      store.generateRepaint(newNodeId, nodeData.image, maskImageUrl, prompt);
     }
   };
 

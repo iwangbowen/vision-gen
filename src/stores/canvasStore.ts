@@ -12,6 +12,7 @@ import type {
   AppEdge,
   Text2ImageData,
   Image2ImageData,
+  ImageData as AppImageData,
   GridSize,
   GridCell,
 } from '../types';
@@ -41,6 +42,7 @@ interface CanvasState {
   // Node actions
   updateNodeData: (nodeId: string, data: Partial<Text2ImageData | Image2ImageData>) => void;
   simulateGenerate: (nodeId: string) => Promise<void>;
+  generateRepaint: (nodeId: string, sourceImage: string, maskImage: string, prompt: string) => Promise<void>;
   splitGridNode: (nodeId: string) => void;
   splitGeneratedImage: (nodeId: string) => Promise<void>;
   duplicateNode: (nodeId: string) => void;
@@ -268,7 +270,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         image: image,
         gridSize: gridSize,
         status: 'done',
-      } as Partial<ImageData>);
+      } as Partial<AppImageData>);
 
       // Update edge to normal state
       set((state) => ({
@@ -302,7 +304,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
               image: image,
               gridSize: (node.data as Text2ImageData).gridSize || '1x1',
               status: 'done',
-            } as Partial<ImageData>);
+            } as Partial<AppImageData>);
 
             // Update edge to normal state
             set((state) => ({
@@ -325,6 +327,85 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
           nodes: state.nodes.filter(n => n.id !== newNodeId),
           edges: state.edges.filter(e => e.id !== `edge_${nodeId}_${newNodeId}`)
         }));
+      }
+    }
+  },
+
+  generateRepaint: async (nodeId, sourceImage, maskImage, prompt) => {
+    const { updateNodeData } = get();
+    const node = get().nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+
+    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+
+    useTaskStore.getState().addTask({
+      id: taskId,
+      nodeId,
+      type: 'image2image',
+      prompt,
+    });
+
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
+      if (task?.status === 'generating' && task.progress < 90) {
+        useTaskStore.getState().updateTask(taskId, { progress: task.progress + Math.floor(Math.random() * 10) + 5 });
+      }
+    }, 500);
+
+    try {
+      const { getLLMService } = await import('../services/llm/factory');
+      const llmService = getLLMService();
+
+      // Call the actual LLM service with all parameters
+      const result = await llmService.generateImage({
+        prompt,
+        sourceImage,
+        maskImage,
+      });
+
+      clearInterval(progressInterval);
+      useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+
+      let image: string;
+      if (typeof result === 'string') {
+        image = result;
+      } else if (Array.isArray(result)) {
+        image = result[0];
+      } else {
+        image = String(result);
+      }
+
+      // Update the node with the generated image
+      updateNodeData(nodeId, {
+        image: image,
+        status: 'done',
+      } as Partial<AppImageData>);
+
+    } catch (error) {
+      console.error('Failed to generate repaint image:', error);
+
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      // If API key is not configured, fallback to simulation for demo purposes
+      if (errorMessage.includes('not configured')) {
+        setTimeout(() => {
+          clearInterval(progressInterval);
+          useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });
+
+          const image = getRandomSampleImage();
+
+          // Update the node with the generated image
+          updateNodeData(nodeId, {
+            image: image,
+            status: 'done',
+          } as Partial<AppImageData>);
+        }, 1500);
+      } else {
+        clearInterval(progressInterval);
+        useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
+        alert(`重绘图片失败: ${errorMessage}`);
+        updateNodeData(nodeId, { status: 'idle' } as Partial<AppImageData>);
       }
     }
   },
@@ -368,8 +449,8 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       generatedImage = (node.data as Text2ImageData).generatedImage;
       gridSize = (node.data as Text2ImageData).gridSize;
     } else if (node.type === 'image') {
-      generatedImage = (node.data as ImageData).image;
-      gridSize = (node.data as ImageData).gridSize;
+      generatedImage = (node.data as AppImageData).image;
+      gridSize = (node.data as AppImageData).gridSize;
     }
 
     if (!generatedImage || !gridSize || gridSize === '1x1') return;
