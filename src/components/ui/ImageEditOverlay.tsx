@@ -96,6 +96,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
             transform: 'translate(-50%, -100%)',
           }}
           onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           {[
             { icon: <Expand size={14} />, label: '扩图', action: 'outpaint' },
