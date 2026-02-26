@@ -28,10 +28,10 @@ export default function NotificationCenter() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg transition-colors hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark"
+        className="relative p-1.5 rounded-md transition-colors hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark"
         title="通知中心"
       >
-        <Bell size={18} />
+        <Bell size={15} />
         {activeTasks.length > 0 && (
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
         )}

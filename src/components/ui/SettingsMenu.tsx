@@ -65,10 +65,10 @@ export default function SettingsMenu() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg transition-colors hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark"
+        className="p-1.5 rounded-md transition-colors hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark"
         title="设置"
       >
-        <SettingsIcon size={18} />
+        <SettingsIcon size={15} />
       </button>
 
       {isOpen && (
