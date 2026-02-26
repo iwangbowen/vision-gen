@@ -4,6 +4,7 @@ import { ImageIcon, Sparkles, Loader2, Settings2, Upload, Library } from 'lucide
 import { useCanvasStore } from '../../stores/canvasStore';
 import AssetPickerDialog from '../ui/AssetPickerDialog';
 import ImageContextMenu from '../ui/ImageContextMenu';
+import ImageEditOverlay from '../ui/ImageEditOverlay';
 import type { Image2ImageData } from '../../types';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
@@ -44,6 +45,10 @@ function Image2ImageNode({ id, data }: NodeProps) {
     }
   };
 
+  const handleCropComplete = (croppedImageUrl: string) => {
+    updateNodeData(id, { sourceImage: croppedImageUrl });
+  };
+
   return (
     <div className="node-card w-56 rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
       {/* Header - icon only */}
@@ -77,25 +82,30 @@ function Image2ImageNode({ id, data }: NodeProps) {
             label={nodeData.label || '参考图'}
             className="w-full rounded-lg overflow-hidden border border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group"
           >
-            <img src={nodeData.sourceImage} alt="source" className="w-full aspect-video object-cover" />
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors"
-                title="本地上传"
-              >
-                <Upload size={10} />
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowAssetPicker(true)}
-                className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors"
-                title="从资产库选择"
-              >
-                <Library size={10} />
-              </button>
-            </div>
+            <ImageEditOverlay
+              imageUrl={nodeData.sourceImage}
+              onCropComplete={handleCropComplete}
+            >
+              <img src={nodeData.sourceImage} alt="source" className="w-full aspect-video object-cover" />
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none">
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                  className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors pointer-events-auto"
+                  title="本地上传"
+                >
+                  <Upload size={10} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setShowAssetPicker(true); }}
+                  className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors pointer-events-auto"
+                  title="从资产库选择"
+                >
+                  <Library size={10} />
+                </button>
+              </div>
+            </ImageEditOverlay>
           </ImageContextMenu>
         ) : (
           <div className="w-full rounded-lg border border-dashed border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark">

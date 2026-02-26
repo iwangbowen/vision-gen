@@ -3,11 +3,16 @@ import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { ImageIcon, Scissors, Loader2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import ImageContextMenu from '../ui/ImageContextMenu';
+import ImageEditOverlay from '../ui/ImageEditOverlay';
 import type { ImageData } from '../../types';
 
 function ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as ImageData;
-  const { splitGeneratedImage } = useCanvasStore();
+  const { splitGeneratedImage, updateNodeData } = useCanvasStore();
+
+  const handleCropComplete = (croppedImageUrl: string) => {
+    updateNodeData(id, { image: croppedImageUrl });
+  };
 
   return (
     <div className="node-card w-44 rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark border-node-border dark:border-node-border-dark shadow-lg">
@@ -39,12 +44,17 @@ function ImageNode({ id, data }: NodeProps) {
             className="rounded-lg overflow-hidden"
             showAddToTimelineIcon={true}
           >
-            <img
-              src={nodeData.image}
-              alt={nodeData.label}
-              className="w-full aspect-square object-cover"
-              loading="lazy"
-            />
+            <ImageEditOverlay
+              imageUrl={nodeData.image}
+              onCropComplete={handleCropComplete}
+            >
+              <img
+                src={nodeData.image}
+                alt={nodeData.label}
+                className="w-full aspect-square object-cover"
+                loading="lazy"
+              />
+            </ImageEditOverlay>
           </ImageContextMenu>
         )}
         {nodeData.gridSize && nodeData.gridSize !== '1x1' && nodeData.status !== 'generating' && (
