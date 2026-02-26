@@ -20,12 +20,21 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, children }:
       }
     };
 
+    const handleCloseOtherToolbars = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail !== containerRef.current) {
+        setShowToolbar(false);
+      }
+    };
+
     if (showToolbar) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('imageEditToolbarOpened', handleCloseOtherToolbars);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('imageEditToolbarOpened', handleCloseOtherToolbars);
     };
   }, [showToolbar]);
 
@@ -41,7 +50,11 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, children }:
         type="button"
         className="w-full h-full cursor-pointer block p-0 m-0 border-none bg-transparent text-left"
         onClick={() => {
-          setShowToolbar(!showToolbar);
+          const newShowToolbar = !showToolbar;
+          setShowToolbar(newShowToolbar);
+          if (newShowToolbar) {
+            document.dispatchEvent(new CustomEvent('imageEditToolbarOpened', { detail: containerRef.current }));
+          }
         }}
       >
         {children}
