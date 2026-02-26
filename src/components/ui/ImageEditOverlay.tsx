@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Expand, Crop, Paintbrush, Camera, Sun } from 'lucide-react';
+import { Expand, Crop, Paintbrush, Camera, Sun, Eye } from 'lucide-react';
 import CropDialog from './CropDialog';
 import RepaintDialog from './RepaintDialog';
+import ImagePreviewDialog from './ImagePreviewDialog';
 
 interface ImageEditOverlayProps {
   readonly imageUrl: string;
@@ -14,6 +15,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
   const [showToolbar, setShowToolbar] = useState(false);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const [isRepaintDialogOpen, setIsRepaintDialogOpen] = useState(false);
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -78,6 +80,15 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         >
           {[
             { icon: <Expand size={14} />, label: '扩图', action: 'outpaint' },
+            {
+              icon: <Eye size={14} />,
+              label: '预览',
+              action: 'preview',
+              onClick: () => {
+                setIsPreviewDialogOpen(true);
+                setShowToolbar(false);
+              }
+            },
             { icon: <Crop size={14} />, label: '裁剪', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
             { icon: <Paintbrush size={14} />, label: '重绘', action: 'repaint', onClick: () => setIsRepaintDialogOpen(true) },
             { icon: <Camera size={14} />, label: '镜头角度', action: 'camera' },
@@ -112,6 +123,12 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         onClose={() => setIsRepaintDialogOpen(false)}
         imageUrl={imageUrl}
         onRepaintComplete={handleRepaintComplete}
+      />
+
+      <ImagePreviewDialog
+        isOpen={isPreviewDialogOpen}
+        onClose={() => setIsPreviewDialogOpen(false)}
+        imageUrl={imageUrl}
       />
     </div>
   );
