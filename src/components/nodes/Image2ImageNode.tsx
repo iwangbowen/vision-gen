@@ -46,7 +46,14 @@ function Image2ImageNode({ id, data }: NodeProps) {
   };
 
   const handleCropComplete = (croppedImageUrl: string) => {
-    updateNodeData(id, { sourceImage: croppedImageUrl });
+    const node = useCanvasStore.getState().nodes.find(n => n.id === id);
+    if (node) {
+      useCanvasStore.getState().addImageNode(
+        { x: node.position.x + 250, y: node.position.y },
+        croppedImageUrl,
+        `${nodeData.label || '参考图'} (裁剪)`
+      );
+    }
   };
 
   return (

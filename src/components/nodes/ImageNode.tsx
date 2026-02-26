@@ -8,10 +8,17 @@ import type { ImageData } from '../../types';
 
 function ImageNode({ id, data }: NodeProps) {
   const nodeData = data as unknown as ImageData;
-  const { splitGeneratedImage, updateNodeData } = useCanvasStore();
+  const { splitGeneratedImage } = useCanvasStore();
 
   const handleCropComplete = (croppedImageUrl: string) => {
-    updateNodeData(id, { image: croppedImageUrl });
+    const node = useCanvasStore.getState().nodes.find(n => n.id === id);
+    if (node) {
+      useCanvasStore.getState().addImageNode(
+        { x: node.position.x + 200, y: node.position.y },
+        croppedImageUrl,
+        `${nodeData.label} (裁剪)`
+      );
+    }
   };
 
   return (
