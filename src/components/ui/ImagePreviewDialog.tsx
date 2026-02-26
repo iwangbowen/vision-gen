@@ -13,7 +13,7 @@ export default function ImagePreviewDialog({ isOpen, onClose, imageUrl, altText 
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20"
       onClick={onClose}
       onKeyDown={(e) => {
         if (e.key === 'Escape') onClose();
