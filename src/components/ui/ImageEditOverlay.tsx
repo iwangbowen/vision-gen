@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight } from 'lucide-react';
 import CropDialog from './CropDialog';
 import RepaintDialog from './RepaintDialog';
@@ -18,6 +19,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const [isRepaintDialogOpen, setIsRepaintDialogOpen] = useState(false);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -71,7 +73,13 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
           e.stopPropagation();
           const newShowToolbar = !showToolbar;
           setShowToolbar(newShowToolbar);
-          if (newShowToolbar) {
+          if (newShowToolbar && containerRef.current) {
+            // Calculate toolbar position
+            const rect = containerRef.current.getBoundingClientRect();
+            setToolbarPosition({
+              top: rect.top - 10, // 10px above the image
+              left: rect.left + rect.width / 2,
+            });
             document.dispatchEvent(new CustomEvent('imageEditToolbarOpened', { detail: containerRef.current }));
           }
         }}
@@ -79,9 +87,14 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         {children}
       </div>
 
-      {showToolbar && (
+      {showToolbar && createPortal(
         <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 flex items-center justify-center gap-1 p-1.5 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max"
+          className="fixed flex items-center justify-center gap-1 p-1.5 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max"
+          style={{
+            top: `${toolbarPosition.top}px`,
+            left: `${toolbarPosition.left}px`,
+            transform: 'translateX(-50%)',
+          }}
           onPointerDown={(e) => e.stopPropagation()}
         >
           {[
@@ -142,7 +155,8 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
               )}
             </div>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
 
       <CropDialog
