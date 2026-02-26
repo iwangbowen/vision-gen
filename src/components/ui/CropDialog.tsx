@@ -81,7 +81,7 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center">
       <button
         type="button"
         className="absolute inset-0 w-full h-full cursor-default block p-0 m-0 border-none bg-transparent"

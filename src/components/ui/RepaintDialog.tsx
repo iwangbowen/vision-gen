@@ -198,7 +198,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center">
       <div className="relative w-full max-w-3xl h-[90vh] max-h-[90vh] bg-surface dark:bg-surface-dark rounded-xl shadow-2xl border border-border dark:border-border-dark overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-border-dark">
@@ -258,8 +258,8 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
           </div>
 
           {/* Controls Area */}
-          <div className="w-full md:w-64 md:shrink-0 p-4 border-t md:border-t-0 md:border-l border-border dark:border-border-dark flex flex-col gap-4 bg-surface dark:bg-surface-dark">
-            <div className="space-y-2">
+          <div className="w-full md:w-60 md:shrink-0 p-3 border-t md:border-t-0 md:border-l border-border dark:border-border-dark flex flex-col gap-2.5 bg-surface dark:bg-surface-dark">
+            <div className="space-y-1.5">
               <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
                 图片缩放（{Math.round(zoom * 100)}%）
               </p>
@@ -290,12 +290,12 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   <ZoomIn size={14} />
                 </button>
               </div>
-              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark">
+              <p className="text-[10px] leading-snug text-text-secondary dark:text-text-secondary-dark">
                 支持滚轮缩放；放大后可切到“移动”模式拖拽查看细节。
               </p>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
                 画笔大小
               </p>
@@ -309,7 +309,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
                 画笔颜色
               </p>
@@ -333,16 +333,16 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   />
                 ))}
               </div>
-              <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark leading-relaxed">
+              <p className="text-[10px] leading-snug text-text-secondary dark:text-text-secondary-dark">
                 颜色用于区分涂抹区域；提交时会统一作为重绘区域。
               </p>
             </div>
 
-            <div className="flex gap-2">
+            <div className="grid grid-cols-3 gap-1.5">
               <button
                 type="button"
                 onClick={() => setIsPanMode(true)}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                className={`w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors ${
                   isPanMode
                     ? 'bg-accent text-white dark:text-black'
                     : 'bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark'
@@ -357,7 +357,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   setIsPanMode(false);
                   setIsErasing(false);
                 }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                className={`w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors ${
                   isErasing || isPanMode
                     ? 'bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark'
                     : 'bg-accent text-white dark:text-black'
@@ -372,21 +372,21 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   setIsPanMode(false);
                   setIsErasing(true);
                 }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                className={`w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors ${
                   isErasing && !isPanMode
                     ? 'bg-accent text-white dark:text-black'
                     : 'bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark'
                 }`}
               >
                 <Eraser size={14} />
-                橡皮擦
+                擦除
               </button>
             </div>
 
             <button
               type="button"
               onClick={handleClear}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-[11px] font-medium bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
             >
               <Undo size={14} />
               清除蒙版
