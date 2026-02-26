@@ -14,6 +14,7 @@ import type { AssetCategory, Text2ImageData, Image2ImageData, MultiInputData } f
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import ImagePreviewDialog from '../ui/ImagePreviewDialog';
 import {
   ASSET_CATEGORIES,
   GRID_OPTIONS,
@@ -36,6 +37,7 @@ export default function PropertyPanel() {
   const [analysisResult, setAnalysisResult] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState('');
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const resultScrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll result box as content streams in
@@ -372,9 +374,15 @@ export default function PropertyPanel() {
             <div className="flex-1 flex flex-col gap-0">
               {/* Thumbnail */}
               <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-                <div className="rounded-lg overflow-hidden border border-border dark:border-border-dark">
-                  <img src={nodeImage} alt="preview" className="w-full aspect-video object-cover" />
-                </div>
+                <button
+                  onClick={() => setIsPreviewOpen(true)}
+                  className="w-full rounded-lg overflow-hidden border border-border dark:border-border-dark
+                    bg-canvas-bg dark:bg-canvas-bg-dark flex items-center justify-center
+                    hover:opacity-90 hover:border-accent transition-all cursor-zoom-in"
+                  title="点击查看大图"
+                >
+                  <img src={nodeImage} alt="preview" className="max-w-full max-h-24 object-contain" />
+                </button>
               </div>
 
               {/* Prompt + button */}
@@ -447,6 +455,14 @@ export default function PropertyPanel() {
             </div>
           )}
         </div>
+      )}
+
+      {nodeImage && (
+        <ImagePreviewDialog
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+          imageUrl={nodeImage}
+        />
       )}
     </div>
   );
