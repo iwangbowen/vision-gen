@@ -11,13 +11,20 @@ function ImageNode({ id, data }: NodeProps) {
   const { splitGeneratedImage } = useCanvasStore();
 
   const handleCropComplete = (croppedImageUrl: string) => {
-    const node = useCanvasStore.getState().nodes.find(n => n.id === id);
+    const store = useCanvasStore.getState();
+    const node = store.nodes.find(n => n.id === id);
     if (node) {
-      useCanvasStore.getState().addImageNode(
+      const newNodeId = store.addImage2ImageNode(
         { x: node.position.x + 200, y: node.position.y },
         croppedImageUrl,
         `${nodeData.label} (裁剪)`
       );
+      store.onConnect({
+        source: id,
+        target: newNodeId,
+        sourceHandle: null,
+        targetHandle: null
+      });
     }
   };
 

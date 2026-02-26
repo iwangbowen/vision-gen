@@ -34,8 +34,8 @@ interface CanvasState {
 
   // Add nodes
   addText2ImageNode: (position: { x: number; y: number }) => void;
-  addImage2ImageNode: (position: { x: number; y: number }, image?: string, label?: string) => void;
-  addImageNode: (position: { x: number; y: number }, image: string, label?: string) => void;
+  addImage2ImageNode: (position: { x: number; y: number }, image?: string, label?: string) => string;
+  addImageNode: (position: { x: number; y: number }, image: string, label?: string) => string;
   addGridNode: (position: { x: number; y: number }, gridSize: GridSize, generatedImages?: string[]) => void;
 
   // Node actions
@@ -116,6 +116,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       },
     };
     set((state) => ({ nodes: [...state.nodes, newNode] }));
+    return id;
   },
 
   addImageNode: (position, image, label) => {
@@ -130,6 +131,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       },
     };
     set((state) => ({ nodes: [...state.nodes, newNode] }));
+    return id;
   },
 
   addGridNode: (position, gridSize, generatedImages) => {
