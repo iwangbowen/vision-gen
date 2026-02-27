@@ -6,6 +6,7 @@ import AssetPickerDialog from '../ui/AssetPickerDialog';
 import ImageContextMenu from '../ui/ImageContextMenu';
 import ImageEditOverlay from '../ui/ImageEditOverlay';
 import type { Image2ImageData } from '../../types';
+import type { GenerativeSettingsValues } from '../ui/GenerativeSettings';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
 function Image2ImageNode({ id, data, selected }: NodeProps) {
@@ -78,15 +79,15 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
     }
   };
 
-  const handleEnhanceComplete = () => {
+  const handleEnhanceComplete = (settings?: GenerativeSettingsValues) => {
     if (nodeData.sourceImage) {
-      useCanvasStore.getState().generateEnhance(id, nodeData.sourceImage, nodeData.label || '参考图', nodeData.style);
+      useCanvasStore.getState().generateEnhance(id, nodeData.sourceImage, nodeData.label || '参考图', settings ?? { style: nodeData.style });
     }
   };
 
-  const handleRemoveWatermarkComplete = () => {
+  const handleRemoveWatermarkComplete = (settings?: GenerativeSettingsValues) => {
     if (nodeData.sourceImage) {
-      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.sourceImage, nodeData.label || '参考图');
+      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.sourceImage, nodeData.label || '参考图', settings);
     }
   };
 

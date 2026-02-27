@@ -5,6 +5,7 @@ import { useCanvasStore } from '../../stores/canvasStore';
 import ImageContextMenu from '../ui/ImageContextMenu';
 import ImageEditOverlay from '../ui/ImageEditOverlay';
 import type { ImageData } from '../../types';
+import type { GenerativeSettingsValues } from '../ui/GenerativeSettings';
 
 function ImageNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as ImageData;
@@ -41,12 +42,12 @@ function ImageNode({ id, data, selected }: NodeProps) {
     useCanvasStore.getState().generateOutpaint(id, nodeData.image, aspectRatio, nodeData.label);
   };
 
-  const handleEnhanceComplete = () => {
-    useCanvasStore.getState().generateEnhance(id, nodeData.image, nodeData.label);
+  const handleEnhanceComplete = (settings?: GenerativeSettingsValues) => {
+    useCanvasStore.getState().generateEnhance(id, nodeData.image, nodeData.label, settings);
   };
 
-  const handleRemoveWatermarkComplete = () => {
-    useCanvasStore.getState().generateRemoveWatermark(id, nodeData.image, nodeData.label);
+  const handleRemoveWatermarkComplete = (settings?: GenerativeSettingsValues) => {
+    useCanvasStore.getState().generateRemoveWatermark(id, nodeData.image, nodeData.label, settings);
   };
 
   const handleCameraAngleComplete = (prompt: string) => {

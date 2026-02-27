@@ -66,8 +66,8 @@ interface CanvasState {
   ungroupSplitGroup: (groupId: string) => void;
   splitGeneratedImage: (nodeId: string, customGridSize?: string) => Promise<void>;
   generateOutpaint: (sourceNodeId: string, sourceImage: string, targetAspectRatio: string, label: string, style?: string) => Promise<void>;
-  generateEnhance: (sourceNodeId: string, sourceImage: string, label: string, style?: string) => Promise<void>;
-  generateRemoveWatermark: (sourceNodeId: string, sourceImage: string, label: string) => Promise<void>;
+  generateEnhance: (sourceNodeId: string, sourceImage: string, label: string, settings?: { gridSize?: string; aspectRatio?: string; imageSize?: string; style?: string }) => Promise<void>;
+  generateRemoveWatermark: (sourceNodeId: string, sourceImage: string, label: string, settings?: { gridSize?: string; aspectRatio?: string; imageSize?: string; style?: string }) => Promise<void>;
   generateCameraAngle: (sourceNodeId: string, sourceImage: string, anglePrompt: string, label: string, style?: string) => Promise<void>;
   duplicateNode: (nodeId: string) => void;
   duplicateNodes: (nodeIds: string[]) => void;
@@ -716,15 +716,25 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     }
   },
 
-  generateEnhance: async (sourceNodeId, sourceImage, label, style) => {
+  generateEnhance: async (sourceNodeId, sourceImage, label, settings) => {
     const node = get().nodes.find((n) => n.id === sourceNodeId);
     if (!node) return;
+
+    const style = settings?.style;
 
     const newNodeId = get().addImage2ImageNode(
       { x: node.position.x + 280, y: node.position.y },
       '',
       `${label} (变清晰)`
     );
+    if (settings) {
+      get().updateNodeData(newNodeId, {
+        ...(settings.gridSize && { gridSize: settings.gridSize }),
+        ...(settings.aspectRatio && { aspectRatio: settings.aspectRatio }),
+        ...(settings.imageSize && { imageSize: settings.imageSize }),
+        ...(settings.style && { style: settings.style }),
+      } as Partial<Image2ImageData>);
+    }
     get().updateNodeData(newNodeId, { status: 'generating' } as Partial<Image2ImageData>);
     get().onConnect({ source: sourceNodeId, target: newNodeId, sourceHandle: null, targetHandle: null });
 
@@ -770,15 +780,25 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     }
   },
 
-  generateRemoveWatermark: async (sourceNodeId, sourceImage, label) => {
+  generateRemoveWatermark: async (sourceNodeId, sourceImage, label, settings) => {
     const node = get().nodes.find((n) => n.id === sourceNodeId);
     if (!node) return;
+
+    const style = settings?.style;
 
     const newNodeId = get().addImage2ImageNode(
       { x: node.position.x + 280, y: node.position.y },
       '',
       `${label} (去水印)`
     );
+    if (settings) {
+      get().updateNodeData(newNodeId, {
+        ...(settings.gridSize && { gridSize: settings.gridSize }),
+        ...(settings.aspectRatio && { aspectRatio: settings.aspectRatio }),
+        ...(settings.imageSize && { imageSize: settings.imageSize }),
+        ...(settings.style && { style: settings.style }),
+      } as Partial<Image2ImageData>);
+    }
     get().updateNodeData(newNodeId, { status: 'generating' } as Partial<Image2ImageData>);
     get().onConnect({ source: sourceNodeId, target: newNodeId, sourceHandle: null, targetHandle: null });
 
@@ -797,7 +817,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     try {
       const { getLLMService } = await import('../services/llm/factory');
       const llmService = getLLMService();
-      const result = await llmService.generateImage({ prompt: removeWatermarkPrompt, sourceImage });
+      const result = await llmService.generateImage({ prompt: removeWatermarkPrompt, sourceImage, style });
 
       clearInterval(progressInterval);
       useTaskStore.getState().updateTask(taskId, { status: 'done', progress: 100, endTime: Date.now() });

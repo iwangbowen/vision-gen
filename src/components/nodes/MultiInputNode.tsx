@@ -6,6 +6,7 @@ import ImageContextMenu from '../ui/ImageContextMenu';
 import ImageEditOverlay from '../ui/ImageEditOverlay';
 import ImagePreviewDialog from '../ui/ImagePreviewDialog';
 import type { MultiInputData, ImageData, Image2ImageData } from '../../types';
+import type { GenerativeSettingsValues } from '../ui/GenerativeSettings';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
 function MultiInputNode({ id, data, selected }: NodeProps) {
@@ -92,15 +93,15 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
     }
   };
 
-  const handleEnhanceComplete = () => {
+  const handleEnhanceComplete = (settings?: GenerativeSettingsValues) => {
     if (nodeData.generatedImage) {
-      useCanvasStore.getState().generateEnhance(id, nodeData.generatedImage, nodeData.label || '融合结果');
+      useCanvasStore.getState().generateEnhance(id, nodeData.generatedImage, nodeData.label || '融合结果', settings);
     }
   };
 
-  const handleRemoveWatermarkComplete = () => {
+  const handleRemoveWatermarkComplete = (settings?: GenerativeSettingsValues) => {
     if (nodeData.generatedImage) {
-      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.generatedImage, nodeData.label || '融合结果');
+      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.generatedImage, nodeData.label || '融合结果', settings);
     }
   };
 

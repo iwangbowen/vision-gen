@@ -14,13 +14,8 @@ import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ImagePreviewDialog from '../ui/ImagePreviewDialog';
-import {
-  ASSET_CATEGORIES,
-  GRID_OPTIONS,
-  ASPECT_RATIO_OPTIONS,
-  IMAGE_SIZE_OPTIONS,
-  IMAGE_STYLE_OPTIONS,
-} from '../../utils/constants';
+import { ASSET_CATEGORIES } from '../../utils/constants';
+import GenerativeSettings from '../ui/GenerativeSettings';
 
 type PanelTab = 'properties' | 'analysis';
 
@@ -140,94 +135,13 @@ export default function PropertyPanel() {
                 <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
                   生成设置
                 </p>
-
-                {/* Grid size selector */}
-                <div>
-                  <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                    生成规格
-                  </p>
-                  <div className="flex gap-1.5 flex-wrap">
-                    {GRID_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => updateNodeData(selectedNode.id, { gridSize: opt.value })}
-                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                          ${(generativeData.gridSize || '1x1') === opt.value
-                            ? 'bg-accent text-white dark:text-black'
-                            : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                          }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Aspect Ratio selector */}
-                <div>
-                  <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                    画面比例
-                  </p>
-                  <div className="flex gap-1.5 flex-wrap">
-                    {ASPECT_RATIO_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => updateNodeData(selectedNode.id, { aspectRatio: opt.value })}
-                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                          ${(generativeData.aspectRatio || '16:9') === opt.value
-                            ? 'bg-accent text-white dark:text-black'
-                            : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                          }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Image Size selector */}
-                <div>
-                  <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                    图片尺寸
-                  </p>
-                  <div className="flex gap-1.5 flex-wrap">
-                    {IMAGE_SIZE_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => updateNodeData(selectedNode.id, { imageSize: opt.value })}
-                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                          ${(generativeData.imageSize || '1k') === opt.value
-                            ? 'bg-accent text-white dark:text-black'
-                            : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                          }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Image Style selector */}
-                <div>
-                  <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-                    画面风格
-                  </p>
-                  <div className="flex gap-1.5 flex-wrap">
-                    {IMAGE_STYLE_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => updateNodeData(selectedNode.id, { style: opt.value })}
-                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-medium transition-colors
-                          ${(generativeData.style || '') === opt.value
-                            ? 'bg-accent text-white dark:text-black'
-                            : 'bg-canvas-bg dark:bg-canvas-bg-dark text-text-secondary dark:text-text-secondary-dark border border-border dark:border-border-dark hover:border-accent/50'
-                          }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <GenerativeSettings
+                  gridSize={generativeData.gridSize || '1x1'}
+                  aspectRatio={generativeData.aspectRatio || '16:9'}
+                  imageSize={generativeData.imageSize || '1k'}
+                  style={generativeData.style || ''}
+                  onChange={(key, value) => updateNodeData(selectedNode.id, { [key]: value })}
+                />
               </div>
             )}
 

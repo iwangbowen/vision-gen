@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight, Sparkles, Eraser } from 'lucide-react';
+import { Expand, Crop, Paintbrush, Camera, Sun, Eye, Scissors, ChevronRight, Sparkles, Eraser, SlidersHorizontal } from 'lucide-react';
 import CropDialog from './CropDialog';
 import RepaintDialog from './RepaintDialog';
 import ImagePreviewDialog from './ImagePreviewDialog';
 import CameraAngleDialog from './CameraAngleDialog';
+import GenerativeSettingsDialog from './GenerativeSettingsDialog';
+import type { GenerativeSettingsValues } from './GenerativeSettings';
 import { ASPECT_RATIO_OPTIONS } from '../../utils/constants';
 
 interface ImageEditOverlayProps {
@@ -12,8 +14,8 @@ interface ImageEditOverlayProps {
   readonly onCropComplete: (croppedImageUrl: string) => void;
   readonly onRepaintComplete?: (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => void;
   readonly onOutpaintComplete?: (targetAspectRatio: string) => void;
-  readonly onEnhanceComplete?: () => void;
-  readonly onRemoveWatermarkComplete?: () => void;
+  readonly onEnhanceComplete?: (settings?: GenerativeSettingsValues) => void;
+  readonly onRemoveWatermarkComplete?: (settings?: GenerativeSettingsValues) => void;
   readonly onSplitComplete?: (gridSize?: string) => void;
   readonly onCameraAngleComplete?: (prompt: string) => void;
   readonly children: React.ReactNode;
@@ -28,6 +30,8 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
   const [isRepaintDialogOpen, setIsRepaintDialogOpen] = useState(false);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
   const [isCameraAngleDialogOpen, setIsCameraAngleDialogOpen] = useState(false);
+  const [enhanceSettingsOpen, setEnhanceSettingsOpen] = useState(false);
+  const [watermarkSettingsOpen, setWatermarkSettingsOpen] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const [submenuDirection, setSubmenuDirection] = useState<'up' | 'down'>('up');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -232,18 +236,40 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
 
               {tool.action === 'more' && showMoreMenu && (
                 <div className={`absolute left-1/2 -translate-x-1/2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col ${submenuDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onEnhanceComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
-                    className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
-                  >
-                    <Sparkles size={12} />变清晰
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onRemoveWatermarkComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
-                    className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
-                  >
-                    <Eraser size={12} />去水印
-                  </button>
+                  {/* 变清晰 - 分栏按钮 */}
+                  <div className="flex items-center">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onEnhanceComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
+                      className="flex-1 px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
+                      title="直接生成"
+                    >
+                      <Sparkles size={12} />变清晰
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); setEnhanceSettingsOpen(true); }}
+                      className="px-2 py-1.5 text-xs text-text-secondary dark:text-text-secondary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark hover:text-accent border-l border-border dark:border-border-dark"
+                      title="配置后生成"
+                    >
+                      <SlidersHorizontal size={12} />
+                    </button>
+                  </div>
+                  {/* 去水印 - 分栏按钮 */}
+                  <div className="flex items-center">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onRemoveWatermarkComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
+                      className="flex-1 px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
+                      title="直接生成"
+                    >
+                      <Eraser size={12} />去水印
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); setWatermarkSettingsOpen(true); }}
+                      className="px-2 py-1.5 text-xs text-text-secondary dark:text-text-secondary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark hover:text-accent border-l border-border dark:border-border-dark"
+                      title="配置后生成"
+                    >
+                      <SlidersHorizontal size={12} />
+                    </button>
+                  </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
                     className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
@@ -289,6 +315,20 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
           setIsCameraAngleDialogOpen(false);
           onCameraAngleComplete?.(prompt);
         }}
+      />
+
+      <GenerativeSettingsDialog
+        isOpen={enhanceSettingsOpen}
+        onClose={() => setEnhanceSettingsOpen(false)}
+        onConfirm={(settings) => onEnhanceComplete?.(settings)}
+        title="变清晰 - 生成配置"
+      />
+
+      <GenerativeSettingsDialog
+        isOpen={watermarkSettingsOpen}
+        onClose={() => setWatermarkSettingsOpen(false)}
+        onConfirm={(settings) => onRemoveWatermarkComplete?.(settings)}
+        title="去水印 - 生成配置"
       />
     </div>
   );
