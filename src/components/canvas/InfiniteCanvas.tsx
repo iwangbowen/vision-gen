@@ -45,6 +45,13 @@ export default function InfiniteCanvas() {
   const { theme } = useThemeStore();
   const [minimapOpen, setMinimapOpen] = useState(false);
 
+  // Listen for toggle-minimap event from global shortcut
+  useEffect(() => {
+    const handler = () => setMinimapOpen((prev) => !prev);
+    globalThis.addEventListener('toggle-minimap', handler);
+    return () => globalThis.removeEventListener('toggle-minimap', handler);
+  }, []);
+
   const { screenToFlowPosition } = useReactFlow();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);

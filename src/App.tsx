@@ -15,7 +15,7 @@ function App() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const { rightPanelOpen, setRightPanelOpen } = useCanvasStore();
   const { collapsed: timelineCollapsed, setCollapsed: setTimelineCollapsed } = useTimelineStore();
-  const { theme } = useThemeStore();
+  const { theme, toggleTheme } = useThemeStore();
   const chordRef = useRef(false);
 
   // Initialize dark class on mount
@@ -50,6 +50,18 @@ function App() {
         e.preventDefault();
         // Ctrl + Alt + P: Toggle timeline
         setTimelineCollapsed(!timelineCollapsed);
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        // Ctrl + Alt + M: Toggle minimap
+        globalThis.dispatchEvent(new CustomEvent('toggle-minimap'));
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 't') {
+        e.preventDefault();
+        // Ctrl + Alt + T: Toggle theme
+        toggleTheme();
       }
 
       // Ctrl+K chord start

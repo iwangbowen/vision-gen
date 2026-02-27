@@ -18,6 +18,8 @@ export default function ShortcutsDialog({ isOpen, onClose }: ShortcutsDialogProp
     { keys: ['Ctrl', 'B'], description: '资产面板' },
     { keys: ['Ctrl', 'Alt', 'B'], description: '属性面板' },
     { keys: ['Ctrl', 'Alt', 'P'], description: '轨道面板' },
+    { keys: ['Ctrl', 'Alt', 'M'], description: '小地图' },
+    { keys: ['Ctrl', 'Alt', 'T'], description: '切换主题' },
     { keys: ['Ctrl', 'K', 'Ctrl', 'S'], description: '快捷键' },
   ];
 
