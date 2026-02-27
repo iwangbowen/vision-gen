@@ -7,6 +7,8 @@ import {
   PanelLeftClose,
   PanelRightOpen,
   PanelRightClose,
+  Undo2,
+  Redo2,
 } from 'lucide-react';
 import ThemeToggle from '../ui/ThemeToggle';
 import SettingsMenu from '../ui/SettingsMenu';
@@ -26,7 +28,7 @@ export default function Toolbar({
   onToggleLeftPanel,
   onToggleRightPanel,
 }: ToolbarProps) {
-  const { addText2ImageNode, addImage2ImageNode, addMultiInputNode } = useCanvasStore();
+  const { addText2ImageNode, addImage2ImageNode, addMultiInputNode, undo, redo, _history, _historyFuture } = useCanvasStore();
 
   const handleAddText2Image = useCallback(() => {
     addText2ImageNode({ x: 250 + Math.random() * 200, y: 150 + Math.random() * 200 });
@@ -94,6 +96,32 @@ export default function Toolbar({
         >
           <Layers size={13} />
           <span className="hidden sm:inline">多图融合</span>
+        </button>
+
+        <div className="w-px h-4 bg-border dark:bg-border-dark mx-0.5" />
+
+        <button
+          onClick={undo}
+          disabled={_history.length === 0}
+          className="p-1.5 rounded-md transition-colors
+            hover:bg-surface-hover dark:hover:bg-surface-hover-dark
+            text-text-secondary dark:text-text-secondary-dark
+            disabled:opacity-30 disabled:cursor-not-allowed"
+          title="撤销 (Ctrl+Z)"
+        >
+          <Undo2 size={15} />
+        </button>
+
+        <button
+          onClick={redo}
+          disabled={_historyFuture.length === 0}
+          className="p-1.5 rounded-md transition-colors
+            hover:bg-surface-hover dark:hover:bg-surface-hover-dark
+            text-text-secondary dark:text-text-secondary-dark
+            disabled:opacity-30 disabled:cursor-not-allowed"
+          title="重做 (Ctrl+Shift+Z)"
+        >
+          <Redo2 size={15} />
         </button>
       </div>
 

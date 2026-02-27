@@ -38,6 +38,8 @@ export default function InfiniteCanvas() {
     onEdgesChange,
     onConnect,
     setSelectedNodeId,
+    undo,
+    redo,
   } = useCanvasStore();
 
   const { theme } = useThemeStore();
@@ -121,6 +123,22 @@ export default function InfiniteCanvas() {
     setContextMenu(null);
     setCanvasContextMenu(null);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if ((e.metaKey || e.ctrlKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        redo();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
 
   const onSelectionChange: OnSelectionChangeFunc = useCallback(
     ({ nodes: selectedNodes }) => {

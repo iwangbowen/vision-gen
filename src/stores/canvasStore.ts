@@ -79,6 +79,13 @@ interface CanvasState {
   copyNodes: (nodeIds: string[]) => void;
   cutNodes: (nodeIds: string[]) => void;
   pasteNodes: (offset?: { x: number; y: number }) => void;
+
+  // History (undo/redo)
+  _history: { nodes: AppNode[]; edges: AppEdge[] }[];
+  _historyFuture: { nodes: AppNode[]; edges: AppEdge[] }[];
+  _snapshot: () => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 let nodeIdCounter = 0;
@@ -90,11 +97,47 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   selectedNodeId: null,
   rightPanelOpen: false,
   clipboard: { nodes: [], isCut: false },
+  _history: [],
+  _historyFuture: [],
 
-  onNodesChange: (changes) =>
+  _snapshot: () => {
+    const { nodes, edges, _history } = get();
+    const snapshot = { nodes: [...nodes], edges: [...edges] };
+    set({ _history: [..._history, snapshot].slice(-50), _historyFuture: [] });
+  },
+
+  undo: () => {
+    const { _history, _historyFuture, nodes, edges } = get();
+    if (_history.length === 0) return;
+    const previous = _history.at(-1)!;
+    set({
+      nodes: previous.nodes,
+      edges: previous.edges,
+      _history: _history.slice(0, -1),
+      _historyFuture: [{ nodes, edges }, ..._historyFuture].slice(0, 50),
+    });
+  },
+
+  redo: () => {
+    const { _history, _historyFuture, nodes, edges } = get();
+    if (_historyFuture.length === 0) return;
+    const next = _historyFuture[0];
+    set({
+      nodes: next.nodes,
+      edges: next.edges,
+      _history: [..._history, { nodes, edges }].slice(-50),
+      _historyFuture: _historyFuture.slice(1),
+    });
+  },
+
+  onNodesChange: (changes) => {
+    if (changes.some((c) => c.type === 'remove')) {
+      get()._snapshot();
+    }
     set((state) => ({
       nodes: applyNodeChanges(changes, state.nodes) as AppNode[],
-    })),
+    }));
+  },
 
   onEdgesChange: (changes) =>
     set((state) => ({
@@ -113,6 +156,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   setRightPanelOpen: (open) => set({ rightPanelOpen: open }),
 
   addText2ImageNode: (position) => {
+    get()._snapshot();
     const id = getNodeId();
     const newNode: AppNode = {
       id,
@@ -132,6 +176,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   },
 
   addImage2ImageNode: (position, image, label) => {
+    get()._snapshot();
     const id = getNodeId();
     const newNode: AppNode = {
       id,
@@ -153,6 +198,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   },
 
   addImageNode: (position, image, label) => {
+    get()._snapshot();
     const id = getNodeId();
     const newNode: AppNode = {
       id,
@@ -168,6 +214,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   },
 
   addMultiInputNode: (position) => {
+    get()._snapshot();
     const id = getNodeId();
     const newNode: AppNode = {
       id,
@@ -1016,17 +1063,21 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     set((s) => ({ nodes: [...s.nodes, ...newNodes] }));
   },
 
-  removeNode: (nodeId) =>
+  removeNode: (nodeId) => {
+    get()._snapshot();
     set((state) => ({
       nodes: state.nodes.filter((n) => n.id !== nodeId),
       edges: state.edges.filter((e) => e.source !== nodeId && e.target !== nodeId),
-    })),
+    }));
+  },
 
-  removeNodes: (nodeIds) =>
+  removeNodes: (nodeIds) => {
+    get()._snapshot();
     set((state) => ({
       nodes: state.nodes.filter((n) => !nodeIds.includes(n.id)),
       edges: state.edges.filter((e) => !nodeIds.includes(e.source) && !nodeIds.includes(e.target)),
-    })),
+    }));
+  },
 
   copyNodes: (nodeIds) => {
     const state = get();
@@ -1039,6 +1090,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const state = get();
     const nodesToCut = state.nodes.filter((n) => nodeIds.includes(n.id));
     if (nodesToCut.length === 0) return;
+    get()._snapshot();
     set({
       clipboard: { nodes: nodesToCut.map((n) => ({ ...n, data: { ...n.data } } as AppNode)), isCut: true },
       nodes: state.nodes.filter((n) => !nodeIds.includes(n.id)),
@@ -1050,6 +1102,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const state = get();
     const { nodes: clipboardNodes, isCut } = state.clipboard;
     if (clipboardNodes.length === 0) return;
+    get()._snapshot();
 
     const dx = offset?.x ?? 50;
     const dy = offset?.y ?? 50;

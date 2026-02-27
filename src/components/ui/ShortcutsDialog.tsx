@@ -9,6 +9,8 @@ export default function ShortcutsDialog({ isOpen, onClose }: ShortcutsDialogProp
   if (!isOpen) return null;
 
   const shortcuts = [
+    { keys: ['Ctrl', 'Z'], description: '撤销' },
+    { keys: ['Ctrl', 'Shift', 'Z'], description: '重做' },
     { keys: ['Ctrl', 'C'], description: '复制选中节点' },
     { keys: ['Ctrl', 'X'], description: '剪切选中节点' },
     { keys: ['Ctrl', 'V'], description: '粘贴节点' },
