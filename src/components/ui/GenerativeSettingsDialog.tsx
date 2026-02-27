@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import GenerativeSettings from './GenerativeSettings';
 
 interface GenerativeSettingsDialogProps {
@@ -63,8 +63,8 @@ export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, t
             }}
             className="px-3 py-1 rounded-md text-[11px] font-medium bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors flex items-center gap-1"
           >
-            <Sparkles size={11} />
-            生成
+            <Check size={11} />
+            确认
           </button>
         </div>
       </div>

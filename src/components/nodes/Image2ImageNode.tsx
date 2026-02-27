@@ -190,54 +190,56 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
           onChange={handleImageUpload}
         />
 
-        <div className="relative p-1">
-          <textarea
-            ref={textareaRef}
-            value={localPrompt}
-            onChange={(e) => setLocalPrompt(e.target.value)}
-            placeholder="输入提示词..."
-            rows={2}
-            className="w-full pl-1.5 pr-7 py-1 rounded-md text-[10px] resize-none bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark focus:outline-none focus:border-accent placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark min-h-6 max-h-40 overflow-y-auto custom-scrollbar"
-          />
-          <button
-            type="button"
-            onClick={handleGenerate}
-            disabled={nodeData.status === 'generating'}
-            aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
-            title={nodeData.status === 'generating' ? '生成中' : '生成'}
-            className="absolute right-2 bottom-2 p-0.5 flex items-center justify-center rounded transition-colors text-emerald-500 hover:bg-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {nodeData.status === 'generating' ? (
-              <Loader2 size={12} className="animate-spin" />
-            ) : (
-              <Send size={12} />
-            )}
-          </button>
-        </div>
-        {/* Spec badge */}
-        <div className="flex items-center gap-1 px-1.5 pb-1">
-          <ImageIcon size={10} className="text-emerald-500 shrink-0" />
-          {nodeData.status === 'generating' && (
-            <Loader2 size={10} className="animate-spin text-emerald-500 shrink-0" />
-          )}
-          <button
-            type="button"
-            className="flex items-center gap-0.5 px-1 py-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors truncate"
-            onClick={() => setShowSettingsDialog(true)}
-            title="修改生成配置"
-          >
-            <span>{nodeData.gridSize || '1x1'}</span>
-            <span>·</span>
-            <span>{nodeData.aspectRatio || '16:9'}</span>
-            <span>·</span>
-            <span className="uppercase">{nodeData.imageSize || '1k'}</span>
-            {nodeData.style && (
-              <>
+        <div className="p-1">
+          <div className="relative rounded-md border border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark focus-within:border-accent">
+            <textarea
+              ref={textareaRef}
+              value={localPrompt}
+              onChange={(e) => setLocalPrompt(e.target.value)}
+              placeholder="输入提示词..."
+              rows={2}
+              className="w-full pl-1.5 pr-7 py-1 text-[10px] resize-none bg-transparent text-text-primary dark:text-text-primary-dark border-none focus:outline-none placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark min-h-6 max-h-40 overflow-y-auto custom-scrollbar"
+            />
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={nodeData.status === 'generating'}
+              aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
+              title={nodeData.status === 'generating' ? '生成中' : '生成'}
+              className="absolute right-1.5 bottom-1.5 p-0.5 flex items-center justify-center rounded transition-colors text-emerald-500 hover:bg-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {nodeData.status === 'generating' ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Send size={12} />
+              )}
+            </button>
+            {/* Spec badge inside input */}
+            <div className="flex items-center gap-1 px-1 pb-1">
+              <ImageIcon size={10} className="text-emerald-500 shrink-0" />
+              {nodeData.status === 'generating' && (
+                <Loader2 size={10} className="animate-spin text-emerald-500 shrink-0" />
+              )}
+              <button
+                type="button"
+                className="flex items-center gap-0.5 px-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors truncate"
+                onClick={() => setShowSettingsDialog(true)}
+                title="修改生成配置"
+              >
+                <span>{nodeData.gridSize || '1x1'}</span>
                 <span>·</span>
-                <span className="truncate">{IMAGE_STYLE_OPTIONS.find(o => o.value === nodeData.style)?.label || nodeData.style}</span>
-              </>
-            )}
-          </button>
+                <span>{nodeData.aspectRatio || '16:9'}</span>
+                <span>·</span>
+                <span className="uppercase">{nodeData.imageSize || '1k'}</span>
+                {nodeData.style && (
+                  <>
+                    <span>·</span>
+                    <span className="truncate">{IMAGE_STYLE_OPTIONS.find(o => o.value === nodeData.style)?.label || nodeData.style}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
           </>
         )}
