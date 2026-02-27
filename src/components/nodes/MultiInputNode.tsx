@@ -149,6 +149,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
             >
               <ImageEditOverlay
                 imageUrl={nodeData.generatedImage}
+                nodeId={id}
                 onCropComplete={handleCropComplete}
                 onRepaintComplete={handleRepaintComplete}
                 onOutpaintComplete={nodeData.generatedImage && nodeData.status !== 'generating' ? handleOutpaintComplete : undefined}

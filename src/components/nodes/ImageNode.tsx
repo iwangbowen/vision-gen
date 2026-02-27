@@ -86,6 +86,7 @@ function ImageNode({ id, data, selected }: NodeProps) {
           >
             <ImageEditOverlay
               imageUrl={nodeData.image}
+              nodeId={id}
               onCropComplete={handleCropComplete}
               onRepaintComplete={handleRepaintComplete}
               onOutpaintComplete={handleOutpaintComplete}

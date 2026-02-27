@@ -8,9 +8,11 @@ import CameraAngleDialog from './CameraAngleDialog';
 import GenerativeSettingsDialog from './GenerativeSettingsDialog';
 import type { GenerativeSettingsValues } from './GenerativeSettings';
 import { ASPECT_RATIO_OPTIONS } from '../../utils/constants';
+import { useCanvasStore } from '../../stores/canvasStore';
 
 interface ImageEditOverlayProps {
   readonly imageUrl: string;
+  readonly nodeId?: string;
   readonly onCropComplete: (croppedImageUrl: string) => void;
   readonly onRepaintComplete?: (maskImageUrl: string, prompt: string, options: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => void;
   readonly onOutpaintComplete?: (targetAspectRatio: string) => void;
@@ -21,7 +23,7 @@ interface ImageEditOverlayProps {
   readonly children: React.ReactNode;
 }
 
-export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintComplete, onOutpaintComplete, onEnhanceComplete, onRemoveWatermarkComplete, onSplitComplete, onCameraAngleComplete, children }: ImageEditOverlayProps) {
+export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onRepaintComplete, onOutpaintComplete, onEnhanceComplete, onRemoveWatermarkComplete, onSplitComplete, onCameraAngleComplete, children }: ImageEditOverlayProps) {
   const [showToolbar, setShowToolbar] = useState(false);
   const [showSplitMenu, setShowSplitMenu] = useState(false);
   const [showOutpaintMenu, setShowOutpaintMenu] = useState(false);
@@ -89,6 +91,8 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         onPointerDown={(e) => {
           // Use onPointerDown instead of onClick to capture the event before React Flow's drag/select handlers
           e.stopPropagation();
+          // Ensure the parent node gets selected in the property panel
+          if (nodeId) useCanvasStore.getState().setSelectedNodeId(nodeId);
           const newShowToolbar = !showToolbar;
           setShowToolbar(newShowToolbar);
           if (newShowToolbar && containerRef.current) {

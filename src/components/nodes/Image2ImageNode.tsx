@@ -122,6 +122,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
             >
               <ImageEditOverlay
                 imageUrl={nodeData.sourceImage}
+                nodeId={id}
                 onCropComplete={handleCropComplete}
                 onRepaintComplete={handleRepaintComplete}
                 onOutpaintComplete={nodeData.sourceImage && nodeData.status !== 'generating' ? handleOutpaintComplete : undefined}
