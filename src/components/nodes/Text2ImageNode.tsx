@@ -39,14 +39,14 @@ function Text2ImageNode({ id, data, selected }: NodeProps) {
             value={localPrompt}
             onChange={(e) => setLocalPrompt(e.target.value)}
             placeholder="描述想要生成的画面..."
-            rows={4}
+            rows={6}
             className="w-full pl-1.5 pr-7 py-1 text-[10px] resize-none
               bg-transparent
               text-text-primary dark:text-text-primary-dark
               border-none
               focus:outline-none
               placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark
-              min-h-16 max-h-40 overflow-y-auto custom-scrollbar"
+              min-h-24 max-h-40 overflow-y-auto custom-scrollbar"
           />
           <button
             type="button"

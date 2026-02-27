@@ -322,6 +322,8 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         onClose={() => setEnhanceSettingsOpen(false)}
         onConfirm={(settings) => onEnhanceComplete?.(settings)}
         title="变清晰 - 生成配置"
+        confirmLabel="生成"
+        confirmIcon={<Sparkles size={11} />}
       />
 
       <GenerativeSettingsDialog
@@ -329,6 +331,8 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
         onClose={() => setWatermarkSettingsOpen(false)}
         onConfirm={(settings) => onRemoveWatermarkComplete?.(settings)}
         title="去水印 - 生成配置"
+        confirmLabel="生成"
+        confirmIcon={<Sparkles size={11} />}
       />
     </div>
   );

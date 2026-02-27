@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Check } from 'lucide-react';
 import GenerativeSettings from './GenerativeSettings';
@@ -9,9 +9,11 @@ interface GenerativeSettingsDialogProps {
   readonly onConfirm: (settings: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => void;
   readonly title: string;
   readonly initialValues?: { gridSize?: string; aspectRatio?: string; imageSize?: string; style?: string };
+  readonly confirmLabel?: string;
+  readonly confirmIcon?: ReactNode;
 }
 
-export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, title, initialValues }: GenerativeSettingsDialogProps) {
+export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, title, initialValues, confirmLabel = '确认', confirmIcon }: GenerativeSettingsDialogProps) {
   const [settings, setSettings] = useState({
     gridSize: initialValues?.gridSize || '1x1',
     aspectRatio: initialValues?.aspectRatio || '16:9',
@@ -63,8 +65,8 @@ export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, t
             }}
             className="px-3 py-1 rounded-md text-[11px] font-medium bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors flex items-center gap-1"
           >
-            <Check size={11} />
-            确认
+            {confirmIcon || <Check size={11} />}
+            {confirmLabel}
           </button>
         </div>
       </div>
