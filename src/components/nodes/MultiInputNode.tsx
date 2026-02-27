@@ -38,6 +38,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
   }, [sourceImages, id, updateNodeData, nodeData.sourceImages]);
 
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
+  const [imagesExpanded, setImagesExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const adjustHeight = () => {
@@ -194,15 +195,20 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
             </div>
             {sourceImages.length > 0 ? (
               <div className="flex flex-wrap gap-1">
-                {sourceImages.slice(0, 4).map((img, idx) => (
+                {(imagesExpanded ? sourceImages : sourceImages.slice(0, 4)).map((img, idx) => (
               <div key={`${id}-src-${idx}`} className="w-8 h-8 rounded overflow-hidden border border-border dark:border-border-dark">
                 <img src={img} alt={`Source ${idx}`} className="w-full h-full object-cover" />
               </div>
             ))}
                 {sourceImages.length > 4 && (
-                  <div className="w-8 h-8 rounded bg-surface dark:bg-surface-dark border border-border dark:border-border-dark flex items-center justify-center text-[10px] text-text-secondary">
-                    +{sourceImages.length - 4}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setImagesExpanded(v => !v); }}
+                    className="w-8 h-8 rounded bg-surface dark:bg-surface-dark border border-border dark:border-border-dark flex items-center justify-center text-[10px] text-accent hover:bg-accent/10 transition-colors font-medium"
+                    title={imagesExpanded ? '收起' : '展开全部'}
+                  >
+                    {imagesExpanded ? '收起' : `+${sourceImages.length - 4}`}
+                  </button>
                 )}
               </div>
             ) : (
