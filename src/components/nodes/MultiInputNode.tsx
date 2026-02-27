@@ -1,6 +1,6 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps, useNodeConnections, useNodesData } from '@xyflow/react';
-import { Layers, Send, Loader2, Scissors } from 'lucide-react';
+import { Layers, Send, Loader2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import ImageContextMenu from '../ui/ImageContextMenu';
 import ImageEditOverlay from '../ui/ImageEditOverlay';
@@ -185,17 +185,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
                 <img src={nodeData.generatedImage} alt="generated" className="w-full h-auto block" />
               </ImageEditOverlay>
             </ImageContextMenu>
-            {nodeData.gridSize && nodeData.gridSize !== '1x1' && nodeData.status !== 'generating' && (
-              <div className="p-1.5 border-b border-border dark:border-border-dark">
-                <button
-                  onClick={() => splitGeneratedImage(id)}
-                  className="w-full flex items-center justify-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-colors bg-pink-500/10 text-pink-500 hover:bg-pink-500/20"
-                >
-                  <Scissors size={10} />
-                  切分
-                </button>
-              </div>
-            )}
+
           </div>
         ) : (
           <div className="p-2 border-b border-border dark:border-border-dark bg-surface-hover dark:bg-surface-hover-dark">

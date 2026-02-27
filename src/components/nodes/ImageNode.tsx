@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { ImageIcon, Scissors, Loader2 } from 'lucide-react';
+import { ImageIcon, Loader2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import ImageContextMenu from '../ui/ImageContextMenu';
 import ImageEditOverlay from '../ui/ImageEditOverlay';
@@ -102,15 +102,7 @@ function ImageNode({ id, data, selected }: NodeProps) {
             </ImageEditOverlay>
           </ImageContextMenu>
         )}
-        {nodeData.gridSize && nodeData.gridSize !== '1x1' && nodeData.status !== 'generating' && (
-          <button
-            onClick={() => splitGeneratedImage(id)}
-            className="w-full flex items-center justify-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-colors bg-pink-500/10 text-pink-500 hover:bg-pink-500/20"
-          >
-            <Scissors size={10} />
-            切分
-          </button>
-        )}
+
       </div>
 
       <Handle type="target" position={Position.Left} className="w-2.5! h-2.5!" />

@@ -213,7 +213,7 @@ export default function ImageEditOverlay({ imageUrl, onCropComplete, onRepaintCo
 
               {tool.action === 'split' && showSplitMenu && (
                 <div className={`absolute left-1/2 -translate-x-1/2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col ${submenuDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
-                  {['2x2', '3x3', '4x4'].map((size) => (
+                  {['2x2', '3x3', '4x4', '5x5'].map((size) => (
                     <button
                       key={size}
                       onClick={(e) => {

@@ -1,6 +1,6 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { ImageIcon, Send, Loader2, Upload, Library, Scissors } from 'lucide-react';
+import { ImageIcon, Send, Loader2, Upload, Library } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import AssetPickerDialog from '../ui/AssetPickerDialog';
 import ImageContextMenu from '../ui/ImageContextMenu';
@@ -179,17 +179,6 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
                 </div>
               </ImageEditOverlay>
             </ImageContextMenu>
-            {nodeData.gridSize && nodeData.gridSize !== '1x1' && nodeData.status !== 'generating' && (
-              <div className="p-1.5 border-b border-border dark:border-border-dark">
-                <button
-                  onClick={() => splitGeneratedImage(id)}
-                  className="w-full flex items-center justify-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-colors bg-pink-500/10 text-pink-500 hover:bg-pink-500/20"
-                >
-                  <Scissors size={10} />
-                  切分
-                </button>
-              </div>
-            )}
           </div>
         ) : (
           <div className="w-full border-b border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark overflow-hidden">
