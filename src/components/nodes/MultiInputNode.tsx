@@ -4,6 +4,7 @@ import { Layers, Send, Loader2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
 import ImageContextMenu from '../ui/ImageContextMenu';
 import ImageEditOverlay from '../ui/ImageEditOverlay';
+import ImagePreviewDialog from '../ui/ImagePreviewDialog';
 import type { MultiInputData, ImageData, Image2ImageData } from '../../types';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
@@ -39,6 +40,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
 
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const [imagesExpanded, setImagesExpanded] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const adjustHeight = () => {
@@ -196,9 +198,15 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
             {sourceImages.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {(imagesExpanded ? sourceImages : sourceImages.slice(0, 4)).map((img, idx) => (
-              <div key={`${id}-src-${idx}`} className="w-8 h-8 rounded overflow-hidden border border-border dark:border-border-dark">
+              <button
+                type="button"
+                key={`${id}-src-${idx}`}
+                className="w-8 h-8 rounded overflow-hidden border border-border dark:border-border-dark hover:ring-2 hover:ring-accent transition-all cursor-pointer"
+                onClick={(e) => { e.stopPropagation(); setPreviewIndex(idx); }}
+                title="点击预览"
+              >
                 <img src={img} alt={`Source ${idx}`} className="w-full h-full object-cover" />
-              </div>
+              </button>
             ))}
                 {sourceImages.length > 4 && (
                   <button
@@ -249,6 +257,16 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
 
       <Handle type="target" position={Position.Left} className="w-2.5! h-2.5!" />
       <Handle type="source" position={Position.Right} className="w-2.5! h-2.5!" />
+
+      {previewIndex !== null && (
+        <ImagePreviewDialog
+          isOpen={true}
+          onClose={() => setPreviewIndex(null)}
+          images={sourceImages.map((url, i) => ({ url, label: `输入图片 ${i + 1}` }))}
+          currentIndex={previewIndex}
+          onIndexChange={setPreviewIndex}
+        />
+      )}
     </div>
   );
 }
