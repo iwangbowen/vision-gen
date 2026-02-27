@@ -5,16 +5,18 @@ import { useCanvasStore } from '../../stores/canvasStore';
 import AssetPickerDialog from '../ui/AssetPickerDialog';
 import ImageContextMenu from '../ui/ImageContextMenu';
 import ImageEditOverlay from '../ui/ImageEditOverlay';
+import GenerativeSettingsDialog from '../ui/GenerativeSettingsDialog';
 import type { Image2ImageData } from '../../types';
 import type { GenerativeSettingsValues } from '../ui/GenerativeSettings';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
 function Image2ImageNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as Image2ImageData;
-  const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen, splitGeneratedImage } = useCanvasStore();
+  const { updateNodeData, simulateGenerate, splitGeneratedImage } = useCanvasStore();
 
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
   const [showAssetPicker, setShowAssetPicker] = useState(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -99,37 +101,6 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
 
   return (
     <div className={`node-card w-52 rounded-xl border-2 bg-node-bg dark:bg-node-bg-dark shadow-lg overflow-hidden transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
-      {/* Header - icon and settings */}
-      <div className="flex items-center justify-between px-1.5 py-1 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
-        <div className="flex items-center gap-1.5">
-          <ImageIcon size={12} className="text-emerald-500" />
-          {nodeData.status === 'generating' && (
-            <Loader2 size={10} className="animate-spin text-emerald-500" />
-          )}
-        </div>
-        <button
-          type="button"
-          className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors"
-          onClick={() => {
-            setSelectedNodeId(id);
-            setRightPanelOpen(true);
-          }}
-          title="打开属性设置"
-        >
-          <span>{nodeData.gridSize || '1x1'}</span>
-          <span>·</span>
-          <span>{nodeData.aspectRatio || '16:9'}</span>
-          <span>·</span>
-          <span className="uppercase">{nodeData.imageSize || '1k'}</span>
-          {nodeData.style && (
-            <>
-              <span>·</span>
-              <span>{IMAGE_STYLE_OPTIONS.find(o => o.value === nodeData.style)?.label || nodeData.style}</span>
-            </>
-          )}
-        </button>
-      </div>
-
       {/* Body */}
       <div className="p-0 space-y-0">
         {nodeData.status === 'generating' && !nodeData.sourceImage ? (
@@ -243,9 +214,44 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
             )}
           </button>
         </div>
+        {/* Spec badge */}
+        <div className="flex items-center gap-1 px-1.5 pb-1">
+          <ImageIcon size={10} className="text-emerald-500 shrink-0" />
+          {nodeData.status === 'generating' && (
+            <Loader2 size={10} className="animate-spin text-emerald-500 shrink-0" />
+          )}
+          <button
+            type="button"
+            className="flex items-center gap-0.5 px-1 py-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors truncate"
+            onClick={() => setShowSettingsDialog(true)}
+            title="修改生成配置"
+          >
+            <span>{nodeData.gridSize || '1x1'}</span>
+            <span>·</span>
+            <span>{nodeData.aspectRatio || '16:9'}</span>
+            <span>·</span>
+            <span className="uppercase">{nodeData.imageSize || '1k'}</span>
+            {nodeData.style && (
+              <>
+                <span>·</span>
+                <span className="truncate">{IMAGE_STYLE_OPTIONS.find(o => o.value === nodeData.style)?.label || nodeData.style}</span>
+              </>
+            )}
+          </button>
+        </div>
           </>
         )}
       </div>
+
+      {showSettingsDialog && (
+        <GenerativeSettingsDialog
+          isOpen={showSettingsDialog}
+          onClose={() => setShowSettingsDialog(false)}
+          onConfirm={(settings) => updateNodeData(id, settings)}
+          title="生成配置"
+          initialValues={{ gridSize: nodeData.gridSize, aspectRatio: nodeData.aspectRatio, imageSize: nodeData.imageSize, style: nodeData.style }}
+        />
+      )}
 
       <Handle type="target" position={Position.Left} className="w-2.5! h-2.5!" />
       <Handle type="source" position={Position.Right} className="w-2.5! h-2.5!" />

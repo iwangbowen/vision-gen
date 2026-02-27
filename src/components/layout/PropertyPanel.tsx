@@ -9,18 +9,17 @@ import { useCanvasStore } from '../../stores/canvasStore';
 import { useAssetStore } from '../../stores/assetStore';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { analyzeImageWithGemini } from '../../services/llm/gemini';
-import type { AssetCategory, Text2ImageData, Image2ImageData, MultiInputData } from '../../types';
+import type { AssetCategory } from '../../types';
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ImagePreviewDialog from '../ui/ImagePreviewDialog';
 import { ASSET_CATEGORIES } from '../../utils/constants';
-import GenerativeSettings from '../ui/GenerativeSettings';
 
 type PanelTab = 'properties' | 'analysis';
 
 export default function PropertyPanel() {
-  const { nodes, selectedNodeId, removeNode, setSelectedNodeId, updateNodeData } = useCanvasStore();
+  const { nodes, selectedNodeId, removeNode, setSelectedNodeId } = useCanvasStore();
   const { addAsset } = useAssetStore();
   const { provider, gemini } = useSettingsStore();
   const [activeTab, setActiveTab] = useState<PanelTab>('properties');
@@ -99,9 +98,6 @@ export default function PropertyPanel() {
     }
   };
 
-  const isGenerativeNode = selectedNode.type === 'text2image' || selectedNode.type === 'image2image' || selectedNode.type === 'multiInput';
-  const generativeData = isGenerativeNode ? (selectedNode.data as unknown as Text2ImageData | Image2ImageData | MultiInputData) : null;
-
   const tabClass = (tab: PanelTab) =>
     `flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium border-b-2 transition-colors ${
       activeTab === tab
@@ -129,22 +125,6 @@ export default function PropertyPanel() {
       {activeTab === 'properties' && (
         <div className="flex-1 overflow-y-auto flex flex-col">
           <div className="flex-1">
-            {/* Generative Settings */}
-            {isGenerativeNode && generativeData && (
-              <div className="px-4 py-3 border-b border-border dark:border-border-dark space-y-4">
-                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
-                  生成设置
-                </p>
-                <GenerativeSettings
-                  gridSize={generativeData.gridSize || '1x1'}
-                  aspectRatio={generativeData.aspectRatio || '16:9'}
-                  imageSize={generativeData.imageSize || '1k'}
-                  style={generativeData.style || ''}
-                  onChange={(key, value) => updateNodeData(selectedNode.id, { [key]: value })}
-                />
-              </div>
-            )}
-
             {/* Image preview */}
             {nodeImage && (
               <div className="px-4 py-3 border-b border-border dark:border-border-dark">

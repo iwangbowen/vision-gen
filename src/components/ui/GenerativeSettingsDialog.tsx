@@ -8,14 +8,15 @@ interface GenerativeSettingsDialogProps {
   readonly onClose: () => void;
   readonly onConfirm: (settings: { gridSize: string; aspectRatio: string; imageSize: string; style: string }) => void;
   readonly title: string;
+  readonly initialValues?: { gridSize?: string; aspectRatio?: string; imageSize?: string; style?: string };
 }
 
-export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, title }: GenerativeSettingsDialogProps) {
+export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, title, initialValues }: GenerativeSettingsDialogProps) {
   const [settings, setSettings] = useState({
-    gridSize: '1x1',
-    aspectRatio: '16:9',
-    imageSize: '1k',
-    style: '',
+    gridSize: initialValues?.gridSize || '1x1',
+    aspectRatio: initialValues?.aspectRatio || '16:9',
+    imageSize: initialValues?.imageSize || '1k',
+    style: initialValues?.style || '',
   });
 
   if (!isOpen) return null;

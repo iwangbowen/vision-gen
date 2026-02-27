@@ -2,13 +2,15 @@ import { memo, useState, useRef, useEffect } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { Type, Send, Loader2 } from 'lucide-react';
 import { useCanvasStore } from '../../stores/canvasStore';
+import GenerativeSettingsDialog from '../ui/GenerativeSettingsDialog';
 import type { Text2ImageData } from '../../types';
 import { IMAGE_STYLE_OPTIONS } from '../../utils/constants';
 
 function Text2ImageNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as Text2ImageData;
-  const { updateNodeData, simulateGenerate, setSelectedNodeId, setRightPanelOpen } = useCanvasStore();
+  const { updateNodeData, simulateGenerate } = useCanvasStore();
   const [localPrompt, setLocalPrompt] = useState(nodeData.prompt || '');
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const adjustHeight = () => {
@@ -29,39 +31,6 @@ function Text2ImageNode({ id, data, selected }: NodeProps) {
 
   return (
     <div className={`node-card w-52 rounded-xl border-2 overflow-hidden bg-node-bg dark:bg-node-bg-dark shadow-lg transition-[border-color] duration-150 ${selected ? 'border-accent dark:border-accent' : 'border-node-border dark:border-node-border-dark'}`}>
-      {/* Header - icon and settings */}
-      <div className="flex items-center justify-between px-1.5 py-1
-        bg-surface dark:bg-surface-dark
-        border-b border-border dark:border-border-dark">
-        <div className="flex items-center gap-1.5">
-          <Type size={12} className="text-accent" />
-          {nodeData.status === 'generating' && (
-            <Loader2 size={10} className="animate-spin text-accent" />
-          )}
-        </div>
-        <button
-          type="button"
-          className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors"
-          onClick={() => {
-            setSelectedNodeId(id);
-            setRightPanelOpen(true);
-          }}
-          title="打开属性设置"
-        >
-          <span>{nodeData.gridSize || '1x1'}</span>
-          <span>·</span>
-          <span>{nodeData.aspectRatio || '16:9'}</span>
-          <span>·</span>
-          <span className="uppercase">{nodeData.imageSize || '1k'}</span>
-          {nodeData.style && (
-            <>
-              <span>·</span>
-              <span>{IMAGE_STYLE_OPTIONS.find(o => o.value === nodeData.style)?.label || nodeData.style}</span>
-            </>
-          )}
-        </button>
-      </div>
-
       {/* Body */}
       <div className="p-1">
         <div className="relative">
@@ -97,7 +66,42 @@ function Text2ImageNode({ id, data, selected }: NodeProps) {
             )}
           </button>
         </div>
+        {/* Spec badge */}
+        <div className="flex items-center gap-1 px-0.5 pt-0.5">
+          <Type size={10} className="text-accent shrink-0" />
+          {nodeData.status === 'generating' && (
+            <Loader2 size={10} className="animate-spin text-accent shrink-0" />
+          )}
+          <button
+            type="button"
+            className="flex items-center gap-0.5 px-1 py-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors truncate"
+            onClick={() => setShowSettingsDialog(true)}
+            title="修改生成配置"
+          >
+            <span>{nodeData.gridSize || '1x1'}</span>
+            <span>·</span>
+            <span>{nodeData.aspectRatio || '16:9'}</span>
+            <span>·</span>
+            <span className="uppercase">{nodeData.imageSize || '1k'}</span>
+            {nodeData.style && (
+              <>
+                <span>·</span>
+                <span className="truncate">{IMAGE_STYLE_OPTIONS.find(o => o.value === nodeData.style)?.label || nodeData.style}</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      {showSettingsDialog && (
+        <GenerativeSettingsDialog
+          isOpen={showSettingsDialog}
+          onClose={() => setShowSettingsDialog(false)}
+          onConfirm={(settings) => updateNodeData(id, settings)}
+          title="生成配置"
+          initialValues={{ gridSize: nodeData.gridSize, aspectRatio: nodeData.aspectRatio, imageSize: nodeData.imageSize, style: nodeData.style }}
+        />
+      )}
 
       {/* Handles */}
       <Handle
