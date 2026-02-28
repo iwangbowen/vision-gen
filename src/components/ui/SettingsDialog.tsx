@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { X, Settings as SettingsIcon } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
-import type { LLMProvider } from '../../stores/settingsStore';
 import { GEMINI_IMAGE_MODELS, GEMINI_TEXT_MODELS } from '../../services/llm/gemini';
 
 interface SettingsDialogProps {
@@ -13,8 +11,7 @@ const inputClass = 'w-full px-2.5 py-1.5 rounded-lg text-xs focus:outline-none f
 const labelClass = 'block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-0.5';
 
 export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
-  const { provider, gemini, custom, setProvider, updateGeminiSettings, updateCustomSettings } = useSettingsStore();
-  const [activeTab, setActiveTab] = useState<LLMProvider>(provider);
+  const { gemini, updateGeminiSettings } = useSettingsStore();
 
   if (!isOpen) return null;
 
@@ -43,68 +40,8 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          <div className="mb-4">
-            <div className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
-              Default Model Provider
-            </div>
-            <div className="flex gap-1.5">
-              <button
-                onClick={() => {
-                  setProvider('gemini');
-                  setActiveTab('gemini');
-                }}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-colors border ${
-                  provider === 'gemini'
-                    ? 'bg-accent text-white dark:text-black border-accent'
-                    : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'
-                }`}
-              >
-                Gemini
-              </button>
-              <button
-                onClick={() => {
-                  setProvider('custom');
-                  setActiveTab('custom');
-                }}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-colors border ${
-                  provider === 'custom'
-                    ? 'bg-accent text-white dark:text-black border-accent'
-                    : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'
-                }`}
-              >
-                Custom (OpenAI)
-              </button>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex border-b border-zinc-200 dark:border-zinc-800 mb-3">
-            <button
-              onClick={() => setActiveTab('gemini')}
-              className={`px-3 py-1.5 text-xs font-medium border-b-2 transition-colors ${
-                activeTab === 'gemini'
-                  ? 'border-accent text-accent'
-                  : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-              }`}
-            >
-              Gemini
-            </button>
-            <button
-              onClick={() => setActiveTab('custom')}
-              className={`px-3 py-1.5 text-xs font-medium border-b-2 transition-colors ${
-                activeTab === 'custom'
-                  ? 'border-accent text-accent'
-                  : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-              }`}
-            >
-              Custom
-            </button>
-          </div>
-
-          {/* Tab Content */}
+          {/* Gemini Settings */}
           <div className="space-y-3">
-            {activeTab === 'gemini' && (
-              <>
                 <div>
                   <div className={labelClass}>API Key</div>
                   <input
@@ -153,43 +90,6 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                     ))}
                   </select>
                 </div>
-              </>
-            )}
-
-            {activeTab === 'custom' && (
-              <>
-                <div>
-                  <div className={labelClass}>API Key</div>
-                  <input
-                    type="password"
-                    value={custom.apiKey}
-                    onChange={(e) => updateCustomSettings({ apiKey: e.target.value })}
-                    placeholder="sk-..."
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <div className={labelClass}>Base URL</div>
-                  <input
-                    type="text"
-                    value={custom.baseUrl}
-                    onChange={(e) => updateCustomSettings({ baseUrl: e.target.value })}
-                    placeholder="https://api.openai.com/v1"
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <div className={labelClass}>Model</div>
-                  <input
-                    type="text"
-                    value={custom.model}
-                    onChange={(e) => updateCustomSettings({ model: e.target.value })}
-                    placeholder="gpt-4o"
-                    className={inputClass}
-                  />
-                </div>
-              </>
-            )}
           </div>
         </div>
 
