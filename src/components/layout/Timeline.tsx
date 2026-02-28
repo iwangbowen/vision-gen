@@ -34,7 +34,7 @@ export default function Timeline() {
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', String(idx));
     // Add a specific type for internal timeline dragging
-    e.dataTransfer.setData('application/instavideo-timeline-item', String(idx));
+    e.dataTransfer.setData('application/visiongen-timeline-item', String(idx));
   }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
@@ -60,7 +60,7 @@ export default function Timeline() {
   const handleTrackDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     // Check if it's an internal drag or external asset
-    if (e.dataTransfer.types.includes('application/instavideo-timeline-item')) {
+    if (e.dataTransfer.types.includes('application/visiongen-timeline-item')) {
       e.dataTransfer.dropEffect = 'move';
     } else {
       e.dataTransfer.dropEffect = 'copy';
@@ -84,7 +84,7 @@ export default function Timeline() {
     const targetPosition = Math.max(0, Math.floor(relativeX / SLOT_WIDTH));
 
     // Handle internal reordering
-    const timelineItemData = e.dataTransfer.getData('application/instavideo-timeline-item');
+    const timelineItemData = e.dataTransfer.getData('application/visiongen-timeline-item');
     if (timelineItemData) {
       const sourceIdx = Number.parseInt(timelineItemData, 10);
       if (!Number.isNaN(sourceIdx) && sourceIdx >= 0 && sourceIdx < items.length) {
@@ -111,7 +111,7 @@ export default function Timeline() {
     }
 
     // Handle external asset drop
-    const data = e.dataTransfer.getData('application/instavideo-asset');
+    const data = e.dataTransfer.getData('application/visiongen-asset');
     if (!data) return;
 
     const { image, name } = JSON.parse(data);

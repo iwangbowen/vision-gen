@@ -62,9 +62,9 @@ export default function Toolbar({
         <div className="w-px h-4 bg-border dark:bg-border-dark mx-0.5" />
 
         <a href="/" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-          <img src="/favicon.svg" alt="InstaVideo Logo" className="w-4 h-4" />
+          <img src="/favicon.svg" alt="VisionGen Logo" className="w-4 h-4" />
           <span className="text-xs font-semibold text-text-primary dark:text-text-primary-dark tracking-wide">
-            InstaVideo
+            VisionGen
           </span>
         </a>
       </div>

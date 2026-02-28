@@ -8,7 +8,7 @@ type AssetTab = 'assets';
 
 export default function AssetPanel() {
   const handleDragStart = (e: React.DragEvent, image: string, name: string) => {
-    e.dataTransfer.setData('application/instavideo-asset', JSON.stringify({ image, name }));
+    e.dataTransfer.setData('application/visiongen-asset', JSON.stringify({ image, name }));
     e.dataTransfer.effectAllowed = 'copy';
   };
 

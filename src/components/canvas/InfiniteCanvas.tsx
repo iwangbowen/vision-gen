@@ -166,7 +166,7 @@ export default function InfiniteCanvas() {
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-      const data = event.dataTransfer.getData('application/instavideo-asset');
+      const data = event.dataTransfer.getData('application/visiongen-asset');
       if (!data) return;
 
       const { image, name } = JSON.parse(data);

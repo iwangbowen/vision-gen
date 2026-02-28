@@ -24,7 +24,7 @@ export const useThemeStore = create<ThemeState>()(
       },
     }),
     {
-      name: 'instavideo-theme',
+      name: 'visiongen-theme',
       onRehydrateStorage: () => (state) => {
         if (state) {
           document.documentElement.classList.toggle('dark', state.theme === 'dark');

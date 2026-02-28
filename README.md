@@ -1,6 +1,6 @@
-# InstaVideo
+# VisionGen
 
-InstaVideo 是一个面向影视/动画内容创作者的**节点式无限画布 AI 图像生成工具**，专注于分镜图生成与图像资产管理。纯前端应用，无需后端，通过外部 LLM API（Gemini 或 OpenAI 兼容接口）驱动图像生成。
+VisionGen 是一个面向影视/动画内容创作者的**节点式无限画布 AI 图像生成工具**，专注于分镜图生成与图像资产管理。纯前端应用，无需后端，通过外部 LLM API（Gemini 或 OpenAI 兼容接口）驱动图像生成。
 
 ## 参考资源
 
@@ -93,8 +93,8 @@ InstaVideo 是一个面向影视/动画内容创作者的**节点式无限画布
 ### 安装与运行
 
 ```bash
-git clone https://github.com/iwangbowen/insta-video.git
-cd insta-video
+git clone https://github.com/iwangbowen/vision-gen.git
+cd vision-gen
 npm install
 npm run dev
 ```
@@ -140,7 +140,7 @@ App
 
 - **节点 ID**：`node_${++counter}_${Date.now()}` 确保跨会话唯一性
 - **主题**：通过 `.dark` 类名手动切换，CSS 自定义变量同步 React Flow 主题
-- **拖拽协议**：素材使用 `application/instavideo-asset` MIME 类型，时间轴内部使用 `instavideo-timeline-item`
+- **拖拽协议**：素材使用 `application/visiongen-asset` MIME 类型，时间轴内部使用 `visiongen-timeline-item`
 - **弹窗渲染**：所有对话框通过 `createPortal(…, document.body)` 渲染，避免 z-index 层叠问题
 - **Tailwind 主题**：`index.css` 中通过 `@theme { }` 定义设计 Token，映射为 `bg-canvas-bg` 等工具类
 

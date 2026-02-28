@@ -1,4 +1,4 @@
-# InstaVideo 项目指南
+# VisionGen 项目指南
 
 ## 代码风格
 - **语言**: React 19 + TypeScript 5.9 (严格类型检查, ES2020 目标)。

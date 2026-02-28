@@ -47,7 +47,7 @@ export const useSettingsStore = create<SettingsState>()(
         })),
     }),
     {
-      name: 'instavideo-settings',
+      name: 'visiongen-settings',
       merge: (persistedState, currentState) => {
         const ps = persistedState as Partial<SettingsState>;
         return {
