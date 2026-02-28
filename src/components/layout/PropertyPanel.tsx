@@ -48,7 +48,7 @@ export default function PropertyPanel() {
         bg-panel-bg dark:bg-panel-bg-dark
         border-l border-border dark:border-border-dark">
         <p className="text-sm text-text-secondary dark:text-text-secondary-dark">
-          选择一个节点查看属性
+          Select a node to view properties
         </p>
       </div>
     );
@@ -76,7 +76,7 @@ export default function PropertyPanel() {
   const handleAnalyzeImage = async () => {
     if (!nodeImage || !analysisPrompt.trim()) return;
     if (provider !== 'gemini' || !gemini.apiKey) {
-      setAnalysisError('请先在设置中配置 Gemini API Key');
+      setAnalysisError('Please configure Gemini API Key in settings first');
       return;
     }
     setIsAnalyzing(true);
@@ -113,11 +113,11 @@ export default function PropertyPanel() {
       <div className="flex border-b border-border dark:border-border-dark bg-panel-bg dark:bg-panel-bg-dark">
         <button className={tabClass('properties')} onClick={() => setActiveTab('properties')}>
           <SlidersHorizontal size={12} />
-          属性
+          Properties
         </button>
         <button className={tabClass('analysis')} onClick={() => setActiveTab('analysis')}>
           <ScanSearch size={12} />
-          图片分析
+          Image Analysis
         </button>
       </div>
 
@@ -129,7 +129,7 @@ export default function PropertyPanel() {
             {nodeImage && (
               <div className="px-4 py-3 border-b border-border dark:border-border-dark">
                 <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark mb-2">
-                  预览
+                  Preview
                 </p>
                 <div className="rounded-lg overflow-hidden border border-border dark:border-border-dark">
                   <img
@@ -148,7 +148,7 @@ export default function PropertyPanel() {
                   <div className="space-y-2">
                     <input
                       type="text"
-                      placeholder="资产名称..."
+                      placeholder="Asset Name..."
                       value={saveName}
                       onChange={(e) => setSaveName(e.target.value)}
                       className="w-full px-3 py-1.5 rounded-md text-xs
@@ -175,7 +175,7 @@ export default function PropertyPanel() {
                         className="flex-1 px-3 py-1.5 rounded-md text-xs font-medium
                           bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
                       >
-                        保存
+                        Save
                       </button>
                       <button
                         onClick={() => setShowSaveForm(false)}
@@ -185,7 +185,7 @@ export default function PropertyPanel() {
                           hover:bg-surface-hover dark:hover:bg-surface-hover-dark
                           border border-border dark:border-border-dark"
                       >
-                        取消
+                        Cancel
                       </button>
                     </div>
                   </div>
@@ -196,7 +196,7 @@ export default function PropertyPanel() {
                       bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors"
                   >
                     <Save size={14} />
-                    保存为资产
+                    Save as Asset
                   </button>
                 )}
               </div>
@@ -205,7 +205,7 @@ export default function PropertyPanel() {
             {/* Position info */}
             <div className="px-4 py-3 border-b border-border dark:border-border-dark">
               <p className="text-xs font-medium text-text-secondary dark:text-text-secondary-dark mb-2">
-                位置
+                Position
               </p>
               <div className="grid grid-cols-2 gap-2 text-xs text-text-primary dark:text-text-primary-dark">
                 <div>
@@ -231,7 +231,7 @@ export default function PropertyPanel() {
                 bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
             >
               <Trash2 size={14} />
-              删除节点
+              Delete Node
             </button>
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function PropertyPanel() {
                   className="w-full rounded-lg overflow-hidden border border-border dark:border-border-dark
                     bg-canvas-bg dark:bg-canvas-bg-dark flex items-center justify-center
                     hover:opacity-90 hover:border-accent transition-all cursor-zoom-in"
-                  title="点击查看大图"
+                  title="Click to View Full Size"
                 >
                   <img src={nodeImage} alt="preview" className="max-w-full max-h-24 object-contain" />
                 </button>
@@ -258,10 +258,10 @@ export default function PropertyPanel() {
               {/* Prompt + button */}
               <div className="px-4 py-3 space-y-2 flex-1">
                 <p className="text-[10px] font-medium text-text-secondary dark:text-text-secondary-dark uppercase tracking-wide">
-                  分析提示词
+                  Analysis Prompt
                 </p>
                 <textarea
-                  placeholder="输入提示词，例如：描述这张图片的内容、风格和情绪..."
+                  placeholder="Enter prompt, e.g.: Describe the content, style, and mood of this image..."
                   value={analysisPrompt}
                   onChange={(e) => setAnalysisPrompt(e.target.value)}
                   rows={3}
@@ -280,9 +280,9 @@ export default function PropertyPanel() {
                     disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isAnalyzing ? (
-                    <><Loader2 size={13} className="animate-spin" />分析中...</>
+                    <><Loader2 size={13} className="animate-spin" />Analyzing...</>
                   ) : (
-                    <><ScanSearch size={13} />开始分析</>
+                    <><ScanSearch size={13} />Start Analysis</>
                   )}
                 </button>
 
@@ -297,7 +297,7 @@ export default function PropertyPanel() {
                 {(analysisResult || isAnalyzing) && (
                   <div className="space-y-1">
                     <p className="text-[10px] font-medium text-text-secondary dark:text-text-secondary-dark uppercase tracking-wide flex items-center gap-1.5">
-                      分析结果
+                      Analysis Result
                       {isAnalyzing && <Loader2 size={10} className="animate-spin" />}
                     </p>
                     <div
@@ -320,7 +320,7 @@ export default function PropertyPanel() {
             <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-2">
               <ScanSearch size={32} className="text-text-secondary dark:text-text-secondary-dark opacity-40" />
               <p className="text-xs text-text-secondary dark:text-text-secondary-dark">
-                当前节点暂无图片，生成图片后可在此进行分析
+                No image in current node. Analyze after generation.
               </p>
             </div>
           )}

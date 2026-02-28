@@ -66,7 +66,7 @@ export default function SettingsMenu() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-1.5 rounded-md transition-colors hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark"
-        title="设置"
+        title="Settings"
       >
         <SettingsIcon size={15} />
       </button>
@@ -82,7 +82,7 @@ export default function SettingsMenu() {
           <div className="absolute top-full right-0 mt-2 w-48 z-50 bg-surface dark:bg-surface-dark border border-border dark:border-border-dark rounded-lg shadow-xl p-1 flex flex-col">
             <MenuItem
               icon={<Cpu size={16} className="text-text-secondary dark:text-text-secondary-dark" />}
-              label="LLM 配置"
+              label="LLM Configuration"
               onClick={() => {
                 setIsDialogOpen(true);
                 setIsOpen(false);
@@ -90,17 +90,17 @@ export default function SettingsMenu() {
             />
             <MenuItem
               icon={<Keyboard size={16} className="text-text-secondary dark:text-text-secondary-dark" />}
-              label="快捷键"
+              label="Shortcuts"
               onClick={() => {
                 setIsShortcutsOpen(true);
                 setIsOpen(false);
               }}
             />
             {/* Future multi-level menus can be added here like this:
-            <MenuItem label="更多设置" icon={<SettingsIcon size={16} />}>
-              <MenuItem label="二级菜单 1" />
-              <MenuItem label="二级菜单 2">
-                <MenuItem label="三级菜单 1" />
+            <MenuItem label="More Settings" icon={<SettingsIcon size={16} />}>
+              <MenuItem label="Submenu 1" />
+              <MenuItem label="Submenu 2">
+                <MenuItem label="Level 3 Menu 1" />
               </MenuItem>
             </MenuItem>
             */}

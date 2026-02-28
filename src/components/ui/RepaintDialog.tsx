@@ -215,7 +215,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-border-dark">
           <h2 className="text-sm font-semibold text-text-primary dark:text-text-primary-dark">
-            局部重绘
+            Inpaint
           </h2>
           <button
             onClick={handleClose}
@@ -276,7 +276,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                 type="button"
                 onClick={() => setZoomClamped(zoom - 0.1)}
                 className="p-1.5 rounded-md bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
-                title="缩小"
+                title="Zoom Out"
               >
                 <ZoomOut size={14} />
               </button>
@@ -287,7 +287,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                 type="button"
                 onClick={() => setZoomClamped(zoom + 0.1)}
                 className="p-1.5 rounded-md bg-surface-hover dark:bg-surface-hover-dark text-text-primary dark:text-text-primary-dark hover:bg-border dark:hover:bg-border-dark transition-colors"
-                title="放大"
+                title="Zoom In"
               >
                 <ZoomIn size={14} />
               </button>
@@ -300,12 +300,12 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
             {/* Prompt Section (Top) */}
             <div className="p-4 border-b border-border dark:border-border-dark space-y-2">
               <p className="text-xs font-medium text-text-primary dark:text-text-primary-dark">
-                重绘提示词
+                Inpaint Prompt
               </p>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="描述你想要在涂抹区域生成的内容..."
+                placeholder="Describe what you want to generate in the painted area..."
                 className="w-full min-h-20 p-2.5 text-sm bg-canvas-bg dark:bg-canvas-bg-dark border border-border dark:border-border-dark rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-accent text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark"
               />
             </div>
@@ -317,7 +317,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                 onClick={() => setIsBrushSettingsOpen(!isBrushSettingsOpen)}
                 className="w-full flex items-center justify-between p-4 hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
               >
-                <span className="text-xs font-medium text-text-primary dark:text-text-primary-dark">画笔设置</span>
+                <span className="text-xs font-medium text-text-primary dark:text-text-primary-dark">Brush Settings</span>
                 {isBrushSettingsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
               </button>
 
@@ -334,7 +334,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                       }`}
                     >
                       <Move size={14} />
-                      移动
+                      Move
                     </button>
                     <button
                       type="button"
@@ -349,7 +349,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                       }`}
                     >
                       <Paintbrush size={14} />
-                      画笔
+                      Brush
                     </button>
                     <button
                       type="button"
@@ -364,13 +364,13 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                       }`}
                     >
                       <Eraser size={14} />
-                      擦除
+                      Eraser
                     </button>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs text-text-secondary dark:text-text-secondary-dark">画笔大小</p>
+                      <p className="text-xs text-text-secondary dark:text-text-secondary-dark">Brush Size</p>
                       <span className="text-xs text-text-secondary dark:text-text-secondary-dark">{brushSize}px</span>
                     </div>
                     <input
@@ -384,7 +384,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-xs text-text-secondary dark:text-text-secondary-dark">画笔颜色</p>
+                    <p className="text-xs text-text-secondary dark:text-text-secondary-dark">Brush Color</p>
                     <div className="flex flex-wrap items-center gap-2">
                       {BRUSH_COLORS.map((color) => (
                         <button
@@ -401,7 +401,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                               : 'border-border dark:border-border-dark hover:scale-105'
                           }`}
                           style={{ backgroundColor: color }}
-                          title={`选择颜色 ${color}`}
+                          title={`Select Color ${color}`}
                         />
                       ))}
                     </div>
@@ -413,7 +413,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                     className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium bg-canvas-bg dark:bg-canvas-bg-dark text-text-primary dark:text-text-primary-dark border border-border dark:border-border-dark hover:border-accent/50 transition-colors"
                   >
                     <Undo size={14} />
-                    清除蒙版
+                    Clear Mask
                   </button>
                 </div>
               )}
@@ -426,7 +426,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                 onClick={() => setIsGenSettingsOpen(!isGenSettingsOpen)}
                 className="w-full flex items-center justify-between p-4 hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
               >
-                <span className="text-xs font-medium text-text-primary dark:text-text-primary-dark">生成规格</span>
+                <span className="text-xs font-medium text-text-primary dark:text-text-primary-dark">Generation Specs</span>
                 {isGenSettingsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
               </button>
 
@@ -435,7 +435,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   {/* Grid size selector */}
                   <div>
                     <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-2">
-                      生成数量
+                      Generation Count
                     </p>
                     <div className="flex gap-2 flex-wrap">
                       {GRID_OPTIONS.map((opt) => (
@@ -458,7 +458,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   {/* Aspect Ratio selector */}
                   <div>
                     <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-2">
-                      画面比例
+                      Aspect Ratio
                     </p>
                     <div className="flex gap-2 flex-wrap">
                       {ASPECT_RATIO_OPTIONS.map((opt) => (
@@ -481,7 +481,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   {/* Image Size selector */}
                   <div>
                     <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-2">
-                      图片尺寸
+                      Image Size
                     </p>
                     <div className="flex gap-2 flex-wrap">
                       {IMAGE_SIZE_OPTIONS.map((opt) => (
@@ -504,7 +504,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
                   {/* Image Style selector */}
                   <div>
                     <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-2">
-                      画面风格
+                      Image Style
                     </p>
                     <div className="flex gap-2 flex-wrap">
                       {IMAGE_STYLE_OPTIONS.map((opt) => (
@@ -535,7 +535,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
             onClick={handleClose}
             className="px-4 py-2 rounded-lg text-xs font-medium text-text-secondary dark:text-text-secondary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
           >
-            取消
+            Cancel
           </button>
           <button
             onClick={handleComplete}
@@ -543,7 +543,7 @@ export default function RepaintDialog({ isOpen, onClose, imageUrl, onRepaintComp
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Check size={14} />
-            确认重绘
+            Confirm Inpaint
           </button>
         </div>
       </div>

@@ -1,11 +1,11 @@
 import type { AssetCategory, GridSize, AspectRatio, ImageSize, ImageStyle } from '../types';
 
 export const ASSET_CATEGORIES: { label: string; value: AssetCategory }[] = [
-  { label: '人物', value: 'character' },
-  { label: '道具', value: 'prop' },
-  { label: '场景', value: 'scene' },
-  { label: '服装', value: 'costume' },
-  { label: '分镜', value: 'storyboard' },
+  { label: 'Character', value: 'character' },
+  { label: 'Prop', value: 'prop' },
+  { label: 'Scene', value: 'scene' },
+  { label: 'Costume', value: 'costume' },
+  { label: 'Storyboard', value: 'storyboard' },
 ];
 
 export const GRID_OPTIONS: { label: string; value: GridSize }[] = [
@@ -33,15 +33,15 @@ export const IMAGE_SIZE_OPTIONS: { label: string; value: ImageSize }[] = [
 ];
 
 export const IMAGE_STYLE_OPTIONS: { label: string; value: ImageStyle }[] = [
-  { label: '无', value: '' },
-  { label: '摄影写实', value: 'photorealistic' },
-  { label: '概念设计', value: 'concept-art' },
-  { label: '手绘草图', value: 'sketch' },
-  { label: '美漫风格', value: 'comic-book' },
-  { label: '日系动漫', value: 'anime' },
-  { label: '3D渲染', value: '3d-render' },
-  { label: '水彩艺术', value: 'watercolor' },
-  { label: '油画质感', value: 'oil-painting' },
-  { label: '赛博朋克', value: 'cyberpunk' },
-  { label: '水墨丹青', value: 'ink-wash' },
+  { label: 'None', value: '' },
+  { label: 'Photorealistic', value: 'photorealistic' },
+  { label: 'Concept Art', value: 'concept-art' },
+  { label: 'Sketch', value: 'sketch' },
+  { label: 'Comic Book', value: 'comic-book' },
+  { label: 'Anime', value: 'anime' },
+  { label: '3D Render', value: '3d-render' },
+  { label: 'Watercolor', value: 'watercolor' },
+  { label: 'Oil Painting', value: 'oil-painting' },
+  { label: 'Cyberpunk', value: 'cyberpunk' },
+  { label: 'Ink Wash', value: 'ink-wash' },
 ];

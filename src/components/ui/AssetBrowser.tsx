@@ -11,12 +11,12 @@ import { useAssetStore } from '../../stores/assetStore';
 import type { Asset, AssetCategory } from '../../types';
 
 const CATEGORIES: { label: string; value: AssetCategory | 'all'; icon: React.ReactNode }[] = [
-  { label: '全部', value: 'all', icon: null },
-  { label: '人物', value: 'character', icon: <User size={14} /> },
-  { label: '道具', value: 'prop', icon: <Sword size={14} /> },
-  { label: '场景', value: 'scene', icon: <Mountain size={14} /> },
-  { label: '服装', value: 'costume', icon: <Shirt size={14} /> },
-  { label: '分镜', value: 'storyboard', icon: <Film size={14} /> },
+  { label: 'All', value: 'all', icon: null },
+  { label: 'Character', value: 'character', icon: <User size={14} /> },
+  { label: 'Prop', value: 'prop', icon: <Sword size={14} /> },
+  { label: 'Scene', value: 'scene', icon: <Mountain size={14} /> },
+  { label: 'Costume', value: 'costume', icon: <Shirt size={14} /> },
+  { label: 'Storyboard', value: 'storyboard', icon: <Film size={14} /> },
 ];
 
 interface AssetBrowserProps {
@@ -48,7 +48,7 @@ export default function AssetBrowser({ onSelect, onDragStart, columns = 3, local
         <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary dark:text-text-secondary-dark" />
         <input
           type="text"
-          placeholder="搜索资产..."
+          placeholder="Search Assets..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-8 pr-3 py-1.5 rounded-md text-xs
@@ -109,7 +109,7 @@ export default function AssetBrowser({ onSelect, onDragStart, columns = 3, local
         </div>
         {assets.length === 0 && (
           <p className="text-xs text-text-secondary dark:text-text-secondary-dark text-center mt-8">
-            暂无资产
+            No Assets
           </p>
         )}
       </div>

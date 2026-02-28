@@ -13,7 +13,7 @@ interface GenerativeSettingsDialogProps {
   readonly confirmIcon?: ReactNode;
 }
 
-export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, title, initialValues, confirmLabel = '确认', confirmIcon }: GenerativeSettingsDialogProps) {
+export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, title, initialValues, confirmLabel = 'Confirm', confirmIcon }: GenerativeSettingsDialogProps) {
   const [settings, setSettings] = useState({
     gridSize: initialValues?.gridSize || '1x1',
     aspectRatio: initialValues?.aspectRatio || '16:9',
@@ -56,7 +56,7 @@ export default function GenerativeSettingsDialog({ isOpen, onClose, onConfirm, t
             onClick={onClose}
             className="px-3 py-1 rounded-md text-[11px] font-medium text-text-secondary dark:text-text-secondary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors"
           >
-            取消
+            Cancel
           </button>
           <button
             onClick={() => {

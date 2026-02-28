@@ -152,10 +152,10 @@ export default function Timeline() {
         <div className="flex items-center gap-1">
           <Film size={11} className="text-accent" />
           <span className="text-[11px] font-semibold text-text-primary dark:text-text-primary-dark">
-            轨道
+            Tracks
           </span>
           <span className="text-[10px] text-text-secondary dark:text-text-secondary-dark">
-            ({items.length} 帧)
+            ({items.length} Frames)
           </span>
         </div>
         <div className="flex items-center gap-0.5">
@@ -168,14 +168,14 @@ export default function Timeline() {
                 className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
               >
                 <Download size={10} />
-                导出
+                Export
               </button>
               <button
                 onClick={clearTimeline}
                 className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
               >
                 <Trash2 size={10} />
-                清空
+                Clear
               </button>
             </>
           )}
@@ -252,7 +252,7 @@ export default function Timeline() {
                           removeItem(item.id);
                         }}
                         className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/60 text-white hover:bg-red-500 transition-all pointer-events-auto"
-                        title="移除"
+                        title="Remove"
                       >
                         <X size={10} />
                       </button>

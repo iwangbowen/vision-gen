@@ -23,7 +23,7 @@ function GridNode({ id, data }: NodeProps) {
       id: `timeline_${id}_cell_${cell.id}_${Date.now()}`,
       image: cell.image,
       sourceNodeId: id,
-      label: `分镜 ${cell.row + 1}-${cell.col + 1}`,
+      label: `Storyboard ${cell.row + 1}-${cell.col + 1}`,
     });
   }, [addItem, id]);
 
@@ -40,10 +40,10 @@ function GridNode({ id, data }: NodeProps) {
         <button
           onClick={handleSplit}
           className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-pink-500/10 text-pink-500 hover:bg-pink-500/20 transition-colors"
-          title="切分为独立节点"
+          title="Split into Nodes"
         >
           <Scissors size={12} />
-          切分
+          Split
         </button>
       </div>
 
@@ -80,7 +80,7 @@ function GridNode({ id, data }: NodeProps) {
                     handleCellAddToTimeline(cell);
                   }}
                   className="opacity-0 group-hover:opacity-100 p-1 rounded bg-black/50 text-white hover:bg-black/70 transition-all"
-                  title="添加到轨道"
+                  title="Add to Tracks"
                 >
                   <ArrowDownToLine size={10} />
                 </button>

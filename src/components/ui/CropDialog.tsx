@@ -12,7 +12,7 @@ interface CropDialogProps {
 }
 
 const ASPECT_RATIOS = [
-  { label: '自由', value: undefined, icon: ImageIcon },
+  { label: 'Free', value: undefined, icon: ImageIcon },
   { label: '1:1', value: 1, icon: Square },
   { label: '4:3', value: 4 / 3, icon: Monitor },
   { label: '16:9', value: 16 / 9, icon: Monitor },
@@ -129,7 +129,7 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            裁剪图片
+            Crop Image
           </h2>
           <button
             onClick={handleClose}
@@ -187,7 +187,7 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
             onClick={handleClose}
             className="px-4 py-2 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           >
-            取消
+            Cancel
           </button>
           <button
             onClick={handleComplete}
@@ -195,7 +195,7 @@ export default function CropDialog({ isOpen, onClose, imageUrl, onCropComplete }
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium bg-accent text-white dark:text-black hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Check size={14} />
-            确认裁剪
+            Confirm Crop
           </button>
         </div>
       </div>

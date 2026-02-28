@@ -11,7 +11,7 @@ export default function ThemeToggle() {
         bg-canvas-bg dark:bg-surface-dark
         hover:bg-surface-hover dark:hover:bg-surface-hover-dark
         text-text-primary dark:text-text-primary-dark"
-      title={theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'}
+      title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
     >
       {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
     </button>

@@ -24,7 +24,7 @@ export default function AssetPickerDialog({ open, onClose, onSelect }: AssetPick
         type="button"
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
-        aria-label="关闭"
+        aria-label="Close"
       />
 
       {/* Dialog */}
@@ -32,7 +32,7 @@ export default function AssetPickerDialog({ open, onClose, onSelect }: AssetPick
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-border-dark">
           <h3 className="text-sm font-semibold text-text-primary dark:text-text-primary-dark">
-            从资产库选择图片
+            Select Image from Asset Library
           </h3>
           <button
             onClick={onClose}

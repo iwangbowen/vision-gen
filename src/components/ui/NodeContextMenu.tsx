@@ -90,7 +90,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
           id: `timeline_${node.id}_cell_${cell.id}_${Date.now()}`,
           image: cell.image,
           sourceNodeId: node.id,
-          label: `分镜 ${cell.row + 1}-${cell.col + 1}`,
+          label: `Storyboard ${cell.row + 1}-${cell.col + 1}`,
         });
       });
     }
@@ -128,7 +128,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
           hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
       >
         <ClipboardCopy size={14} />
-        {isSingleNode ? '复制节点' : `复制 ${targetNodes.length} 个节点`}
+        {isSingleNode ? 'Copy Node' : `Copy ${targetNodes.length} nodes`}
       </button>
 
       {/* Cut */}
@@ -139,7 +139,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
           hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
       >
         <ClipboardX size={14} />
-        {isSingleNode ? '剪切节点' : `剪切 ${targetNodes.length} 个节点`}
+        {isSingleNode ? 'Cut Node' : `Cut ${targetNodes.length} nodes`}
       </button>
 
       {/* Duplicate */}
@@ -150,7 +150,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
           hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
       >
         <Copy size={14} />
-        {isSingleNode ? '克隆节点' : `克隆 ${targetNodes.length} 个节点`}
+        {isSingleNode ? 'Duplicate Node' : `Clone ${targetNodes.length} nodes`}
       </button>
 
       {/* Add to timeline - image node */}
@@ -162,7 +162,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
             hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
         >
           <ArrowDownToLine size={14} />
-          {isSingleNode ? '添加到轨道' : '将图片节点添加到轨道'}
+          {isSingleNode ? 'Add to Timeline' : 'Add image nodes to timeline'}
         </button>
       )}
 
@@ -176,7 +176,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
               hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
           >
             <Scissors size={14} />
-            切分为独立节点
+            Split into Nodes
           </button>
           <button
             onClick={handleAddGridCellsToTimeline}
@@ -185,7 +185,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
               hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
           >
             <ArrowDownToLine size={14} />
-            全部添加到轨道
+            AllAdd to Tracks
           </button>
         </>
       )}
@@ -198,7 +198,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
             text-pink-500 hover:bg-pink-500/10"
         >
           <Ungroup size={14} />
-          取消分组
+          Ungroup
         </button>
       )}
 
@@ -210,7 +210,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
             text-purple-500 hover:bg-purple-500/10"
         >
           <Layers size={14} />
-          将选中的 {targetNodes.length} 个节点融合生成
+          Blend selected {targetNodes.length} nodes
         </button>
       )}
 
@@ -224,7 +224,7 @@ export default function NodeContextMenu({ nodeIds, x, y, onClose }: ContextMenuP
           text-red-500 hover:bg-red-500/10"
       >
         <Trash2 size={14} />
-        {isSingleNode ? '删除节点' : `删除 ${targetNodes.length} 个节点`}
+        {isSingleNode ? 'Delete Node' : `Delete ${targetNodes.length} nodes`}
       </button>
     </div>
   );

@@ -278,7 +278,7 @@ export default function InfiniteCanvas() {
                 ? 'bg-accent/10 dark:bg-accent/20 border-accent/30 text-accent'
                 : 'bg-surface dark:bg-surface-dark border-border dark:border-border-dark text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
             }`}
-            title={minimapOpen ? '隐藏小地图' : '显示小地图'}
+            title={minimapOpen ? 'Hide Minimap' : 'Show Minimap'}
           >
             <Map size={14} />
           </button>

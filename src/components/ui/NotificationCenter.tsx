@@ -29,7 +29,7 @@ export default function NotificationCenter() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-1.5 rounded-md transition-colors hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-text-secondary dark:text-text-secondary-dark"
-        title="通知中心"
+        title="Notification Center"
       >
         <Bell size={15} />
         {activeTasks.length > 0 && (
@@ -48,14 +48,14 @@ export default function NotificationCenter() {
           <div className="absolute top-full right-0 mt-2 w-80 max-h-96 overflow-y-auto custom-scrollbar z-50 bg-surface dark:bg-surface-dark border border-border dark:border-border-dark rounded-xl shadow-xl flex flex-col">
             <div className="flex items-center justify-between p-3 border-b border-border dark:border-border-dark sticky top-0 bg-surface dark:bg-surface-dark z-10">
               <h3 className="text-sm font-semibold text-text-primary dark:text-text-primary-dark">
-                通知中心 {activeTasks.length > 0 ? `(${activeTasks.length} 个进行中)` : ''}
+                Notification Center {activeTasks.length > 0 ? `(${activeTasks.length} in progress)` : ''}
               </h3>
               {completedTasks.length > 0 && (
                 <button
                   onClick={clearCompletedTasks}
                   className="text-xs text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark transition-colors"
                 >
-                  清除已完成
+                  Clear Completed
                 </button>
               )}
             </div>
@@ -63,7 +63,7 @@ export default function NotificationCenter() {
             <div className="p-2 space-y-2">
               {tasks.length === 0 ? (
                 <div className="p-4 text-center text-sm text-text-secondary dark:text-text-secondary-dark">
-                  暂无通知
+                  No Notifications
                 </div>
               ) : (
                 tasks.map(task => (
@@ -82,10 +82,10 @@ export default function NotificationCenter() {
                         </div>
                         <div className="flex flex-col overflow-hidden">
                           <span className="text-xs font-medium text-text-primary dark:text-text-primary-dark truncate">
-                            {task.type === 'text2image' ? '文生图' : '图生图'}
+                            {task.type === 'text2image' ? 'Text to Image' : 'Image to Image'}
                           </span>
                           <span className="text-[10px] text-text-secondary dark:text-text-secondary-dark truncate">
-                            {task.prompt || '无提示词'}
+                            {task.prompt || 'No Prompt'}
                           </span>
                         </div>
                       </div>
@@ -105,7 +105,7 @@ export default function NotificationCenter() {
                         <div className="flex items-center justify-between text-[10px]">
                           <span className="text-emerald-500 flex items-center gap-1">
                             <Loader2 size={10} className="animate-spin" />
-                            生成中...
+                            Generating...
                           </span>
                           <span className="text-text-secondary dark:text-text-secondary-dark font-medium">
                             {task.progress}%
@@ -122,14 +122,14 @@ export default function NotificationCenter() {
                     {task.status === 'done' && (
                       <div className="flex items-center gap-1.5 text-[10px] text-emerald-500">
                         <CheckCircle2 size={12} />
-                        <span>已完成</span>
+                        <span>Completed</span>
                       </div>
                     )}
                     {task.status === 'error' && (
                       <div className="flex items-center gap-1.5 text-[10px] text-red-500">
                         <AlertCircle size={12} />
                         <span className="truncate" title={task.error}>
-                          {task.error || '生成失败'}
+                          {task.error || 'Generation Failed'}
                         </span>
                       </div>
                     )}

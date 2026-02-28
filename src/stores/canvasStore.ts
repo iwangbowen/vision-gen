@@ -163,7 +163,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       type: 'text2image',
       position,
       data: {
-        label: '文生图',
+        label: 'Text to Image',
         prompt: '',
         status: 'idle',
         gridSize: '1x1',
@@ -183,7 +183,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       type: 'image2image',
       position,
       data: {
-        label: label || '图生图',
+        label: label || 'Image to Image',
         prompt: '',
         status: 'idle',
         gridSize: '1x1',
@@ -205,7 +205,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       type: 'image',
       position,
       data: {
-        label: label || '图片',
+        label: label || 'Image',
         image,
       },
     };
@@ -221,7 +221,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       type: 'multiInput',
       position,
       data: {
-        label: '多图融合',
+        label: 'Multi-Input Fusion',
         prompt: '',
         status: 'idle',
         gridSize: '1x1',
@@ -290,7 +290,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       type: 'grid',
       position,
       data: {
-        label: `宫格 ${gridSize}`,
+        label: `Grid ${gridSize}`,
         gridSize,
         cells,
       },
@@ -337,7 +337,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       type: 'image2image',
       position: newNodePosition,
       data: {
-        label: prompt || '生成中...',
+        label: prompt || 'Generating...',
         prompt: '',
         sourceImage: '', // Empty source image initially, will be set after generation
         status: 'generating',
@@ -407,7 +407,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
       // Update the result node with the generated image as sourceImage
       updateNodeData(newNodeId, {
-        label: prompt || '生成的图片',
+        label: prompt || 'Generated Image',
         sourceImage: image,
         status: 'idle',
       } as Partial<Image2ImageData>);
@@ -440,7 +440,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
             // Update the result node with the generated image as sourceImage
             updateNodeData(newNodeId, {
-              label: prompt || '生成的图片',
+              label: prompt || 'Generated Image',
               sourceImage: image,
               status: 'idle',
             } as Partial<Image2ImageData>);
@@ -458,7 +458,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       } else {
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
-        alert(`生成图片失败: ${errorMessage}`);
+        alert(`Image generation failed: ${errorMessage}`);
         updateNodeData(nodeId, { status: 'idle' } as Partial<GenerativeNodeData>);
 
         // Remove the placeholder node and edge on error
@@ -543,7 +543,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       } else {
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
-        alert(`重绘图片失败: ${errorMessage}`);
+        alert(`Inpainting failed: ${errorMessage}`);
         updateNodeData(nodeId, { status: 'idle' } as Partial<AppImageData>);
       }
     }
@@ -557,7 +557,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const newNodeId = get().addImage2ImageNode(
       { x: node.position.x + 250, y: node.position.y },
       '', // No source image yet — will be set after generation
-      `${label} (重绘)`
+      `${label} (Inpaint)`
     );
 
     get().updateNodeData(newNodeId, { status: 'generating' } as Partial<Image2ImageData>);
@@ -636,7 +636,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       } else {
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
-        alert(`重绘图片失败: ${errorMessage}`);
+        alert(`Inpainting failed: ${errorMessage}`);
         // Remove the placeholder node on error
         set((state) => ({
           nodes: state.nodes.filter(n => n.id !== newNodeId),
@@ -653,14 +653,14 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const newNodeId = get().addImage2ImageNode(
       { x: node.position.x + 280, y: node.position.y },
       '',
-      `${label} (扩图 ${targetAspectRatio})`
+      `${label} (Outpaint ${targetAspectRatio})`
     );
 
     get().updateNodeData(newNodeId, { status: 'generating' } as Partial<Image2ImageData>);
     get().onConnect({ source: sourceNodeId, target: newNodeId, sourceHandle: null, targetHandle: null });
 
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-    useTaskStore.getState().addTask({ id: taskId, nodeId: newNodeId, type: 'image2image', prompt: '扩图' });
+    useTaskStore.getState().addTask({ id: taskId, nodeId: newNodeId, type: 'image2image', prompt: 'Outpaint' });
 
     const progressInterval = setInterval(() => {
       const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
@@ -707,7 +707,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       } else {
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
-        alert(`扩图失败: ${errorMessage}`);
+        alert(`Outpainting failed: ${errorMessage}`);
         set((state) => ({
           nodes: state.nodes.filter(n => n.id !== newNodeId),
           edges: state.edges.filter(e => e.target !== newNodeId),
@@ -725,7 +725,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const newNodeId = get().addImage2ImageNode(
       { x: node.position.x + 280, y: node.position.y },
       '',
-      `${label} (变清晰)`
+      `${label} (Enhance)`
     );
     if (settings) {
       get().updateNodeData(newNodeId, {
@@ -739,7 +739,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     get().onConnect({ source: sourceNodeId, target: newNodeId, sourceHandle: null, targetHandle: null });
 
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-    useTaskStore.getState().addTask({ id: taskId, nodeId: newNodeId, type: 'image2image', prompt: '变清晰' });
+    useTaskStore.getState().addTask({ id: taskId, nodeId: newNodeId, type: 'image2image', prompt: 'Enhance' });
 
     const progressInterval = setInterval(() => {
       const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
@@ -771,7 +771,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       } else {
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
-        alert(`变清晰失败: ${errorMessage}`);
+        alert(`Enhancement failed: ${errorMessage}`);
         set((state) => ({
           nodes: state.nodes.filter(n => n.id !== newNodeId),
           edges: state.edges.filter(e => e.target !== newNodeId),
@@ -789,7 +789,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const newNodeId = get().addImage2ImageNode(
       { x: node.position.x + 280, y: node.position.y },
       '',
-      `${label} (去水印)`
+      `${label} (Remove Watermark)`
     );
     if (settings) {
       get().updateNodeData(newNodeId, {
@@ -803,7 +803,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     get().onConnect({ source: sourceNodeId, target: newNodeId, sourceHandle: null, targetHandle: null });
 
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-    useTaskStore.getState().addTask({ id: taskId, nodeId: newNodeId, type: 'image2image', prompt: '去水印' });
+    useTaskStore.getState().addTask({ id: taskId, nodeId: newNodeId, type: 'image2image', prompt: 'Remove Watermark' });
 
     const progressInterval = setInterval(() => {
       const task = useTaskStore.getState().tasks.find(t => t.id === taskId);
@@ -835,7 +835,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       } else {
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
-        alert(`去水印失败: ${errorMessage}`);
+        alert(`Watermark removal failed: ${errorMessage}`);
         set((state) => ({
           nodes: state.nodes.filter(n => n.id !== newNodeId),
           edges: state.edges.filter(e => e.target !== newNodeId),
@@ -889,7 +889,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       } else {
         clearInterval(progressInterval);
         useTaskStore.getState().updateTask(taskId, { status: 'error', error: errorMessage, endTime: Date.now() });
-        alert(`镜头角度生成失败: ${errorMessage}`);
+        alert(`Camera angle generation failed: ${errorMessage}`);
         set((state) => ({
           nodes: state.nodes.filter(n => n.id !== newNodeId),
           edges: state.edges.filter(e => e.target !== newNodeId),
@@ -917,7 +917,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         y: startY + Math.floor(idx / size) * spacing,
       },
       data: {
-        label: `分镜 ${cell.row + 1}-${cell.col + 1}`,
+        label: `Shot ${cell.row + 1}-${cell.col + 1}`,
         image: cell.image,
       },
     }));
@@ -1022,7 +1022,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       type: 'splitGroup',
       position: { x: node.position.x + 300, y: node.position.y },
       data: {
-        label: `切分组 ${gridSize}`,
+        label: `Split Group ${gridSize}`,
       },
       style: { width: groupWidth, height: groupHeight },
     } as AppNode;
@@ -1038,7 +1038,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       parentId: groupId,
       extent: 'parent' as const,
       data: {
-        label: `分镜 ${Math.floor(idx / size) + 1}-${(idx % size) + 1}`,
+        label: `Shot ${Math.floor(idx / size) + 1}-${(idx % size) + 1}`,
         sourceImage: imgSrc,
         prompt: '',
         status: 'idle',

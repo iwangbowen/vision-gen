@@ -69,7 +69,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
       const newNodeId = store.addImage2ImageNode(
         { x: node.position.x + 250, y: node.position.y },
         croppedImageUrl,
-        `${nodeData.label || '参考图'} (裁剪)`
+        `${nodeData.label || 'Reference Image'} (Crop)`
       );
       store.onConnect({
         source: id,
@@ -85,31 +85,31 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
     const node = store.nodes.find(n => n.id === id);
     if (node && nodeData.generatedImage) {
       // Generate repaint, then create an Image2Image node with the result as sourceImage
-      store.generateRepaintToImage2Image(id, nodeData.generatedImage, maskImageUrl, prompt, nodeData.label || '融合结果', options);
+      store.generateRepaintToImage2Image(id, nodeData.generatedImage, maskImageUrl, prompt, nodeData.label || 'Fusion Result', options);
     }
   };
 
   const handleOutpaintComplete = (aspectRatio: string) => {
     if (nodeData.generatedImage) {
-      useCanvasStore.getState().generateOutpaint(id, nodeData.generatedImage, aspectRatio, nodeData.label || '融合结果');
+      useCanvasStore.getState().generateOutpaint(id, nodeData.generatedImage, aspectRatio, nodeData.label || 'Fusion Result');
     }
   };
 
   const handleEnhanceComplete = (settings?: GenerativeSettingsValues) => {
     if (nodeData.generatedImage) {
-      useCanvasStore.getState().generateEnhance(id, nodeData.generatedImage, nodeData.label || '融合结果', settings);
+      useCanvasStore.getState().generateEnhance(id, nodeData.generatedImage, nodeData.label || 'Fusion Result', settings);
     }
   };
 
   const handleRemoveWatermarkComplete = (settings?: GenerativeSettingsValues) => {
     if (nodeData.generatedImage) {
-      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.generatedImage, nodeData.label || '融合结果', settings);
+      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.generatedImage, nodeData.label || 'Fusion Result', settings);
     }
   };
 
   const handleCameraAngleComplete = (prompt: string) => {
     if (nodeData.generatedImage) {
-      useCanvasStore.getState().generateCameraAngle(id, nodeData.generatedImage, prompt, nodeData.label || '融合结果');
+      useCanvasStore.getState().generateCameraAngle(id, nodeData.generatedImage, prompt, nodeData.label || 'Fusion Result');
     }
   };
 
@@ -134,7 +134,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
           /* Full loading state - hide all inputs during generation */
           <div className="w-full aspect-video border-b border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark flex flex-col items-center justify-center gap-2">
             <Loader2 size={28} className="animate-spin text-purple-500" />
-            <span className="text-xs text-text-secondary dark:text-text-secondary-dark">融合生成中...</span>
+            <span className="text-xs text-text-secondary dark:text-text-secondary-dark">Fusion generating...</span>
           </div>
         ) : (
           <>
@@ -144,7 +144,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
             <ImageContextMenu
               image={nodeData.generatedImage}
               sourceNodeId={id}
-              label={nodeData.label || '融合结果'}
+              label={nodeData.label || 'Fusion Result'}
               className="w-full border-b border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group overflow-hidden"
             >
               <ImageEditOverlay
@@ -166,7 +166,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
         ) : (
           <div className="p-2 border-b border-border dark:border-border-dark bg-surface-hover dark:bg-surface-hover-dark">
             <div className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1.5">
-              输入图片 ({sourceImages.length})
+              Input Images ({sourceImages.length})
             </div>
             {sourceImages.length > 0 ? (
               <div className="flex flex-wrap gap-1">
@@ -176,7 +176,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
                 key={`${id}-src-${idx}`}
                 className="w-8 h-8 rounded overflow-hidden border border-border dark:border-border-dark hover:ring-2 hover:ring-accent transition-all cursor-pointer"
                 onClick={(e) => { e.stopPropagation(); setPreviewIndex(idx); }}
-                title="点击预览"
+                title="Click to Preview"
               >
                 <img src={img} alt={`Source ${idx}`} className="w-full h-full object-cover" />
               </button>
@@ -186,15 +186,15 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setImagesExpanded(v => !v); }}
                     className="w-8 h-8 rounded bg-surface dark:bg-surface-dark border border-border dark:border-border-dark flex items-center justify-center text-[10px] text-accent hover:bg-accent/10 transition-colors font-medium"
-                    title={imagesExpanded ? '收起' : '展开全部'}
+                    title={imagesExpanded ? 'Collapse' : 'Expand All'}
                   >
-                    {imagesExpanded ? '收起' : `+${sourceImages.length - 4}`}
+                    {imagesExpanded ? 'Collapse' : `+${sourceImages.length - 4}`}
                   </button>
                 )}
               </div>
             ) : (
               <div className="text-[10px] text-text-secondary dark:text-text-secondary-dark italic py-2 text-center">
-                请连接图片节点
+                Please connect image nodes
               </div>
             )}
           </div>
@@ -206,7 +206,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
               ref={textareaRef}
               value={localPrompt}
               onChange={(e) => setLocalPrompt(e.target.value)}
-              placeholder="输入提示词..."
+              placeholder="Enter prompt..."
               rows={2}
               className="w-full pl-1.5 pr-7 py-1 text-[10px] resize-none bg-transparent text-text-primary dark:text-text-primary-dark border-none focus:outline-none placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark min-h-6 max-h-40 overflow-y-auto custom-scrollbar"
             />
@@ -214,8 +214,8 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
               type="button"
               onClick={handleGenerate}
               disabled={nodeData.status === 'generating'}
-              aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
-              title={nodeData.status === 'generating' ? '生成中' : '生成'}
+              aria-label={nodeData.status === 'generating' ? 'Generating' : 'Generate'}
+              title={nodeData.status === 'generating' ? 'Generating' : 'Generate'}
               className="absolute right-1.5 bottom-1.5 p-0.5 flex items-center justify-center rounded transition-colors text-purple-500 hover:bg-purple-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {nodeData.status === 'generating' ? (
@@ -234,7 +234,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
                 type="button"
                 className="flex items-center gap-0.5 px-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors truncate"
                 onClick={() => setShowSettingsDialog(true)}
-                title="修改生成配置"
+                title="Modify Generation Settings"
               >
                 <span>{nodeData.gridSize || '1x1'}</span>
                 <span>·</span>
@@ -260,7 +260,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
           isOpen={showSettingsDialog}
           onClose={() => setShowSettingsDialog(false)}
           onConfirm={(settings) => updateNodeData(id, settings)}
-          title="生成配置"
+          title="Generation Settings"
           initialValues={{ gridSize: nodeData.gridSize, aspectRatio: nodeData.aspectRatio, imageSize: nodeData.imageSize, style: nodeData.style }}
         />
       )}
@@ -272,7 +272,7 @@ function MultiInputNode({ id, data, selected }: NodeProps) {
         <ImagePreviewDialog
           isOpen={true}
           onClose={() => setPreviewIndex(null)}
-          images={sourceImages.map((url, i) => ({ url, label: `输入图片 ${i + 1}` }))}
+          images={sourceImages.map((url, i) => ({ url, label: `Input Images ${i + 1}` }))}
           currentIndex={previewIndex}
           onIndexChange={setPreviewIndex}
         />

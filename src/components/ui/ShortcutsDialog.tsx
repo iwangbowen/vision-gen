@@ -9,18 +9,18 @@ export default function ShortcutsDialog({ isOpen, onClose }: ShortcutsDialogProp
   if (!isOpen) return null;
 
   const shortcuts = [
-    { keys: ['Ctrl', 'Z'], description: '撤销' },
-    { keys: ['Ctrl', 'Shift', 'Z'], description: '重做' },
-    { keys: ['Ctrl', 'C'], description: '复制节点' },
-    { keys: ['Ctrl', 'X'], description: '剪切节点' },
-    { keys: ['Ctrl', 'V'], description: '粘贴节点' },
-    { keys: ['Delete'], description: '删除节点' },
-    { keys: ['Ctrl', 'B'], description: '资产面板' },
-    { keys: ['Ctrl', 'Alt', 'B'], description: '属性面板' },
-    { keys: ['Ctrl', 'Alt', 'P'], description: '轨道面板' },
-    { keys: ['Ctrl', 'Alt', 'M'], description: '小地图' },
-    { keys: ['Ctrl', 'Alt', 'T'], description: '切换主题' },
-    { keys: ['Ctrl', 'K', 'Ctrl', 'S'], description: '快捷键' },
+    { keys: ['Ctrl', 'Z'], description: 'Undo' },
+    { keys: ['Ctrl', 'Shift', 'Z'], description: 'Redo' },
+    { keys: ['Ctrl', 'C'], description: 'Copy Node' },
+    { keys: ['Ctrl', 'X'], description: 'Cut Node' },
+    { keys: ['Ctrl', 'V'], description: 'Paste Node' },
+    { keys: ['Delete'], description: 'Delete Node' },
+    { keys: ['Ctrl', 'B'], description: 'Asset Panel' },
+    { keys: ['Ctrl', 'Alt', 'B'], description: 'Property Panel' },
+    { keys: ['Ctrl', 'Alt', 'P'], description: 'Track Panel' },
+    { keys: ['Ctrl', 'Alt', 'M'], description: 'Minimap' },
+    { keys: ['Ctrl', 'Alt', 'T'], description: 'Toggle Theme' },
+    { keys: ['Ctrl', 'K', 'Ctrl', 'S'], description: 'Shortcuts' },
   ];
 
   return (
@@ -36,7 +36,7 @@ export default function ShortcutsDialog({ isOpen, onClose }: ShortcutsDialogProp
         <div className="flex items-center justify-between px-3.5 py-2 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-1.5 text-zinc-900 dark:text-zinc-100 text-xs font-semibold">
             <Keyboard size={13} />
-            <h2>快捷键</h2>
+            <h2>Shortcuts</h2>
           </div>
           <button
             onClick={onClose}

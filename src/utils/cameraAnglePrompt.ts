@@ -1,11 +1,11 @@
 /**
- * 根据方位角 (azimuth) 和仰角 (elevation) 生成摄影角度提示词
+ * Generate camera angle prompt from azimuth and elevation
  */
 
 export interface CameraAngle {
-  azimuth: number;   // -180 ~ 180, 0 = 正前方
-  elevation: number; // -90 ~ 90, 0 = 平视, 90 = 俯视
-  zoom?: number;     // 1 ~ 10, default 5 (1=远景, 10=特写)
+  azimuth: number;   // -180 ~ 180, 0 = front
+  elevation: number; // -90 ~ 90, 0 = eye level, 90 = top down
+  zoom?: number;     // 1 ~ 10, default 5 (1=wide shot, 10=close-up)
 }
 
 export interface AnglePreset {
@@ -15,14 +15,14 @@ export interface AnglePreset {
 }
 
 export const ANGLE_PRESETS: AnglePreset[] = [
-  { label: '正面平视', azimuth: 0, elevation: 0 },
-  { label: '背面', azimuth: 180, elevation: 0 },
-  { label: '左侧', azimuth: -90, elevation: 0 },
-  { label: '右侧', azimuth: 90, elevation: 0 },
-  { label: '俯视', azimuth: 0, elevation: 90 },
-  { label: '仰视', azimuth: 0, elevation: -90 },
-  { label: '鸟瞰 45°', azimuth: 0, elevation: 45 },
-  { label: '低角度', azimuth: 0, elevation: -30 },
+  { label: 'Front View', azimuth: 0, elevation: 0 },
+  { label: 'Rear View', azimuth: 180, elevation: 0 },
+  { label: 'Left Side', azimuth: -90, elevation: 0 },
+  { label: 'Right Side', azimuth: 90, elevation: 0 },
+  { label: 'Top Down', azimuth: 0, elevation: 90 },
+  { label: 'Bottom Up', azimuth: 0, elevation: -90 },
+  { label: "Bird's Eye 45°", azimuth: 0, elevation: 45 },
+  { label: 'Low Angle', azimuth: 0, elevation: -30 },
 ];
 
 function getHorizontalDescription(azimuth: number): string {

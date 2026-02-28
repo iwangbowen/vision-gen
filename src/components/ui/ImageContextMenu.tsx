@@ -90,7 +90,7 @@ export default function ImageContextMenu({ image, sourceNodeId, label, children,
               handleAddToTimeline();
             }}
             className="absolute bottom-2 right-2 p-1.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
-            title="添加到轨道"
+            title="Add to Tracks"
           >
             <ArrowDownToLine size={14} />
           </button>
@@ -112,7 +112,7 @@ export default function ImageContextMenu({ image, sourceNodeId, label, children,
               hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
           >
             <ArrowDownToLine size={14} />
-            添加到轨道
+            Add to Tracks
           </button>
           <button
             onClick={handleDownload}
@@ -121,7 +121,7 @@ export default function ImageContextMenu({ image, sourceNodeId, label, children,
               hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
           >
             <Download size={14} />
-            下载到本地
+            Download to Local
           </button>
         </div>,
         document.body

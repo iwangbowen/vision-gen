@@ -55,7 +55,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
       const newNodeId = store.addImage2ImageNode(
         { x: node.position.x + 250, y: node.position.y },
         croppedImageUrl,
-        `${nodeData.label || '参考图'} (裁剪)`
+        `${nodeData.label || 'Reference Image'} (Crop)`
       );
       store.onConnect({
         source: id,
@@ -71,31 +71,31 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
     const node = store.nodes.find(n => n.id === id);
     if (node && nodeData.sourceImage) {
       // Generate repaint, then create an Image2Image node with the result as sourceImage
-      store.generateRepaintToImage2Image(id, nodeData.sourceImage, maskImageUrl, prompt, nodeData.label || '参考图', options);
+      store.generateRepaintToImage2Image(id, nodeData.sourceImage, maskImageUrl, prompt, nodeData.label || 'Reference Image', options);
     }
   };
 
   const handleOutpaintComplete = (aspectRatio: string) => {
     if (nodeData.sourceImage) {
-      useCanvasStore.getState().generateOutpaint(id, nodeData.sourceImage, aspectRatio, nodeData.label || '参考图', nodeData.style);
+      useCanvasStore.getState().generateOutpaint(id, nodeData.sourceImage, aspectRatio, nodeData.label || 'Reference Image', nodeData.style);
     }
   };
 
   const handleEnhanceComplete = (settings?: GenerativeSettingsValues) => {
     if (nodeData.sourceImage) {
-      useCanvasStore.getState().generateEnhance(id, nodeData.sourceImage, nodeData.label || '参考图', settings ?? { style: nodeData.style });
+      useCanvasStore.getState().generateEnhance(id, nodeData.sourceImage, nodeData.label || 'Reference Image', settings ?? { style: nodeData.style });
     }
   };
 
   const handleRemoveWatermarkComplete = (settings?: GenerativeSettingsValues) => {
     if (nodeData.sourceImage) {
-      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.sourceImage, nodeData.label || '参考图', settings);
+      useCanvasStore.getState().generateRemoveWatermark(id, nodeData.sourceImage, nodeData.label || 'Reference Image', settings);
     }
   };
 
   const handleCameraAngleComplete = (prompt: string) => {
     if (nodeData.sourceImage) {
-      useCanvasStore.getState().generateCameraAngle(id, nodeData.sourceImage, prompt, nodeData.label || '参考图', nodeData.style);
+      useCanvasStore.getState().generateCameraAngle(id, nodeData.sourceImage, prompt, nodeData.label || 'Reference Image', nodeData.style);
     }
   };
 
@@ -107,7 +107,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
           /* Full loading state - hide all inputs during generation */
           <div className="w-full aspect-video border-b border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark flex flex-col items-center justify-center gap-2">
             <Loader2 size={28} className="animate-spin text-emerald-500" />
-            <span className="text-xs text-text-secondary dark:text-text-secondary-dark">重绘生成中...</span>
+            <span className="text-xs text-text-secondary dark:text-text-secondary-dark">Inpaint generating...</span>
           </div>
         ) : (
           <>
@@ -117,7 +117,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
             <ImageContextMenu
               image={nodeData.sourceImage}
               sourceNodeId={id}
-              label={nodeData.label || '参考图'}
+              label={nodeData.label || 'Reference Image'}
               className="w-full border-b border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark relative group overflow-hidden"
             >
               <ImageEditOverlay
@@ -137,7 +137,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
                     type="button"
                     onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                     className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors pointer-events-auto"
-                    title="本地上传"
+                    title="Local Upload"
                   >
                     <Upload size={10} />
                   </button>
@@ -145,7 +145,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setShowAssetPicker(true); }}
                     className="p-1.5 rounded-full bg-white/90 text-black hover:bg-white transition-colors pointer-events-auto"
-                    title="从资产库选择"
+                    title="From Asset Library"
                   >
                     <Library size={10} />
                   </button>
@@ -160,7 +160,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="p-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                title="本地上传"
+                title="Local Upload"
               >
                 <Upload size={12} />
               </button>
@@ -168,7 +168,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
                 type="button"
                 onClick={() => setShowAssetPicker(true)}
                 className="p-1.5 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
-                title="从资产库选择"
+                title="From Asset Library"
               >
                 <Library size={12} />
               </button>
@@ -197,7 +197,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
               ref={textareaRef}
               value={localPrompt}
               onChange={(e) => setLocalPrompt(e.target.value)}
-              placeholder="输入提示词..."
+              placeholder="Enter prompt..."
               rows={2}
               className="w-full pl-1.5 pr-7 py-1 text-[10px] resize-none bg-transparent text-text-primary dark:text-text-primary-dark border-none focus:outline-none placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark min-h-6 max-h-40 overflow-y-auto custom-scrollbar"
             />
@@ -205,8 +205,8 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
               type="button"
               onClick={handleGenerate}
               disabled={nodeData.status === 'generating'}
-              aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
-              title={nodeData.status === 'generating' ? '生成中' : '生成'}
+              aria-label={nodeData.status === 'generating' ? 'Generating' : 'Generate'}
+              title={nodeData.status === 'generating' ? 'Generating' : 'Generate'}
               className="absolute right-1.5 bottom-1.5 p-0.5 flex items-center justify-center rounded transition-colors text-emerald-500 hover:bg-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {nodeData.status === 'generating' ? (
@@ -225,7 +225,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
                 type="button"
                 className="flex items-center gap-0.5 px-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors truncate"
                 onClick={() => setShowSettingsDialog(true)}
-                title="修改生成配置"
+                title="Modify Generation Settings"
               >
                 <span>{nodeData.gridSize || '1x1'}</span>
                 <span>·</span>
@@ -251,7 +251,7 @@ function Image2ImageNode({ id, data, selected }: NodeProps) {
           isOpen={showSettingsDialog}
           onClose={() => setShowSettingsDialog(false)}
           onConfirm={(settings) => updateNodeData(id, settings)}
-          title="生成配置"
+          title="Generation Settings"
           initialValues={{ gridSize: nodeData.gridSize, aspectRatio: nodeData.aspectRatio, imageSize: nodeData.imageSize, style: nodeData.style }}
         />
       )}

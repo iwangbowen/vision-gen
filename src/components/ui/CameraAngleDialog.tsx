@@ -165,21 +165,21 @@ export default function CameraAngleDialog({ isOpen, imageUrl, onClose, onConfirm
             <button
               onClick={() => setAngle({ azimuth: 45, elevation: -30, zoom: 5 })}
               className="p-1.5 rounded-md hover:bg-white/10 transition-colors"
-              title="重置"
+              title="Reset"
             >
               <RotateCcw size={13} className="text-white/60" />
             </button>
             <button
               onClick={() => setAngle(p => ({ ...p }))}
               className="p-1.5 rounded-md hover:bg-white/10 transition-colors"
-              title="预设"
+              title="Presets"
             >
               <Globe size={13} className="text-white/60" />
             </button>
             <button
               onClick={() => onConfirm(prompt)}
               className="p-1.5 rounded-md bg-accent hover:bg-accent/90 transition-colors"
-              title="应用并生成"
+              title="Apply & Generate"
             >
               <Check size={13} className="text-white" />
             </button>
@@ -259,12 +259,12 @@ export default function CameraAngleDialog({ isOpen, imageUrl, onClose, onConfirm
 
           {/* Bottom hint */}
           <div className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-white/40">
-            拖拽锚点调整镜头位置和角度
+            Drag anchor to adjust camera position and angle
           </div>
 
           {/* Zoom slider (vertical, right side) */}
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1">
-            <span className="text-[9px] text-white/40 font-mono">远</span>
+            <span className="text-[9px] text-white/40 font-mono">Far</span>
             <input
               type="range"
               min={1} max={10} step={1}
@@ -273,7 +273,7 @@ export default function CameraAngleDialog({ isOpen, imageUrl, onClose, onConfirm
               className="h-28 appearance-none accent-accent cursor-pointer"
               style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
             />
-            <span className="text-[9px] text-white/40 font-mono">近</span>
+            <span className="text-[9px] text-white/40 font-mono">Near</span>
           </div>
         </div>
 

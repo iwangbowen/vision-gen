@@ -18,7 +18,7 @@ function ImageNode({ id, data, selected }: NodeProps) {
       const newNodeId = store.addImage2ImageNode(
         { x: node.position.x + 200, y: node.position.y },
         croppedImageUrl,
-        `${nodeData.label} (裁剪)`
+        `${nodeData.label} (Crop)`
       );
       store.onConnect({
         source: id,
@@ -74,7 +74,7 @@ function ImageNode({ id, data, selected }: NodeProps) {
         {nodeData.status === 'generating' ? (
           <div className="w-full aspect-square rounded-lg border border-dashed border-border dark:border-border-dark bg-canvas-bg dark:bg-canvas-bg-dark flex flex-col items-center justify-center gap-2 text-text-secondary dark:text-text-secondary-dark">
             <Loader2 size={24} className="animate-spin text-accent" />
-            <span className="text-xs">生成中...</span>
+            <span className="text-xs">Generating...</span>
           </div>
         ) : (
           <ImageContextMenu

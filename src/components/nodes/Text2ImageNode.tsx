@@ -38,7 +38,7 @@ function Text2ImageNode({ id, data, selected }: NodeProps) {
             ref={textareaRef}
             value={localPrompt}
             onChange={(e) => setLocalPrompt(e.target.value)}
-            placeholder="描述想要生成的画面..."
+            placeholder="Describe the scene you want to generate..."
             rows={6}
             className="w-full pl-1.5 pr-7 py-1 text-[10px] resize-none
               bg-transparent
@@ -52,8 +52,8 @@ function Text2ImageNode({ id, data, selected }: NodeProps) {
             type="button"
             onClick={handleGenerate}
             disabled={nodeData.status === 'generating'}
-            aria-label={nodeData.status === 'generating' ? '生成中' : '生成'}
-            title={nodeData.status === 'generating' ? '生成中' : '生成'}
+            aria-label={nodeData.status === 'generating' ? 'Generating' : 'Generate'}
+            title={nodeData.status === 'generating' ? 'Generating' : 'Generate'}
             className="absolute right-1.5 bottom-1.5 p-0.5 flex items-center justify-center rounded
               transition-colors
               text-accent hover:bg-accent/10
@@ -75,7 +75,7 @@ function Text2ImageNode({ id, data, selected }: NodeProps) {
               type="button"
               className="flex items-center gap-0.5 px-0.5 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-[9px] text-text-secondary dark:text-text-secondary-dark transition-colors truncate"
               onClick={() => setShowSettingsDialog(true)}
-              title="修改生成配置"
+              title="Modify Generation Settings"
             >
               <span>{nodeData.gridSize || '1x1'}</span>
               <span>·</span>
@@ -98,7 +98,7 @@ function Text2ImageNode({ id, data, selected }: NodeProps) {
           isOpen={showSettingsDialog}
           onClose={() => setShowSettingsDialog(false)}
           onConfirm={(settings) => updateNodeData(id, settings)}
-          title="生成配置"
+          title="Generation Settings"
           initialValues={{ gridSize: nodeData.gridSize, aspectRatio: nodeData.aspectRatio, imageSize: nodeData.imageSize, style: nodeData.style }}
         />
       )}

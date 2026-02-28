@@ -54,7 +54,7 @@ export default function Toolbar({
           className="p-1.5 rounded-md transition-colors
             hover:bg-surface-hover dark:hover:bg-surface-hover-dark
             text-text-secondary dark:text-text-secondary-dark"
-          title={leftPanelOpen ? '收起资产面板' : '展开资产面板'}
+          title={leftPanelOpen ? 'Collapse Asset Panel' : 'Expand Asset Panel'}
         >
           {leftPanelOpen ? <PanelLeftClose size={15} /> : <PanelLeftOpen size={15} />}
         </button>
@@ -77,7 +77,7 @@ export default function Toolbar({
             bg-accent/10 text-accent hover:bg-accent/20"
         >
           <Type size={13} />
-          <span className="hidden sm:inline">文生图</span>
+          <span className="hidden sm:inline">Text to Image</span>
         </button>
 
         <button
@@ -86,7 +86,7 @@ export default function Toolbar({
             bg-accent/10 text-accent hover:bg-accent/20"
         >
           <ImageIcon size={13} />
-          <span className="hidden sm:inline">图生图</span>
+          <span className="hidden sm:inline">Image to Image</span>
         </button>
 
         <button
@@ -95,7 +95,7 @@ export default function Toolbar({
             bg-purple-500/10 text-purple-500 hover:bg-purple-500/20"
         >
           <Layers size={13} />
-          <span className="hidden sm:inline">多图融合</span>
+          <span className="hidden sm:inline">Multi-Input Fusion</span>
         </button>
 
         <div className="w-px h-4 bg-border dark:bg-border-dark mx-0.5" />
@@ -107,7 +107,7 @@ export default function Toolbar({
             hover:bg-surface-hover dark:hover:bg-surface-hover-dark
             text-text-secondary dark:text-text-secondary-dark
             disabled:opacity-30 disabled:cursor-not-allowed"
-          title="撤销 (Ctrl+Z)"
+          title="Undo (Ctrl+Z)"
         >
           <Undo2 size={15} />
         </button>
@@ -119,7 +119,7 @@ export default function Toolbar({
             hover:bg-surface-hover dark:hover:bg-surface-hover-dark
             text-text-secondary dark:text-text-secondary-dark
             disabled:opacity-30 disabled:cursor-not-allowed"
-          title="重做 (Ctrl+Shift+Z)"
+          title="Redo (Ctrl+Shift+Z)"
         >
           <Redo2 size={15} />
         </button>
@@ -136,7 +136,7 @@ export default function Toolbar({
           className="p-1.5 rounded-md transition-colors
             hover:bg-surface-hover dark:hover:bg-surface-hover-dark
             text-text-secondary dark:text-text-secondary-dark"
-          title={rightPanelOpen ? '收起属性面板' : '展开属性面板'}
+          title={rightPanelOpen ? 'Collapse Property Panel' : 'Expand Property Panel'}
         >
           {rightPanelOpen ? <PanelRightClose size={15} /> : <PanelRightOpen size={15} />}
         </button>

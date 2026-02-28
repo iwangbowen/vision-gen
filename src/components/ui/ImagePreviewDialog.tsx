@@ -96,7 +96,7 @@ export default function ImagePreviewDialog({
       <button
         onClick={onClose}
         className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-10"
-        aria-label="关闭预览"
+        aria-label="ClosePreview"
       >
         <X size={24} />
       </button>
@@ -106,7 +106,7 @@ export default function ImagePreviewDialog({
         <button
           onClick={(e) => { e.stopPropagation(); goPrev(); }}
           className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-10"
-          aria-label="上一张"
+          aria-label="Previous"
         >
           <ChevronLeft size={28} />
         </button>
@@ -117,7 +117,7 @@ export default function ImagePreviewDialog({
         <button
           onClick={(e) => { e.stopPropagation(); goNext(); }}
           className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-10"
-          aria-label="下一张"
+          aria-label="Next"
         >
           <ChevronRight size={28} />
         </button>
@@ -148,10 +148,10 @@ export default function ImagePreviewDialog({
           <button
             onClick={() => setAutoPlay(!autoPlay)}
             className="flex items-center gap-1 hover:text-accent transition-colors"
-            aria-label={autoPlay ? '停止自动播放' : '开始自动播放'}
+            aria-label={autoPlay ? 'Stop Autoplay' : 'Start Autoplay'}
           >
             {autoPlay ? <Pause size={14} /> : <Play size={14} />}
-            <span>{autoPlay ? '暂停' : '播放'}</span>
+            <span>{autoPlay ? 'Pause' : 'Play'}</span>
           </button>
 
           {/* Interval selector */}

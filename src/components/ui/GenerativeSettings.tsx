@@ -33,7 +33,7 @@ export default function GenerativeSettings({ gridSize, aspectRatio, imageSize, s
       {/* Grid size selector */}
       <div>
         <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1">
-          生成规格
+          Generation Specs
         </p>
         <div className="flex gap-1 flex-wrap">
           {GRID_OPTIONS.map((opt) => (
@@ -51,7 +51,7 @@ export default function GenerativeSettings({ gridSize, aspectRatio, imageSize, s
       {/* Aspect Ratio selector */}
       <div>
         <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1">
-          画面比例
+          Aspect Ratio
         </p>
         <div className="flex gap-1 flex-wrap">
           {ASPECT_RATIO_OPTIONS.map((opt) => (
@@ -69,7 +69,7 @@ export default function GenerativeSettings({ gridSize, aspectRatio, imageSize, s
       {/* Image Size selector */}
       <div>
         <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1">
-          图片尺寸
+          Image Size
         </p>
         <div className="flex gap-1 flex-wrap">
           {IMAGE_SIZE_OPTIONS.map((opt) => (
@@ -87,7 +87,7 @@ export default function GenerativeSettings({ gridSize, aspectRatio, imageSize, s
       {/* Image Style selector */}
       <div>
         <p className="text-[10px] text-text-secondary dark:text-text-secondary-dark mb-1">
-          画面风格
+          Image Style
         </p>
         <div className="flex gap-1 flex-wrap">
           {IMAGE_STYLE_OPTIONS.map((opt) => (

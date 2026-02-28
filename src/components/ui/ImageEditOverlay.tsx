@@ -132,7 +132,7 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
           <div
             role="toolbar"
-            aria-label="图片编辑工具栏"
+            aria-label="Image Editing Toolbar"
             className="fixed flex items-center justify-center gap-1 p-1.5 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max"
             style={{
               top: `${toolbarPosition.top}px`,
@@ -145,18 +145,18 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
           {[
             {
               icon: <Eye size={14} />,
-              label: '预览',
+              label: 'Preview',
               action: 'preview',
               onClick: () => {
                 setIsPreviewDialogOpen(true);
                 setShowToolbar(false);
               }
             },
-            { icon: <Crop size={14} />, label: '裁剪', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
-            { icon: <Paintbrush size={14} />, label: '重绘', action: 'repaint', onClick: () => setIsRepaintDialogOpen(true) },
+            { icon: <Crop size={14} />, label: 'Crop', action: 'crop', onClick: () => setIsCropDialogOpen(true) },
+            { icon: <Paintbrush size={14} />, label: 'Inpaint', action: 'repaint', onClick: () => setIsRepaintDialogOpen(true) },
             ...(onOutpaintComplete ? [{
               icon: <Expand size={14} />,
-              label: '扩图',
+              label: 'Outpaint',
               action: 'outpaint',
               onClick: () => { setShowOutpaintMenu(!showOutpaintMenu); setShowSplitMenu(false); setShowMoreMenu(false); },
               hasSubmenu: true,
@@ -164,7 +164,7 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
             }] : []),
             ...(onSplitComplete ? [{
               icon: <Scissors size={14} />,
-              label: '切分',
+              label: 'Split',
               action: 'split',
               onClick: () => { setShowSplitMenu(!showSplitMenu); setShowOutpaintMenu(false); setShowMoreMenu(false); },
               hasSubmenu: true,
@@ -172,13 +172,13 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
             }] : []),
             ...(onCameraAngleComplete ? [{
               icon: <Camera size={14} />,
-              label: '镜头角度',
+              label: 'Camera Angle',
               action: 'cameraAngle',
               onClick: () => { setIsCameraAngleDialogOpen(true); setShowToolbar(false); },
             }] : []),
             {
               icon: null,
-              label: '更多',
+              label: 'More',
               action: 'more',
               onClick: () => { setShowMoreMenu(!showMoreMenu); setShowSplitMenu(false); setShowOutpaintMenu(false); },
               hasSubmenu: true,
@@ -232,7 +232,7 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
                       }}
                       className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left"
                     >
-                      {size} 宫格
+                      {size} Grid
                     </button>
                   ))}
                 </div>
@@ -240,36 +240,36 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
 
               {tool.action === 'more' && showMoreMenu && (
                 <div className={`absolute left-1/2 -translate-x-1/2 py-1 rounded-lg bg-surface dark:bg-surface-dark border border-border dark:border-border-dark shadow-xl z-50 w-max flex flex-col ${submenuDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
-                  {/* 变清晰 - 分栏按钮 */}
+                  {/* Enhance - split button */}
                   <div className="flex items-center">
                     <button
                       onClick={(e) => { e.stopPropagation(); onEnhanceComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
                       className="flex-1 px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
-                      title="直接生成"
+                      title="Generate Now"
                     >
-                      <Sparkles size={12} />变清晰
+                      <Sparkles size={12} />Enhance
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); setEnhanceSettingsOpen(true); }}
                       className="px-2 py-1.5 text-xs text-text-secondary dark:text-text-secondary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark hover:text-accent border-l border-border dark:border-border-dark"
-                      title="配置后生成"
+                      title="Configure & Generate"
                     >
                       <SlidersHorizontal size={12} />
                     </button>
                   </div>
-                  {/* 去水印 - 分栏按钮 */}
+                  {/* Remove Watermark - split button */}
                   <div className="flex items-center">
                     <button
                       onClick={(e) => { e.stopPropagation(); onRemoveWatermarkComplete?.(); setShowMoreMenu(false); setShowToolbar(false); }}
                       className="flex-1 px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
-                      title="直接生成"
+                      title="Generate Now"
                     >
-                      <Eraser size={12} />去水印
+                      <Eraser size={12} />Remove Watermark
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); setWatermarkSettingsOpen(true); }}
                       className="px-2 py-1.5 text-xs text-text-secondary dark:text-text-secondary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark hover:text-accent border-l border-border dark:border-border-dark"
-                      title="配置后生成"
+                      title="Configure & Generate"
                     >
                       <SlidersHorizontal size={12} />
                     </button>
@@ -278,7 +278,7 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
                     onClick={(e) => { e.stopPropagation(); setShowMoreMenu(false); setShowToolbar(false); }}
                     className="px-3 py-1.5 text-xs text-text-primary dark:text-text-primary-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-left flex items-center gap-2"
                   >
-                    <Sun size={12} />灯光色调
+                    <Sun size={12} />Lighting Lighting Tone Tone
                   </button>
                 </div>
               )}
@@ -325,8 +325,8 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
         isOpen={enhanceSettingsOpen}
         onClose={() => setEnhanceSettingsOpen(false)}
         onConfirm={(settings) => onEnhanceComplete?.(settings)}
-        title="变清晰 - 生成配置"
-        confirmLabel="生成"
+        title="Enhance - Generation Settings"
+        confirmLabel="Generate"
         confirmIcon={<Sparkles size={11} />}
       />
 
@@ -334,8 +334,8 @@ export default function ImageEditOverlay({ imageUrl, nodeId, onCropComplete, onR
         isOpen={watermarkSettingsOpen}
         onClose={() => setWatermarkSettingsOpen(false)}
         onConfirm={(settings) => onRemoveWatermarkComplete?.(settings)}
-        title="去水印 - 生成配置"
-        confirmLabel="生成"
+        title="Remove Watermark - Generation Settings"
+        confirmLabel="Generate"
         confirmIcon={<Sparkles size={11} />}
       />
     </div>

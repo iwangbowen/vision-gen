@@ -38,7 +38,7 @@ export default function AssetPanel() {
       <div className="flex border-b border-border dark:border-border-dark bg-panel-bg dark:bg-panel-bg-dark">
         <button className={tabClass('assets')}>
           <Images size={12} />
-          素材库
+          Asset Library
         </button>
       </div>
 

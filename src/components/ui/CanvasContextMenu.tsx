@@ -68,14 +68,14 @@ export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuPr
               hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
           >
             <ClipboardPaste size={14} className="text-amber-500" />
-            粘贴节点 ({clipboard.nodes.length})
+            Paste Node ({clipboard.nodes.length})
           </button>
           <div className="my-1 border-t border-border dark:border-border-dark" />
         </>
       )}
 
       <div className="px-3 py-1.5 text-[10px] font-medium text-text-secondary dark:text-text-secondary-dark uppercase tracking-wider">
-        添加节点
+        Add Node
       </div>
 
       <button
@@ -85,7 +85,7 @@ export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuPr
           hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
       >
         <Type size={14} className="text-indigo-500" />
-        文生图
+        Text to Image
       </button>
 
       <button
@@ -95,7 +95,7 @@ export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuPr
           hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
       >
         <ImageIcon size={14} className="text-emerald-500" />
-        图生图
+        Image to Image
       </button>
 
       <button
@@ -105,7 +105,7 @@ export default function CanvasContextMenu({ x, y, onClose }: CanvasContextMenuPr
           hover:bg-surface-hover dark:hover:bg-surface-hover-dark"
       >
         <Layers size={14} className="text-purple-500" />
-        多图融合
+        Multi-Input Fusion
       </button>
     </div>
   );
